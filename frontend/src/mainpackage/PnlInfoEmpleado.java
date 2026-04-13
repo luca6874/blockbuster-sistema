@@ -46,7 +46,7 @@ public class PnlInfoEmpleado extends JPanel {
         crearCampo("Nombres", startX, 40, 200, card);
         crearCampo("Apellidos", startX + 220, 40, 180, card);
         crearCampo("E-mail", startX, 110, 400, card);
-        crearCampo("Contrasena", startX, 180, 300, card);
+        crearCampo("Contraseña", startX, 180, 300, card);
         crearCampo("Fecha de nacimiento", startX, 250, 150, card);
 
         JButton btnCambiar = new JButton("cambiar informacion");

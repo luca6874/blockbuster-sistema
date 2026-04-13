@@ -132,7 +132,7 @@ public class Ventana extends JFrame {
         d.setUndecorated(true); d.setSize(450, 260); d.setLocationRelativeTo(this);
         JPanel c = new JPanel(null); c.setBackground(CARD_WHITE); c.setBorder(BorderFactory.createLineBorder(ACCENT_RED, 2));
 
-        JLabel t = new JLabel("<html><center>!Atención. Debe de confirmar ser<br>personal autorizado.!</center></html>", SwingConstants.CENTER);
+        JLabel t = new JLabel("<html><center>¡Atención! Debe confirmar ser<br>personal autorizado.</center></html>", SwingConstants.CENTER);
         t.setBounds(20, 50, 410, 80); t.setFont(new Font("Arial", Font.BOLD, 16)); t.setForeground(ACCENT_RED);
         c.add(t);
 

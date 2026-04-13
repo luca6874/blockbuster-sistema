@@ -47,7 +47,7 @@ public class ViewLogin extends JPanel {
         JLabel t = new JLabel("ACCESO AL SISTEMA", SwingConstants.CENTER);
         t.setBounds(0, 20, 400, 40); t.setFont(new Font("Serif", Font.BOLD, 22)); card.add(t);
 
-        crearIn("Nombre", 80, card); crearIn("E-mail", 145, card); crearIn("Contrasena", 210, card);
+        crearIn("Nombre", 80, card); crearIn("E-mail", 145, card); crearIn("Contraseña", 210, card);
 
         chkAutorizado = new JCheckBox("Al acceder, confirmo ser personal autorizado");
         chkAutorizado.setBounds(40, 275, 320, 25); chkAutorizado.setOpaque(false);
@@ -86,7 +86,7 @@ public class ViewLogin extends JPanel {
 
     private void crearIn(String t, int y, JPanel p) {
         JLabel l = new JLabel(t); l.setBounds(40, y, 200, 20); l.setFont(new Font("Arial", Font.BOLD, 12)); p.add(l);
-        JTextField f = t.equals("Contrasena") ? new JPasswordField() : new JTextField();
+        JTextField f = t.equals("Contraseña") ? new JPasswordField() : new JTextField();
         f.setBounds(40, y + 20, 320, 25); f.setBorder(new MatteBorder(0,0,1,0, Color.BLACK));
         f.setBackground(Ventana.CARD_WHITE); p.add(f);
     }
