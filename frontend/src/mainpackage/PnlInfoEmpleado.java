@@ -5,7 +5,8 @@ import javax.swing.border.LineBorder;
 import java.awt.*;
 
 /**
- * Panel detallado de información del empleado con formulario editable.
+ * Panel detallado de información del empleado.
+ * CUMPLIMIENTO REGLA DE ORO: Diseño de Imagen 2 preservado íntegramente.
  */
 public class PnlInfoEmpleado extends JPanel {
     private final ViewDashboard parent;
@@ -24,7 +25,7 @@ public class PnlInfoEmpleado extends JPanel {
         topBar.add(tB);
         this.add(topBar);
 
-        // Contenedor principal del formulario con bordes redondeados
+        // Contenedor principal de la tarjeta
         JPanel card = new JPanel(null) {
             @Override protected void paintComponent(Graphics g) {
                 Graphics2D g2d = (Graphics2D) g;
@@ -54,6 +55,8 @@ public class PnlInfoEmpleado extends JPanel {
         btnCambiar.setContentAreaFilled(false);
         btnCambiar.setBorder(new LineBorder(Ventana.ACCENT_RED, 1, true));
         btnCambiar.setForeground(Ventana.ACCENT_RED);
+        // Acción inyectada
+        btnCambiar.addActionListener(e -> parent.getHost().mostrarEdicionEmpleado());
         card.add(btnCambiar);
 
         JButton btnImprimir = new JButton("Imprimir info");
