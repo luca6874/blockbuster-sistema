@@ -6,6 +6,8 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 /**
  * Módulo de Gestión de Clientes.
  * CUMPLIMIENTO REGLA DE ORO: Diseño fiel a Figma con todos los elementos visuales.
@@ -22,7 +24,10 @@ public class PnlGestionClientes extends JPanel {
     private JCheckBox chkFrecuentes;
     private JButton btnCrearCliente;
     private JLabel lblTotalClientes;
+    private JLabel lblTituloEstadisticas;
     private JLabel lblJuegosPendientes;
+    private PnlTotalJuego pnlTotalJuego;
+    private PnlResumenCliente pnlResumenCliente;
 
     public PnlGestionClientes(ViewDashboard parent) {
         this.parent = parent;
@@ -173,25 +178,47 @@ public class PnlGestionClientes extends JPanel {
         panel.setBounds(660, 0, 270, 340);
         
         // Título
-        JLabel lblTitulo = new JLabel("Resumen del cliente");
-        lblTitulo.setBounds(0, 0, 250, 25);
-        lblTitulo.setFont(new Font("Arial", Font.BOLD, 14));
-        lblTitulo.setForeground(Color.BLACK);
-        panel.add(lblTitulo);
+        lblTituloEstadisticas = new JLabel("Total juegos (lapso 6 meses)");
+        lblTituloEstadisticas.setBounds(0, 0, 250, 25);
+        lblTituloEstadisticas.setFont(new Font("Arial", Font.BOLD, 14));
+        lblTituloEstadisticas.setForeground(Color.BLACK);
+        panel.add(lblTituloEstadisticas);
         
         // Área vacía para el panel externo
         JPanel areaVacia = new JPanel(null);
         areaVacia.setBackground(Color.WHITE);
         areaVacia.setBounds(0, 40, 250, 300);
         
-        // Llamar al panel externo PnlResumenCliente
-        PnlResumenCliente pnlResumen = new PnlResumenCliente();
-        pnlResumen.setBounds(0, 0, 250, 320);
-        areaVacia.add(pnlResumen);
+        // Panel inicial de estadísticas
+        pnlTotalJuego = new PnlTotalJuego();
+        pnlTotalJuego.setBounds(0, 0, 250, 200);
+        areaVacia.add(pnlTotalJuego);
+
+        // Panel de resumen del cliente oculto al inicio
+        pnlResumenCliente = new PnlResumenCliente();
+        pnlResumenCliente.setBounds(0, 0, 250, 300);
+        pnlResumenCliente.setVisible(false);
+        areaVacia.add(pnlResumenCliente);
         
         panel.add(areaVacia);
         
         return panel;
+    }
+    
+    private void mostrarPanelTotalJuego() {
+        if (pnlTotalJuego != null && pnlResumenCliente != null) {
+            pnlTotalJuego.setVisible(true);
+            pnlResumenCliente.setVisible(false);
+            lblTituloEstadisticas.setText("Total juegos (lapso 6 meses)");
+        }
+    }
+    
+    private void mostrarPanelResumenCliente() {
+        if (pnlTotalJuego != null && pnlResumenCliente != null) {
+            pnlTotalJuego.setVisible(false);
+            pnlResumenCliente.setVisible(true);
+            lblTituloEstadisticas.setText("Resumen del cliente");
+        }
     }
     
     private JPanel createPanelInferior() {
@@ -399,6 +426,15 @@ public class PnlGestionClientes extends JPanel {
         tablaClientes.setShowVerticalLines(false);
         tablaClientes.setGridColor(new Color(235, 235, 235));
         tablaClientes.setFont(new Font("Arial", Font.PLAIN, 12));
+        tablaClientes.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int row = tablaClientes.rowAtPoint(e.getPoint());
+                if (row >= 0) {
+                    mostrarPanelResumenCliente();
+                }
+            }
+        });
         
         // Renderizador para la columna de acciones
         tablaClientes.getColumnModel().getColumn(5).setCellRenderer(new TableCellRenderer() {

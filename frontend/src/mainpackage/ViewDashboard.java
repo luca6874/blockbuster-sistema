@@ -61,8 +61,18 @@ public class ViewDashboard extends JPanel {
         });
         sidebar.add(pClientes);
 
+        JPanel pVideojuegos = crearItemSidebar("Videojuegos", null, 130);
+        pVideojuegos.addMouseListener(new MouseAdapter() {
+            @Override public void mouseClicked(MouseEvent e) {
+                itemPanelActual = pVideojuegos;
+                resaltarItem(pVideojuegos);
+                setContenido(new PnlVideojuegos(ViewDashboard.this));
+            }
+        });
+        sidebar.add(pVideojuegos);
+
         // --- BOTONES INFERIORES ---
-        pPerfil = crearItemSidebar("Perfil", "/frontend/src/images/iconUser1.png", 420);
+        pPerfil = crearItemSidebar("Perfil", "/frontend/src/images/iconUser1.png", 470);
         pPerfil.addMouseListener(new MouseAdapter() {
             @Override public void mouseClicked(MouseEvent e) {
                 itemPanelActual = pPerfil;
@@ -72,7 +82,7 @@ public class ViewDashboard extends JPanel {
         });
         sidebar.add(pPerfil);
 
-        JPanel pAyuda = crearItemSidebar("Ayuda y preguntas", "/frontend/src/images/iconSettings.png", 465);
+        JPanel pAyuda = crearItemSidebar("Ayuda y preguntas", "/frontend/src/images/iconSettings.png", 515);
         pAyuda.addMouseListener(new MouseAdapter() {
             @Override public void mouseClicked(MouseEvent e) {
                 resaltarItem(pAyuda);
@@ -81,7 +91,7 @@ public class ViewDashboard extends JPanel {
         });
         sidebar.add(pAyuda);
 
-        JPanel pSalir = crearItemSidebar("Salir", "/frontend/src/images/iconExit1.png", 510);
+        JPanel pSalir = crearItemSidebar("Salir", "/frontend/src/images/iconExit1.png", 560);
         pSalir.addMouseListener(new MouseAdapter() {
             @Override public void mouseClicked(MouseEvent e) {
                 resaltarItem(pSalir);

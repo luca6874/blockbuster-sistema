@@ -13,8 +13,8 @@ public class PnlResumenCliente extends JPanel {
     public PnlResumenCliente() {
         this.setLayout(null);
         this.setBackground(Color.WHITE);
-        this.setPreferredSize(new Dimension(250, 320));
-        this.setSize(250, 320);
+        this.setPreferredSize(new Dimension(250, 300));
+        this.setSize(250, 300);
         this.setBorder(BorderFactory.createCompoundBorder(
                 new LineBorder(new Color(220, 220, 220), 1, true),
                 BorderFactory.createEmptyBorder(10, 10, 10, 10)
