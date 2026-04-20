@@ -1,6 +1,7 @@
 package frontend.src.mainpackage;
 
 import javax.swing.*;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
@@ -248,13 +249,21 @@ public class PnlVideojuegos extends JPanel {
         };
 
         tablaVideojuegos = new JTable(modelo);
-        tablaVideojuegos.setRowHeight(35);
+        tablaVideojuegos.setRowHeight(55);
         tablaVideojuegos.setSelectionBackground(new Color(152, 33, 54, 40));
         tablaVideojuegos.setSelectionForeground(Color.BLACK);
         tablaVideojuegos.setShowVerticalLines(false);
         tablaVideojuegos.setGridColor(new Color(235, 235, 235));
         tablaVideojuegos.setFont(new Font("Arial", Font.PLAIN, 12));
         tablaVideojuegos.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        tablaVideojuegos.getColumnModel().getColumn(0).setPreferredWidth(180);
+        tablaVideojuegos.getColumnModel().getColumn(0).setCellRenderer(new TituloTableRenderer());
+        tablaVideojuegos.getColumnModel().getColumn(1).setPreferredWidth(100);
+        tablaVideojuegos.getColumnModel().getColumn(2).setPreferredWidth(90);
+        tablaVideojuegos.getColumnModel().getColumn(3).setPreferredWidth(70);
+        tablaVideojuegos.getColumnModel().getColumn(4).setPreferredWidth(70);
+        tablaVideojuegos.getColumnModel().getColumn(5).setPreferredWidth(50);
 
         tablaVideojuegos.addMouseListener(new MouseAdapter() {
             @Override
@@ -270,7 +279,7 @@ public class PnlVideojuegos extends JPanel {
         header.setBackground(Ventana.MAROON_BG);
         header.setForeground(Color.WHITE);
         header.setFont(new Font("Arial", Font.BOLD, 12));
-        header.setPreferredSize(new Dimension(0, 35));
+        header.setPreferredSize(new Dimension(0, 40));
         header.setReorderingAllowed(false);
 
         mostrarDetalle(0);
@@ -300,6 +309,62 @@ public class PnlVideojuegos extends JPanel {
             }
         } catch (Exception ex) {
             lblDetalleImagen.setIcon(null);
+        }
+    }
+
+    private class TituloTableRenderer extends JPanel implements TableCellRenderer {
+        private JLabel lblImagen;
+        private JLabel lblTitulo;
+        private JLabel lblAnio;
+
+        public TituloTableRenderer() {
+            setLayout(null);
+            setOpaque(true);
+
+            lblImagen = new JLabel();
+            lblImagen.setBounds(5, 8, 40, 40);
+            add(lblImagen);
+
+            lblTitulo = new JLabel();
+            lblTitulo.setFont(new Font("Arial", Font.BOLD, 12));
+            lblTitulo.setBounds(50, 8, 120, 18);
+            lblTitulo.setForeground(Color.BLACK);
+            add(lblTitulo);
+
+            lblAnio = new JLabel();
+            lblAnio.setFont(new Font("Arial", Font.PLAIN, 10));
+            lblAnio.setBounds(50, 28, 120, 15);
+            lblAnio.setForeground(new Color(100, 100, 100));
+            add(lblAnio);
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            if (row >= 0 && row < datosVideojuegos.length) {
+                String[] fila = datosVideojuegos[row];
+                lblTitulo.setText(fila[0]);
+                lblAnio.setText("(" + fila[8] + ")");
+
+                try {
+                    URL url = getClass().getResource("/frontend/src/images/" + fila[6]);
+                    if (url != null) {
+                        Image img = new ImageIcon(url).getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
+                        lblImagen.setIcon(new ImageIcon(img));
+                    } else {
+                        lblImagen.setIcon(null);
+                    }
+                } catch (Exception ex) {
+                    lblImagen.setIcon(null);
+                }
+            }
+
+            if (isSelected) {
+                setBackground(new Color(152, 33, 54, 40));
+            } else {
+                setBackground(Color.WHITE);
+            }
+
+            return this;
         }
     }
 }
