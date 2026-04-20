@@ -9,6 +9,9 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Módulo de Videojuegos.
@@ -29,7 +32,7 @@ public class PnlVideojuegos extends JPanel {
     private JLabel lblDetallePuntos;
     private JLabel lblDetalleStock;
     private JLabel lblDetalleImagen;
-    private String[][] datosVideojuegos;
+    private List<String[]> datosVideojuegos;
     private int filaSeleccionada = 0;
 
     public PnlVideojuegos(ViewDashboard parent) {
@@ -208,12 +211,18 @@ public class PnlVideojuegos extends JPanel {
         btnEditar.setBounds(20, 360, 115, 28);
         btnEditar.addActionListener(e -> {
             parent.getHost().setOscurecer(true);
-            new DlgEdicionVideojuego(parent.getHost(), datosVideojuegos[filaSeleccionada]).setVisible(true);
+            if (filaSeleccionada >= 0 && filaSeleccionada < datosVideojuegos.size()) {
+                new DlgEdicionVideojuego(parent.getHost(), datosVideojuegos.get(filaSeleccionada)).setVisible(true);
+            }
         });
         panel.add(btnEditar);
 
         JButton btnEliminar = createActionButton("Eliminar juego", new Color(231, 76, 60));
         btnEliminar.setBounds(145, 360, 115, 28);
+        btnEliminar.addActionListener(e -> {
+            parent.getHost().setOscurecer(true);
+            new DlgConfirmarEliminacionVideojuego(parent.getHost(), datosVideojuegos.get(filaSeleccionada), this::eliminarVideojuegoSeleccionado).setVisible(true);
+        });
         panel.add(btnEliminar);
 
         return panel;
@@ -240,16 +249,16 @@ public class PnlVideojuegos extends JPanel {
 
     private void initTablaVideojuegos() {
         String[] columnas = {"Título", "Género", "Clasificación", "Renta", "Compra", "Puntos"};
-        datosVideojuegos = new String[][]{
+        datosVideojuegos = new ArrayList<>(Arrays.asList(new String[][]{
             {"The Evil Within", "Acción/Aventura", "M (Mature)", "$75.00", "$200.00", "10", "caratulaGame5.png", "Xbox 360", "2014", "Venta/Renta"},
             {"Silent Hill", "Survival Horror", "M (Mature)", "$75.00", "$200.00", "10", "caratulagame2.png", "PS5", "2001", "Venta/Renta"},
             {"Assassin's Creed IV", "Acción/Disparo", "M (Mature)", "$65.00", "$180.00", "8", "caratulaGame3.png", "PS4", "2013", "Venta/Renta"},
             {"The Last of Us", "Aventura/Survival", "M (Mature)", "$80.00", "$220.00", "12", "caratulaGame4.png", "PS3", "2013", "Venta/Renta"},
             {"Halo 3 ODST", "Acción/Disparo", "M (Mature)", "$75.00", "$200.00", "10", "caratulagame2.png", "Xbox 360", "2009", "Venta/Renta"},
             {"God of War", "Acción/Aventura", "M (Mature)", "$85.00", "$230.00", "15", "caratulaGame1.png", "PS5", "2018", "Venta/Renta"}
-        };
+        }));
 
-        DefaultTableModel modelo = new DefaultTableModel(datosVideojuegos, columnas) {
+        DefaultTableModel modelo = new DefaultTableModel(datosVideojuegos.toArray(new String[0][]), columnas) {
             @Override public boolean isCellEditable(int r, int c) { return false; }
         };
 
@@ -291,9 +300,9 @@ public class PnlVideojuegos extends JPanel {
     }
 
     private void mostrarDetalle(int row) {
-        if (row < 0 || row >= datosVideojuegos.length) return;
+        if (row < 0 || row >= datosVideojuegos.size()) return;
         filaSeleccionada = row;
-        String[] fila = datosVideojuegos[row];
+        String[] fila = datosVideojuegos.get(row);
         lblDetalleTitulo.setText("<html><b>" + fila[0] + "</b></html>");
         lblDetallePlataforma.setText("<html>" + fila[7] + "</html>");
         lblDetalleGenero.setText("<html>Género: " + fila[1] + "</html>");
@@ -316,6 +325,39 @@ public class PnlVideojuegos extends JPanel {
         } catch (Exception ex) {
             lblDetalleImagen.setIcon(null);
         }
+    }
+
+    private void eliminarVideojuegoSeleccionado() {
+        if (filaSeleccionada < 0 || filaSeleccionada >= datosVideojuegos.size()) return;
+        datosVideojuegos.remove(filaSeleccionada);
+        DefaultTableModel modelo = (DefaultTableModel) tablaVideojuegos.getModel();
+        modelo.setRowCount(0);
+        for (String[] fila : datosVideojuegos) {
+            modelo.addRow(new Object[] { fila[0], fila[1], fila[2], fila[3], fila[4], fila[5] });
+        }
+
+        if (datosVideojuegos.isEmpty()) {
+            limpiarDetalle();
+            filaSeleccionada = -1;
+        } else {
+            int nuevaFila = Math.min(filaSeleccionada, datosVideojuegos.size() - 1);
+            mostrarDetalle(nuevaFila);
+            tablaVideojuegos.setRowSelectionInterval(nuevaFila, nuevaFila);
+        }
+    }
+
+    private void limpiarDetalle() {
+        lblDetalleTitulo.setText("");
+        lblDetallePlataforma.setText("");
+        lblDetalleGenero.setText("");
+        lblDetalleClasificacion.setText("");
+        lblDetalleAnno.setText("");
+        lblDetalleModo.setText("");
+        lblDetalleRenta.setText("");
+        lblDetalleCompra.setText("");
+        lblDetallePuntos.setText("");
+        lblDetalleStock.setText("");
+        lblDetalleImagen.setIcon(null);
     }
 
     private class TituloTableRenderer extends JPanel implements TableCellRenderer {
@@ -346,8 +388,8 @@ public class PnlVideojuegos extends JPanel {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            if (row >= 0 && row < datosVideojuegos.length) {
-                String[] fila = datosVideojuegos[row];
+            if (row >= 0 && row < datosVideojuegos.size()) {
+                String[] fila = datosVideojuegos.get(row);
                 lblTitulo.setText(fila[0]);
                 lblAnio.setText("(" + fila[8] + ")");
 
