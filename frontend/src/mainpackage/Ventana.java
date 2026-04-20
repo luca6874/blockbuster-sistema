@@ -128,7 +128,29 @@ public class Ventana extends JFrame {
         d.add(c); d.setVisible(true);
     }
 
-    // --- DIÁLOGOS DE SEGURIDAD Y SESIÓN (RESTAURADOS) ---
+    // --- MÉTODOS DE VIDEOJUEGOS ---
+
+    public void mostrarAvisoExitoso(DlgEdicionVideojuego padre) {
+        JDialog d = new JDialog(padre, true);
+        d.setUndecorated(true); d.setSize(400, 200); d.setLocationRelativeTo(padre);
+        JPanel c = new JPanel(null) {
+            @Override protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g;
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2d.setColor(CARD_WHITE); g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 30, 30);
+                g2d.setColor(ACCENT_RED); g2d.drawRoundRect(0, 0, getWidth()-1, getHeight()-1, 30, 30);
+            }
+        };
+        c.setOpaque(false);
+        JLabel txt = new JLabel("<html><center>¡Operación Exitosa!<br>Los datos han sido actualizados.</center></html>", SwingConstants.CENTER);
+        txt.setBounds(20, 40, 360, 50); txt.setFont(new Font("Arial", Font.BOLD, 16)); txt.setForeground(MAROON_BG);
+        c.add(txt);
+        JButton b = new JButton("Aceptar");
+        b.setBounds(100, 130, 200, 40); b.setBackground(ACCENT_RED); b.setForeground(Color.WHITE);
+        b.addActionListener(e -> { d.dispose(); padre.dispose(); setOscurecer(false); intentarRestaurarDashboard(); });
+        c.add(b);
+        d.add(c); d.setVisible(true);
+    }
 
     public void mostrarAlertaAutorizacion() {
         setOscurecer(true);

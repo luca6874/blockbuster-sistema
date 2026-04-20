@@ -30,6 +30,7 @@ public class PnlVideojuegos extends JPanel {
     private JLabel lblDetalleStock;
     private JLabel lblDetalleImagen;
     private String[][] datosVideojuegos;
+    private int filaSeleccionada = 0;
 
     public PnlVideojuegos(ViewDashboard parent) {
         this.parent = parent;
@@ -205,6 +206,10 @@ public class PnlVideojuegos extends JPanel {
 
         JButton btnEditar = createActionButton("Editar juego", new Color(46, 204, 113));
         btnEditar.setBounds(20, 360, 115, 28);
+        btnEditar.addActionListener(e -> {
+            parent.getHost().setOscurecer(true);
+            new DlgEdicionVideojuego(parent.getHost(), datosVideojuegos[filaSeleccionada]).setVisible(true);
+        });
         panel.add(btnEditar);
 
         JButton btnEliminar = createActionButton("Eliminar juego", new Color(231, 76, 60));
@@ -287,6 +292,7 @@ public class PnlVideojuegos extends JPanel {
 
     private void mostrarDetalle(int row) {
         if (row < 0 || row >= datosVideojuegos.length) return;
+        filaSeleccionada = row;
         String[] fila = datosVideojuegos[row];
         lblDetalleTitulo.setText("<html><b>" + fila[0] + "</b></html>");
         lblDetallePlataforma.setText("<html>" + fila[7] + "</html>");
