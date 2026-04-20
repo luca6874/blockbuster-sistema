@@ -186,8 +186,20 @@ public class PnlVideojuegos extends JPanel {
         lblDetalleStock = createDetailLabel(170, 285, 150, 18, Font.PLAIN, 11);
         panel.add(lblDetalleStock);
 
-        JButton btnDescargar = createActionButton("Descargar info", new Color(110, 60, 70));
+        JButton btnDescargar = createActionButton("Descargar info", new Color(230, 230, 230));
         btnDescargar.setBounds(16, 315, 308, 28);
+        btnDescargar.setForeground(Color.BLACK);
+        btnDescargar.setBorder(new LineBorder(new Color(120, 120, 120), 1, true));
+        btnDescargar.setBackground(new Color(230, 230, 230));
+        btnDescargar.setHorizontalTextPosition(SwingConstants.RIGHT);
+        btnDescargar.setIconTextGap(8);
+        try {
+            URL downloadIcon = getClass().getResource("/frontend/src/images/download.png");
+            if (downloadIcon != null) {
+                Image img = new ImageIcon(downloadIcon).getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH);
+                btnDescargar.setIcon(new ImageIcon(img));
+            }
+        } catch (Exception ignored) {}
         panel.add(btnDescargar);
 
         JButton btnEditar = createActionButton("Editar juego", new Color(46, 204, 113));
