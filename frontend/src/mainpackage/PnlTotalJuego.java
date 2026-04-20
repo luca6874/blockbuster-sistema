@@ -11,101 +11,106 @@ import java.net.URL;
 public class PnlTotalJuego extends JPanel {
 
     public PnlTotalJuego() {
-        // Aumentamos el tamaño para que quepa todo sin cortarse
         this.setLayout(null);
         this.setBackground(Color.WHITE);
-        this.setPreferredSize(new Dimension(350, 300)); // Tamaño sugerido para el contenedor
-        this.setSize(350, 300); 
+        this.setPreferredSize(new Dimension(250, 200));
+        this.setSize(250, 200);
 
-        // Borde exterior redondeado
         this.setBorder(BorderFactory.createCompoundBorder(
                 new LineBorder(new Color(220, 220, 220), 1, true),
                 BorderFactory.createEmptyBorder(10, 10, 10, 10)
         ));
-        
+
         initComponentes();
     }
 
     private void initComponentes() {
-        // 1. Título Superior - Ajustamos posición y ancho
-        JLabel lblTituloPrincipal = new JLabel("Total juegos (lapso 6 meses)");
-        lblTituloPrincipal.setFont(new Font("Arial", Font.PLAIN, 18));
-        lblTituloPrincipal.setBounds(20, 15, 300, 25);
-        this.add(lblTituloPrincipal);
 
-        // Línea divisoria
-        JSeparator separador = new JSeparator();
-        separador.setBounds(20, 45, 310, 2);
-        separador.setForeground(new Color(230, 230, 230));
-        this.add(separador);
-
-        // 2. Tarjetas - Ajustamos X para que estén centradas en los 350px
-        // Tarjeta Izquierda (x=25)
-        JPanel cardRentados = createCardVertical("Juegos", "rentados", "20", "/frontend/src/images/iconVideoGame1.png", 25, 65);
+        // Tarjeta izquierda
+        JPanel cardRentados = createCardVertical(
+                "Juegos", "rentados", "20",
+                "/frontend/src/images/iconVideoGame1.png",
+                20, 20
+        );
         this.add(cardRentados);
 
-        // Tarjeta Derecha (x=190)
-        JPanel cardComprados = createCardVertical("Juegos", "comprados", "18", "/frontend/src/images/icon$.png", 190, 65);
-        this.add(cardComprados);
+        // Tarjeta derecha
+        JPanel cardVendidos = createCardVertical(
+                "Juegos", "vendidos", "18",
+                "/frontend/src/images/money.png",
+                125, 20
+        );
+        this.add(cardVendidos);
 
-        // 3. Sección inferior - Subimos un poco el Y para que no quede al ras
-        JLabel lblPendientes = new JLabel("Juegos pendientes de entrega: ");
-        lblPendientes.setFont(new Font("Arial", Font.PLAIN, 16));
-        lblPendientes.setBounds(25, 250, 250, 30);
+        // Texto inferior
+        JLabel lblPendientes = new JLabel("Total juegos pendientes :");
+        lblPendientes.setFont(new Font("Arial", Font.PLAIN, 12));
+        lblPendientes.setBounds(20, 150, 170, 20);
         this.add(lblPendientes);
 
-        JLabel lblNumPendientes = new JLabel("18");
-        lblNumPendientes.setFont(new Font("Arial", Font.BOLD, 22));
-        lblNumPendientes.setBounds(255, 248, 50, 30);
-        this.add(lblNumPendientes);
+        JLabel lblNum = new JLabel("18");
+        lblNum.setFont(new Font("Arial", Font.BOLD, 16));
+        lblNum.setBounds(190, 150, 40, 20);
+        this.add(lblNum);
     }
 
-    private JPanel createCardVertical(String linea1, String linea2, String cantidad, String iconPath, int x, int y) {
+    private JPanel createCardVertical(String l1, String l2, String cantidad, String path, int x, int y) {
+
         JPanel card = new JPanel(null) {
             @Override
             protected void paintComponent(Graphics g) {
-                Graphics2D g2d = (Graphics2D) g.create();
-                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2d.setColor(Color.WHITE);
-                g2d.fillRoundRect(0, 0, getWidth()-1, getHeight()-1, 15, 15);
-                g2d.setColor(new Color(210, 210, 210)); 
-                g2d.drawRoundRect(0, 0, getWidth()-1, getHeight()-1, 15, 15);
-                g2d.dispose();
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(Color.WHITE);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 15, 15);
+                g2.setColor(new Color(210, 210, 210));
+                g2.drawRoundRect(0, 0, getWidth()-1, getHeight()-1, 15, 15);
             }
         };
+
         card.setOpaque(false);
-        card.setBounds(x, y, 135, 170); // Ancho de tarjeta ajustado a 135
+        card.setBounds(x, y, 100, 110);
 
         // Icono
-        JLabel lblIcono = new JLabel();
-        lblIcono.setHorizontalAlignment(SwingConstants.CENTER);
-        try {
-            URL imgURL = getClass().getResource(iconPath);
-            if (imgURL != null) {
-                ImageIcon icon = new ImageIcon(imgURL);
-                Image img = icon.getImage().getScaledInstance(35, 35, Image.SCALE_SMOOTH);
-                lblIcono.setIcon(new ImageIcon(img));
-            }
-        } catch (Exception e) {}
-        lblIcono.setBounds(0, 15, 135, 40);
-        card.add(lblIcono);
+        JLabel icon = new JLabel();
+icon.setHorizontalAlignment(SwingConstants.CENTER);
 
-        // Texto descriptivo
-        JLabel txt1 = new JLabel(linea1, SwingConstants.CENTER);
-        txt1.setFont(new Font("Arial", Font.PLAIN, 14));
-        txt1.setBounds(0, 55, 135, 20);
-        card.add(txt1);
+try {
+    URL url = getClass().getResource(path);
 
-        JLabel txt2 = new JLabel(linea2, SwingConstants.CENTER);
-        txt2.setFont(new Font("Arial", Font.PLAIN, 14));
-        txt2.setBounds(0, 75, 135, 20);
-        card.add(txt2);
+    if (url == null) {
+        System.out.println("No se encontró: " + path);
+    } else {
+        Image img = new ImageIcon(url).getImage()
+                .getScaledInstance(30, 30, Image.SCALE_SMOOTH);
+
+        icon.setIcon(new ImageIcon(img));
+    }
+
+} catch (Exception e) {
+    e.printStackTrace();
+}
+
+// 👇 AJUSTE CLAVE DE POSICIÓN
+icon.setBounds(0, 8, 100, 30);
+card.add(icon);
+
+        // Texto
+        JLabel t1 = new JLabel(l1, SwingConstants.CENTER);
+        t1.setFont(new Font("Arial", Font.PLAIN, 11));
+        t1.setBounds(0, 35, 100, 15);
+        card.add(t1);
+
+        JLabel t2 = new JLabel(l2, SwingConstants.CENTER);
+        t2.setFont(new Font("Arial", Font.PLAIN, 11));
+        t2.setBounds(0, 50, 100, 15);
+        card.add(t2);
 
         // Número
-        JLabel lblCant = new JLabel(cantidad, SwingConstants.CENTER);
-        lblCant.setFont(new Font("Arial", Font.BOLD, 32));
-        lblCant.setBounds(0, 110, 135, 40);
-        card.add(lblCant);
+        JLabel num = new JLabel(cantidad, SwingConstants.CENTER);
+        num.setFont(new Font("Arial", Font.BOLD, 20));
+        num.setBounds(0, 70, 100, 30);
+        card.add(num);
 
         return card;
     }

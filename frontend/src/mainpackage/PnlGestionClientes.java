@@ -50,14 +50,14 @@ public class PnlGestionClientes extends JPanel {
         
         // --- Panel Central (Tabla de Clientes y Estadísticas) ---
         JPanel panelCentral = createPanelCentral();
-        panelCentral.setBounds(0, 90, 950, 280);
+        panelCentral.setBounds(0, 90, 950, 340);
         panelPrincipal.add(panelCentral);
-        
+
         // --- Panel Inferior (Historial y Juegos Visuales) ---
         JPanel panelInferior = createPanelInferior();
-        panelInferior.setBounds(0, 370, 950, 380);
+        panelInferior.setBounds(0, 440, 950, 380);
         panelPrincipal.add(panelInferior);
-        
+
         // Scroll principal
         JScrollPane scrollPrincipal = new JScrollPane(panelPrincipal);
         scrollPrincipal.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -170,10 +170,10 @@ public class PnlGestionClientes extends JPanel {
     private JPanel createPanelEstadisticas() {
         JPanel panel = new JPanel(null);
         panel.setBackground(Ventana.CARD_WHITE);
-        panel.setBounds(660, 0, 270, 280);
+        panel.setBounds(660, 0, 270, 340);
         
         // Título
-        JLabel lblTitulo = new JLabel("Total juegos (lapso 6 meses)");
+        JLabel lblTitulo = new JLabel("Resumen del cliente");
         lblTitulo.setBounds(0, 0, 250, 25);
         lblTitulo.setFont(new Font("Arial", Font.BOLD, 14));
         lblTitulo.setForeground(Color.BLACK);
@@ -182,12 +182,12 @@ public class PnlGestionClientes extends JPanel {
         // Área vacía para el panel externo
         JPanel areaVacia = new JPanel(null);
         areaVacia.setBackground(Color.WHITE);
-        areaVacia.setBounds(0, 40, 250, 200);
+        areaVacia.setBounds(0, 40, 250, 300);
         
-        // Llamar al panel externo PnlTotalJuegops
-        PnlTotalJuego pnlJuegos = new PnlTotalJuego();
-        pnlJuegos.setBounds(0, 0, 250, 200);
-        areaVacia.add(pnlJuegos);
+        // Llamar al panel externo PnlResumenCliente
+        PnlResumenCliente pnlResumen = new PnlResumenCliente();
+        pnlResumen.setBounds(0, 0, 250, 320);
+        areaVacia.add(pnlResumen);
         
         panel.add(areaVacia);
         
