@@ -9,13 +9,15 @@ import java.awt.*;
  */
 public class DlgNuevaOperacion extends JDialog {
     private JComboBox<String> comboCliente;
-    private JComboBox<String> comboVideojuego;
+    private JTextField txtVideojuegoSeleccionado;
+    private JButton btnSeleccionarVideojuego;
     private JComboBox<String> comboTipo;
     private JTextField txtMonto;
     private JTextField txtDescuento;
     private JTextField txtPuntos;
     private JTextField txtFechaRenta;
     private JTextField txtFechaVencimiento;
+    private DlgSeleccionVideojuegoOperacion.VideojuegoInfo videojuegoSeleccionado;
 
     public DlgNuevaOperacion(Ventana parent, boolean dummy) {
         super(parent, "Nueva Operación", true);
@@ -64,11 +66,32 @@ public class DlgNuevaOperacion extends JDialog {
         lblVideojuego.setBounds(colX, col2Y, 100, 20);
         lblVideojuego.setFont(new Font("Arial", Font.BOLD, 11));
         mainPanel.add(lblVideojuego);
-        comboVideojuego = new JComboBox<>(new String[]{"Persona 5", "LEAGUE OF LEGENDS", "God of War", "The Last of Us"});
-        comboVideojuego.setBounds(colX, col2Y + 20, 550, 30);
-        comboVideojuego.setFont(new Font("Arial", Font.PLAIN, 12));
-        comboVideojuego.setBorder(new LineBorder(new Color(200, 200, 200), 1));
-        mainPanel.add(comboVideojuego);
+        
+        JPanel panelVideojuego = new JPanel(null);
+        panelVideojuego.setBackground(Ventana.CARD_WHITE);
+        panelVideojuego.setBounds(colX, col2Y + 20, 550, 30);
+        panelVideojuego.setBorder(new LineBorder(new Color(200, 200, 200), 1));
+        
+        txtVideojuegoSeleccionado = new JTextField("Selecciona un videojuego...");
+        txtVideojuegoSeleccionado.setBounds(0, 0, 470, 30);
+        txtVideojuegoSeleccionado.setFont(new Font("Arial", Font.PLAIN, 12));
+        txtVideojuegoSeleccionado.setEditable(false);
+        txtVideojuegoSeleccionado.setBorder(null);
+        txtVideojuegoSeleccionado.setBackground(Ventana.CARD_WHITE);
+        panelVideojuego.add(txtVideojuegoSeleccionado);
+        
+        btnSeleccionarVideojuego = new JButton("Seleccionar");
+        btnSeleccionarVideojuego.setBounds(470, 0, 80, 30);
+        btnSeleccionarVideojuego.setBackground(new Color(110, 60, 70));
+        btnSeleccionarVideojuego.setForeground(Color.WHITE);
+        btnSeleccionarVideojuego.setFocusPainted(false);
+        btnSeleccionarVideojuego.setBorderPainted(false);
+        btnSeleccionarVideojuego.setFont(new Font("Arial", Font.BOLD, 10));
+        btnSeleccionarVideojuego.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnSeleccionarVideojuego.addActionListener(e -> abrirSelectorVideojuego());
+        panelVideojuego.add(btnSeleccionarVideojuego);
+        
+        mainPanel.add(panelVideojuego);
 
         // Tipo
         JLabel lblTipo = new JLabel("Tipo de Operación");
@@ -164,7 +187,7 @@ public class DlgNuevaOperacion extends JDialog {
     }
 
     private void guardar(Ventana parent) {
-        if (comboCliente.getSelectedItem() == null || txtMonto.getText().isEmpty()) {
+        if (comboCliente.getSelectedItem() == null || txtMonto.getText().isEmpty() || videojuegoSeleccionado == null) {
             JOptionPane.showMessageDialog(this, "Por favor completa todos los campos requeridos.", 
                 "Error", JOptionPane.ERROR_MESSAGE);
             return;
@@ -173,5 +196,16 @@ public class DlgNuevaOperacion extends JDialog {
         this.setVisible(false);
         parent.setOscurecer(false);
         parent.mostrarAvisoExitoso(this);
+    }
+    
+    private void abrirSelectorVideojuego() {
+        DlgSeleccionVideojuegoOperacion dlg = new DlgSeleccionVideojuegoOperacion((Ventana) this.getParent(), videojuegoSeleccionado);
+        dlg.setVisible(true);
+        
+        DlgSeleccionVideojuegoOperacion.VideojuegoInfo seleccionado = dlg.getVideojuegoSeleccionado();
+        if (seleccionado != null) {
+            videojuegoSeleccionado = seleccionado;
+            txtVideojuegoSeleccionado.setText(seleccionado.getTitulo() + " (" + seleccionado.getPlataforma() + ")");
+        }
     }
 }

@@ -18,7 +18,9 @@ public class PnlNuevaOperacion extends JPanel {
 
     private final ViewDashboard parent;
     private JButton btnSeleccionarCliente;
+    private JButton btnSeleccionarVideojuego;
     private DlgSeleccionClienteOperacion.ClienteInfo clienteSeleccionado;
+    private DlgSeleccionVideojuegoOperacion.VideojuegoInfo videojuegoSeleccionado;
 
     public PnlNuevaOperacion(ViewDashboard parent) {
         this.parent = parent;
@@ -87,15 +89,10 @@ public class PnlNuevaOperacion extends JPanel {
         JLabel lblVideojuego = createSectionLabel("Videojuego", 16, 120, 120);
         panel.add(lblVideojuego);
 
-        JComboBox<String> comboVideojuego = createComboBox(new String[]{
-            "Seleccionar videojuego",
-            "Persona 5",
-            "LEAGUE OF LEGENDS",
-            "God of War",
-            "The Last of Us"
-        });
-        comboVideojuego.setBounds(16, 140, 205, 28);
-        panel.add(comboVideojuego);
+        btnSeleccionarVideojuego = createSelectorButton("Seleccionar videojuego");
+        btnSeleccionarVideojuego.setBounds(16, 140, 180, 28);
+        btnSeleccionarVideojuego.addActionListener(e -> abrirSelectorVideojuego());
+        panel.add(btnSeleccionarVideojuego);
 
         JSeparator sepDos = new JSeparator();
         sepDos.setBounds(12, 186, 504, 1);
@@ -213,6 +210,20 @@ public class PnlNuevaOperacion extends JPanel {
             clienteSeleccionado = seleccionado;
             btnSeleccionarCliente.setText(seleccionado.getNombre());
             btnSeleccionarCliente.setForeground(Color.BLACK);
+        }
+    }
+
+    private void abrirSelectorVideojuego() {
+        parent.getHost().setOscurecer(true);
+        DlgSeleccionVideojuegoOperacion dialogo = new DlgSeleccionVideojuegoOperacion(parent.getHost(), videojuegoSeleccionado);
+        dialogo.setVisible(true);
+        parent.getHost().setOscurecer(false);
+
+        DlgSeleccionVideojuegoOperacion.VideojuegoInfo seleccionado = dialogo.getVideojuegoSeleccionado();
+        if (seleccionado != null) {
+            videojuegoSeleccionado = seleccionado;
+            btnSeleccionarVideojuego.setText(seleccionado.getTitulo() + " (" + seleccionado.getPlataforma() + ")");
+            btnSeleccionarVideojuego.setForeground(Color.BLACK);
         }
     }
 }
