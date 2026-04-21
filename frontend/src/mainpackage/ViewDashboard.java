@@ -71,6 +71,17 @@ public class ViewDashboard extends JPanel {
         });
         sidebar.add(pVideojuegos);
 
+        JPanel pRentasCompras = crearItemSidebar("Rentas y Compras", null, 180);
+        pRentasCompras.addMouseListener(new MouseAdapter() {
+            @Override public void mouseClicked(MouseEvent e) {
+                itemPanelActual = pRentasCompras;
+                resaltarItem(pRentasCompras);
+                setContenido(new PnlRentasCompras(ViewDashboard.this));
+            }
+        });
+        sidebar.add(pRentasCompras);
+
+        // --- BOTONES INFERIORES ---
         // --- BOTONES INFERIORES ---
         pPerfil = crearItemSidebar("Perfil", "/frontend/src/images/iconUser1.png", 470);
         pPerfil.addMouseListener(new MouseAdapter() {
