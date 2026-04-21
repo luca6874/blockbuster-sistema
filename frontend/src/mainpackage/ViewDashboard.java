@@ -18,6 +18,7 @@ public class ViewDashboard extends JPanel {
 
     private JPanel pPerfil;
     private JPanel pClientes;
+    private JPanel pNuevaOperacion;
 
     public ViewDashboard(Ventana host) {
         this.host = host;
@@ -80,6 +81,14 @@ public class ViewDashboard extends JPanel {
             }
         });
         sidebar.add(pRentasCompras);
+
+        pNuevaOperacion = crearItemSidebar("Nueva operacion", null, 230);
+        pNuevaOperacion.addMouseListener(new MouseAdapter() {
+            @Override public void mouseClicked(MouseEvent e) {
+                mostrarNuevaOperacion();
+            }
+        });
+        sidebar.add(pNuevaOperacion);
 
         // --- BOTONES INFERIORES ---
         // --- BOTONES INFERIORES ---
@@ -172,6 +181,12 @@ public class ViewDashboard extends JPanel {
         mainContent.add(nuevoPanel, BorderLayout.CENTER);
         mainContent.revalidate();
         mainContent.repaint();
+    }
+
+    public void mostrarNuevaOperacion() {
+        itemPanelActual = pNuevaOperacion;
+        resaltarItem(pNuevaOperacion);
+        setContenido(new PnlNuevaOperacion(this));
     }
 
     private JLabel icon(String path, int w, int h) {

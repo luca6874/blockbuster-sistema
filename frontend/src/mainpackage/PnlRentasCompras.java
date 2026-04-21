@@ -132,10 +132,7 @@ public class PnlRentasCompras extends JPanel {
         btnNuevaOperacion.setFocusPainted(false);
         btnNuevaOperacion.setBorderPainted(false);
         btnNuevaOperacion.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnNuevaOperacion.addActionListener(e -> {
-            parent.getHost().setOscurecer(true);
-            new DlgNuevaOperacion(parent.getHost(), false).setVisible(true);
-        });
+        btnNuevaOperacion.addActionListener(e -> parent.mostrarNuevaOperacion());
         panel.add(btnNuevaOperacion);
 
         return panel;
