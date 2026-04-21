@@ -98,9 +98,26 @@ public class PnlVideojuegos extends JPanel {
         btnAgregar.setFocusPainted(false);
         btnAgregar.setBorderPainted(false);
         btnAgregar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnAgregar.addActionListener(e -> {
+            parent.getHost().setOscurecer(true);
+            new DlgAgregarVideojuego(parent.getHost(), this::actualizarTablaDespuesDeAgregar).setVisible(true);
+        });
         panel.add(btnAgregar);
 
         return panel;
+    }
+
+    private void actualizarTablaDespuesDeAgregar() {
+        String[] nuevoJuego = new String[]{
+            "Nuevo Videojuego", "Género", "M (Mature)", "$0.00", "$0.00", "0", "", "", "2024", "Venta/Renta"
+        };
+        datosVideojuegos.add(nuevoJuego);
+        
+        DefaultTableModel modelo = (DefaultTableModel) tablaVideojuegos.getModel();
+        modelo.addRow(new Object[] { nuevoJuego[0], nuevoJuego[1], nuevoJuego[2], nuevoJuego[3], nuevoJuego[4], nuevoJuego[5] });
+        
+        mostrarDetalle(datosVideojuegos.size() - 1);
+        tablaVideojuegos.setRowSelectionInterval(datosVideojuegos.size() - 1, datosVideojuegos.size() - 1);
     }
 
     private JPanel createPanelCentral() {
