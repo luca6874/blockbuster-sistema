@@ -1,8 +1,8 @@
 package frontend.src.mainpackage;
 
+import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
-import java.awt.*;
 
 public class ViewLogin extends JPanel {
     private final Ventana host;
@@ -27,8 +27,8 @@ public class ViewLogin extends JPanel {
 
         try {
             ImageIcon ex = new ImageIcon(getClass().getResource("/frontend/src/images/iconExit1.png"));
-            JLabel lEx = new JLabel(new ImageIcon(ex.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH)));
-            lEx.setBounds(550, 540, 25, 25); lEx.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            JLabel lEx = new JLabel(new ImageIcon(ex.getImage().getScaledInstance(22, 22, Image.SCALE_SMOOTH)));
+            lEx.setBounds(555, 525, 45, 45); lEx.setCursor(new Cursor(Cursor.HAND_CURSOR));
             lEx.addMouseListener(new java.awt.event.MouseAdapter() {
                 @Override public void mouseClicked(java.awt.event.MouseEvent e) { host.mostrarConfirmacionSalida(); }
             });
@@ -44,14 +44,28 @@ public class ViewLogin extends JPanel {
         };
         card.setBounds(150, 50, 400, 500); card.setOpaque(false);
         
-        JLabel t = new JLabel("ACCESO AL SISTEMA", SwingConstants.CENTER);
-        t.setBounds(0, 20, 400, 40); t.setFont(new Font("Serif", Font.BOLD, 22)); card.add(t);
+       JLabel t = new JLabel("ACCESO AL SISTEMA", SwingConstants.CENTER);
+        t.setBounds(0, 20, 400, 40); 
+        t.setFont(new Font("Georgia", Font.BOLD, 26)); 
+        t.setForeground(new Color(0x9C1D3A)); 
+        card.add(t);
 
         crearIn("Nombre", 80, card); crearIn("E-mail", 145, card); crearIn("Contraseña", 210, card);
 
-        chkAutorizado = new JCheckBox("Al acceder, confirmo ser personal autorizado");
-        chkAutorizado.setBounds(40, 275, 320, 25); chkAutorizado.setOpaque(false);
-        chkAutorizado.setFont(new Font("Arial", Font.PLAIN, 11)); card.add(chkAutorizado);
+       
+        chkAutorizado = new JCheckBox();
+        chkAutorizado.setBounds(40, 275, 25, 25); 
+        chkAutorizado.setOpaque(false);
+        chkAutorizado.setFocusPainted(false);
+
+        chkAutorizado.setForeground(new Color(0x9C1D3A)); 
+        card.add(chkAutorizado);
+
+        JLabel lblTextoCheck = new JLabel("Al acceder, confirmo que soy personal autorizado");
+        lblTextoCheck.setBounds(70, 275, 300, 25); 
+        lblTextoCheck.setFont(new Font("Arial", Font.PLAIN, 11));
+        lblTextoCheck.setForeground(Color.BLACK); 
+        card.add(lblTextoCheck);
 
         JLabel pill = new JLabel("Ver políticas de acceso", SwingConstants.CENTER) {
             @Override protected void paintComponent(Graphics g) {
