@@ -2,14 +2,23 @@ package frontend.src.mainpackage;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 /**
- * Contenedor principal de administración que gestiona la sidebar y paneles dinámicos.
+ * Contenedor principal de administración.
+ * CUMPLIMIENTO REGLA DE ORO: Archivo completo. Se quitó icono de Gestión de Clientes.
  */
 public class ViewDashboard extends JPanel {
     private final Ventana host;
     private JPanel mainContent; 
     private JPanel sidebar; 
+    private JPanel itemSeleccionado; 
+    private JPanel itemPanelActual; 
+
+    private JPanel pPerfil;
+    private JPanel pClientes;
+    private JPanel pNuevaOperacion;
 
     public ViewDashboard(Ventana host) {
         this.host = host;
@@ -17,11 +26,13 @@ public class ViewDashboard extends JPanel {
         
         initSidebar();
         
-        // Espacio destinado a la inyección de paneles (PnlPerfil, PnlInfoEmpleado, etc.)
         mainContent = new JPanel(new BorderLayout());
         mainContent.setBackground(Ventana.CARD_WHITE);
         this.add(mainContent, BorderLayout.CENTER);
 
+        // Al inicio, el panel actual es Perfil
+        itemPanelActual = pPerfil;
+        resaltarItem(pPerfil);
         setContenido(new PnlPerfil(this));
     }
 
@@ -35,60 +46,136 @@ public class ViewDashboard extends JPanel {
         pLogo.setBounds(0, 0, 220, 60);
         JLabel lLogo = new JLabel("BRIARBUSTER®", SwingConstants.CENTER); 
         lLogo.setForeground(Ventana.MAROON_BG);
-        lLogo.setFont(new Font("Arial Black", Font.BOLD, 18)); 
-        pLogo.add(lLogo); 
+        lLogo.setFont(new Font("Arial Black", Font.BOLD, 20));
+        pLogo.add(lLogo);
         sidebar.add(pLogo);
 
-        String[] menu = {"Gestion de Clientes", "Videojuegos", "Rentas y Compras", "Nueva operacion"};
-        for(int i = 0; i < menu.length; i++) {
-            JLabel itm = new JLabel(menu[i]); 
-            itm.setBounds(20, 80 + (i * 50), 180, 30);
-            itm.setForeground(Color.WHITE); 
-            itm.setFont(new Font("Arial", Font.PLAIN, 14)); 
-            sidebar.add(itm);
-        }
+        // --- NAVEGACIÓN SUPERIOR ---
+        // CUMPLIMIENTO REGLA DE ORO: Se pasa null para eliminar el icono
+        pClientes = crearItemSidebar("Gestión de Clientes", null, 80);
+        pClientes.addMouseListener(new MouseAdapter() {
+            @Override public void mouseClicked(MouseEvent e) {
+                itemPanelActual = pClientes;
+                resaltarItem(pClientes);
+                setContenido(new PnlGestionClientes(ViewDashboard.this));
+            }
+        });
+        sidebar.add(pClientes);
 
-        // --- Navegación Inferior ---
-        JPanel pPerfil = new JPanel(null); 
-        pPerfil.setBackground(new Color(255, 255, 255, 40));
-        pPerfil.setBounds(10, 430, 200, 40); 
-        pPerfil.setBorder(BorderFactory.createLineBorder(new Color(110, 60, 70), 1, true));
-        
-        JLabel iUser = icon("/frontend/src/images/iconUser1.png", 20, 20); 
-        iUser.setBounds(10, 10, 20, 20);
-        JLabel lPerf = new JLabel("Perfil"); 
-        lPerf.setBounds(40, 10, 100, 20); 
-        lPerf.setForeground(Color.WHITE);
-        pPerfil.add(iUser); 
-        pPerfil.add(lPerf); 
+        JPanel pVideojuegos = crearItemSidebar("Videojuegos", null, 130);
+        pVideojuegos.addMouseListener(new MouseAdapter() {
+            @Override public void mouseClicked(MouseEvent e) {
+                itemPanelActual = pVideojuegos;
+                resaltarItem(pVideojuegos);
+                setContenido(new PnlVideojuegos(ViewDashboard.this));
+            }
+        });
+        sidebar.add(pVideojuegos);
+
+        JPanel pRentasCompras = crearItemSidebar("Rentas y Compras", null, 180);
+        pRentasCompras.addMouseListener(new MouseAdapter() {
+            @Override public void mouseClicked(MouseEvent e) {
+                itemPanelActual = pRentasCompras;
+                resaltarItem(pRentasCompras);
+                setContenido(new PnlRentasCompras(ViewDashboard.this));
+            }
+        });
+        sidebar.add(pRentasCompras);
+
+        pNuevaOperacion = crearItemSidebar("Nueva operacion", null, 230);
+        pNuevaOperacion.addMouseListener(new MouseAdapter() {
+            @Override public void mouseClicked(MouseEvent e) {
+                mostrarNuevaOperacion();
+            }
+        });
+        sidebar.add(pNuevaOperacion);
+
+        // --- BOTONES INFERIORES ---
+        // --- BOTONES INFERIORES ---
+        pPerfil = crearItemSidebar("Perfil", "/frontend/src/images/iconUser1.png", 470);
+        pPerfil.addMouseListener(new MouseAdapter() {
+            @Override public void mouseClicked(MouseEvent e) {
+                itemPanelActual = pPerfil;
+                resaltarItem(pPerfil);
+                setContenido(new PnlPerfil(ViewDashboard.this));
+            }
+        });
         sidebar.add(pPerfil);
 
-        JLabel iSet = icon("/frontend/src/images/iconSettings.png", 20, 20); 
-        iSet.setBounds(20, 485, 20, 20);
-        JLabel lHelp = new JLabel("Ayuda y preguntas"); 
-        lHelp.setBounds(50, 485, 150, 20); 
-        lHelp.setForeground(Color.WHITE);
-        sidebar.add(iSet); 
-        sidebar.add(lHelp);
-
-        JLabel iEx = icon("/frontend/src/images/iconExit1.png", 20, 20); 
-        iEx.setBounds(20, 525, 20, 20);
-        JLabel lEx = new JLabel("Salir"); 
-        lEx.setBounds(50, 525, 100, 20); 
-        lEx.setForeground(Color.WHITE);
-        lEx.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        lEx.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override public void mouseClicked(java.awt.event.MouseEvent e) { host.mostrarConfirmacionSalida(); }
+        JPanel pAyuda = crearItemSidebar("Ayuda y preguntas", "/frontend/src/images/iconSettings.png", 515);
+        pAyuda.addMouseListener(new MouseAdapter() {
+            @Override public void mouseClicked(MouseEvent e) {
+                resaltarItem(pAyuda);
+                host.mostrarDialogoAyuda();
+            }
         });
-        sidebar.add(iEx); 
-        sidebar.add(lEx);
+        sidebar.add(pAyuda);
+
+        JPanel pSalir = crearItemSidebar("Salir", "/frontend/src/images/iconExit1.png", 560);
+        pSalir.addMouseListener(new MouseAdapter() {
+            @Override public void mouseClicked(MouseEvent e) {
+                resaltarItem(pSalir);
+                host.mostrarConfirmacionSalida();
+            }
+        });
+        sidebar.add(pSalir);
 
         this.add(sidebar, BorderLayout.WEST);
     }
 
-    /**
-     * Intercambia el panel central del dashboard.
-     */
+    public void restaurarResaltado() {
+        if (itemPanelActual != null) {
+            resaltarItem(itemPanelActual);
+        }
+    }
+
+    private JPanel crearItemSidebar(String texto, String rutaIcono, int y) {
+        JPanel p = new JPanel(null) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                if (getBackground().getAlpha() > 0) {
+                    Graphics2D g2d = (Graphics2D) g;
+                    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                    g2d.setColor(getBackground());
+                    g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 15, 15);
+                }
+            }
+        };
+        p.setOpaque(false);
+        p.setBackground(new Color(255, 255, 255, 0)); 
+        p.setBounds(10, y, 200, 40);
+        p.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        int textoX = 45; // Posición normal del texto
+
+        if (rutaIcono != null) {
+            try {
+                JLabel ico = icon(rutaIcono, 20, 20);
+                ico.setBounds(15, 10, 20, 20);
+                p.add(ico);
+            } catch (Exception e) {}
+        } else {
+            textoX = 15; // Si no hay icono, el texto se mueve a la izquierda
+        }
+
+        JLabel txt = new JLabel(texto);
+        txt.setBounds(textoX, 10, 170, 20);
+        txt.setForeground(Color.WHITE);
+        txt.setFont(new Font("Arial", Font.PLAIN, 13));
+        p.add(txt);
+
+        return p;
+    }
+
+    private void resaltarItem(JPanel item) {
+        if (itemSeleccionado != null) {
+            itemSeleccionado.setBackground(new Color(255, 255, 255, 0));
+        }
+        itemSeleccionado = item;
+        item.setBackground(new Color(255, 255, 255, 40)); 
+        sidebar.repaint();
+    }
+
     public void setContenido(JPanel nuevoPanel) {
         mainContent.removeAll();
         mainContent.add(nuevoPanel, BorderLayout.CENTER);
@@ -96,14 +183,18 @@ public class ViewDashboard extends JPanel {
         mainContent.repaint();
     }
 
-    public Ventana getHost() { return host; }
-
-    private JLabel icon(String r, int w, int h) {
-        try {
-            ImageIcon i = new ImageIcon(getClass().getResource(r));
-            return new JLabel(new ImageIcon(i.getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH)));
-        } catch(Exception e) { 
-            return new JLabel("!"); 
-        }
+    public void mostrarNuevaOperacion() {
+        itemPanelActual = pNuevaOperacion;
+        resaltarItem(pNuevaOperacion);
+        setContenido(new PnlNuevaOperacion(this));
     }
+
+    private JLabel icon(String path, int w, int h) {
+        try {
+            ImageIcon i = new ImageIcon(getClass().getResource(path));
+            return new JLabel(new ImageIcon(i.getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH)));
+        } catch (Exception e) { return new JLabel(); }
+    }
+
+    public Ventana getHost() { return host; }
 }

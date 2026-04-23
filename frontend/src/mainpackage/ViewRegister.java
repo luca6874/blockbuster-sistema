@@ -21,7 +21,7 @@ public class ViewRegister extends JPanel {
                 g2d.setColor(Ventana.CARD_WHITE); g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 30, 30);
             }
         };
-        c.setBounds(250, 25, 500, 520); c.setOpaque(false);
+        c.setBounds(350, 25, 500, 520); c.setOpaque(false);
 
         JLabel tit = new JLabel("REGISTRO DE ADMINISTRADOR", SwingConstants.CENTER);
         tit.setBounds(0, 20, 500, 30); tit.setFont(new Font("Serif", Font.BOLD, 18)); c.add(tit);
