@@ -28,7 +28,7 @@ public class ViewLogin extends JPanel {
         try {
             ImageIcon ex = new ImageIcon(getClass().getResource("/frontend/src/images/iconExit1.png"));
             JLabel lEx = new JLabel(new ImageIcon(ex.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH)));
-            lEx.setBounds(450, 540, 25, 25); lEx.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            lEx.setBounds(550, 540, 25, 25); lEx.setCursor(new Cursor(Cursor.HAND_CURSOR));
             lEx.addMouseListener(new java.awt.event.MouseAdapter() {
                 @Override public void mouseClicked(java.awt.event.MouseEvent e) { host.mostrarConfirmacionSalida(); }
             });
@@ -42,7 +42,7 @@ public class ViewLogin extends JPanel {
                 g2d.setColor(Ventana.CARD_WHITE); g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 30, 30);
             }
         };
-        card.setBounds(50, 50, 400, 500); card.setOpaque(false);
+        card.setBounds(150, 50, 400, 500); card.setOpaque(false);
         
         JLabel t = new JLabel("ACCESO AL SISTEMA", SwingConstants.CENTER);
         t.setBounds(0, 20, 400, 40); t.setFont(new Font("Serif", Font.BOLD, 22)); card.add(t);

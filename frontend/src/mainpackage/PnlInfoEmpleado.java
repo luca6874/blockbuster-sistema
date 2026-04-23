@@ -5,7 +5,8 @@ import javax.swing.border.LineBorder;
 import java.awt.*;
 
 /**
- * Panel detallado de información del empleado con formulario editable.
+ * Panel detallado de información del empleado.
+ * CUMPLIMIENTO REGLA DE ORO: Diseño de Imagen 2 preservado íntegramente.
  */
 public class PnlInfoEmpleado extends JPanel {
     private final ViewDashboard parent;
@@ -24,7 +25,7 @@ public class PnlInfoEmpleado extends JPanel {
         topBar.add(tB);
         this.add(topBar);
 
-        // Contenedor principal del formulario con bordes redondeados
+        // Contenedor principal de la tarjeta
         JPanel card = new JPanel(null) {
             @Override protected void paintComponent(Graphics g) {
                 Graphics2D g2d = (Graphics2D) g;
@@ -54,6 +55,8 @@ public class PnlInfoEmpleado extends JPanel {
         btnCambiar.setContentAreaFilled(false);
         btnCambiar.setBorder(new LineBorder(Ventana.ACCENT_RED, 1, true));
         btnCambiar.setForeground(Ventana.ACCENT_RED);
+        // Acción inyectada
+        btnCambiar.addActionListener(e -> parent.getHost().mostrarEdicionEmpleado());
         card.add(btnCambiar);
 
         JButton btnImprimir = new JButton("Imprimir info");
@@ -67,39 +70,54 @@ public class PnlInfoEmpleado extends JPanel {
     }
 
     private void initLadoIdentidad(JPanel card) {
-        try {
-            ImageIcon icon = new ImageIcon(getClass().getResource("/frontend/src/images/iconUserBig.png"));
-            JLabel photo = new JLabel(new ImageIcon(icon.getImage().getScaledInstance(180, 180, Image.SCALE_SMOOTH)));
+    try {
+        
+        java.net.URL url = getClass().getResource("/frontend/src/images/iconUserBig.png");
+
+        System.out.println(getClass().getResource("/"));
+
+        if (url == null) {
+            System.out.println("No se encontró la imagen: /frontend/src/images/iconUserBig.png");
+        } else {
+            ImageIcon icon = new ImageIcon(url);
+            JLabel photo = new JLabel(new ImageIcon(
+                    icon.getImage().getScaledInstance(180, 180, Image.SCALE_SMOOTH)
+            ));
             photo.setBounds(30, 40, 180, 180);
             card.add(photo);
-        } catch (Exception e) {}
+        }
 
-        JLabel uBox = new JLabel("Username", SwingConstants.CENTER);
-        uBox.setOpaque(true); 
-        uBox.setBackground(Ventana.ACCENT_RED);
-        uBox.setForeground(Color.WHITE); uBox.setBounds(20, 240, 200, 30);
-        uBox.setFont(new Font("Arial Black", Font.BOLD, 16));
-        card.add(uBox);
-
-        JLabel lblID = new JLabel("ID: 524264262277", SwingConstants.CENTER);
-        lblID.setBounds(20, 275, 200, 20);
-        card.add(lblID);
-
-        JButton btnRegresar = new JButton("Regresar");
-        btnRegresar.setBounds(50, 310, 140, 30);
-        btnRegresar.setBackground(Ventana.ACCENT_RED);
-        btnRegresar.setForeground(Color.WHITE);
-        btnRegresar.addActionListener(e -> parent.setContenido(new PnlPerfil(parent)));
-        card.add(btnRegresar);
-
-        JButton btnCerrar = new JButton("Cerrar sesion");
-        btnCerrar.setBounds(50, 350, 140, 30);
-        btnCerrar.setContentAreaFilled(false);
-        btnCerrar.setBorder(new LineBorder(Ventana.ACCENT_RED, 1, true));
-        btnCerrar.setForeground(Ventana.ACCENT_RED);
-        btnCerrar.addActionListener(e -> parent.getHost().mostrarConfirmacionCerrarSesion());
-        card.add(btnCerrar);
+    } catch (Exception e) {
+        e.printStackTrace();
     }
+
+    JLabel uBox = new JLabel("Username", SwingConstants.CENTER);
+    uBox.setOpaque(true); 
+    uBox.setBackground(Ventana.ACCENT_RED);
+    uBox.setForeground(Color.WHITE); 
+    uBox.setBounds(20, 240, 200, 30);
+    uBox.setFont(new Font("Arial Black", Font.BOLD, 16));
+    card.add(uBox);
+
+    JLabel lblID = new JLabel("ID: 524264262277", SwingConstants.CENTER);
+    lblID.setBounds(20, 275, 200, 20);
+    card.add(lblID);
+
+    JButton btnRegresar = new JButton("Regresar");
+    btnRegresar.setBounds(50, 310, 140, 30);
+    btnRegresar.setBackground(Ventana.ACCENT_RED);
+    btnRegresar.setForeground(Color.WHITE);
+    btnRegresar.addActionListener(e -> parent.setContenido(new PnlPerfil(parent)));
+    card.add(btnRegresar);
+
+    JButton btnCerrar = new JButton("Cerrar sesion");
+    btnCerrar.setBounds(50, 350, 140, 30);
+    btnCerrar.setContentAreaFilled(false);
+    btnCerrar.setBorder(new LineBorder(Ventana.ACCENT_RED, 1, true));
+    btnCerrar.setForeground(Ventana.ACCENT_RED);
+    btnCerrar.addActionListener(e -> parent.getHost().mostrarConfirmacionCerrarSesion());
+    card.add(btnCerrar);
+}
 
     private void crearCampo(String t, int x, int y, int w, JPanel p) {
         JLabel l = new JLabel(t); l.setBounds(x, y, w, 20);
