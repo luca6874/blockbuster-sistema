@@ -1,7 +1,7 @@
 package frontend.src.mainpackage;
 
-import javax.swing.*;
 import java.awt.*;
+import javax.swing.*;
 
 /**
  * JFrame principal que actúa como host para las vistas y gestiona diálogos modales.
@@ -198,28 +198,48 @@ public class Ventana extends JFrame {
         d.add(c); d.setVisible(true);
     }
 
-    public void mostrarAlertaAutorizacion() {
-        setOscurecer(true);
-        JDialog d = new JDialog(this, "Atención", true);
-        d.setUndecorated(true); d.setSize(450, 260); d.setLocationRelativeTo(this);
-        JPanel c = new JPanel(null); c.setBackground(CARD_WHITE); c.setBorder(BorderFactory.createLineBorder(ACCENT_RED, 2));
+  public void mostrarAlertaAutorizacion() {
+    setOscurecer(true);
+    JDialog d = new JDialog(this, "Atención", true);
+    d.setUndecorated(true); 
+    d.setSize(480, 300); 
+    d.setLocationRelativeTo(this);
+    
+    JPanel c = new JPanel(null); 
+    c.setBackground(CARD_WHITE); 
+    c.setBorder(BorderFactory.createLineBorder(new Color(0x9C1D3A), 2));
 
-        JLabel t = new JLabel("<html><center>¡Atención! Debe confirmar ser<br>personal autorizado.</center></html>", SwingConstants.CENTER);
-        t.setBounds(20, 50, 410, 80); t.setFont(new Font("Arial", Font.BOLD, 16)); t.setForeground(ACCENT_RED);
-        c.add(t);
+    JLabel t = new JLabel("<html><center><div style='font-family: Segoe UI, sans-serif; color:#9C1D3A;'>"
+            + "<div style='font-size:34px; font-weight: bold; margin-bottom: 10px;'>¡Atención!</div>"
+            + "<div style='font-size:14px; font-weight: normal; margin-top: 5px;'>"
+            + "Debe de confirmar ser<br>personal autorizado.</div>"
+            + "</div></center></html>", SwingConstants.CENTER);
+    t.setBounds(20, 30, 440, 150); 
+    c.add(t);
 
-        JButton b1 = new JButton("Confirmar"); b1.setBounds(40, 160, 170, 40); b1.setBackground(ACCENT_RED);
-        b1.setForeground(Color.WHITE); b1.addActionListener(e -> { setOscurecer(false); d.dispose(); intentarRestaurarDashboard(); });
-        c.add(b1);
+    JButton b1 = new JButton("Confirmar"); 
+    b1.setBounds(65, 210, 165, 45); 
+    b1.setBackground(new Color(0x9C1D3A)); 
+    b1.setForeground(Color.WHITE); 
+    b1.setFont(new Font("Segoe UI", Font.BOLD, 13)); 
+    b1.setFocusPainted(false);   
+    b1.setBorderPainted(false);  
+    b1.addActionListener(e -> { setOscurecer(false); d.dispose(); intentarRestaurarDashboard(); });
+    c.add(b1);
 
-        JButton b2 = new JButton("Cancelar"); b2.setBounds(240, 160, 170, 40); b2.setContentAreaFilled(false);
-        b2.setForeground(ACCENT_RED); b2.setBorder(BorderFactory.createLineBorder(ACCENT_RED, 1));
-        b2.addActionListener(e -> { setOscurecer(false); d.dispose(); intentarRestaurarDashboard(); });
-        c.add(b2);
+    JButton b2 = new JButton("Cancelar"); 
+    b2.setBounds(250, 210, 165, 45); 
+    b2.setContentAreaFilled(false);
+    b2.setForeground(new Color(0x9C1D3A)); 
+    b2.setFont(new Font("Segoe UI", Font.BOLD, 13)); 
+    b2.setFocusPainted(false);   
+    b2.setBorder(BorderFactory.createLineBorder(new Color(0x9C1D3A), 1));
+    b2.addActionListener(e -> { setOscurecer(false); d.dispose(); });
+    c.add(b2);
 
-        d.add(c); d.setVisible(true);
-    }
-
+    d.add(c); 
+    d.setVisible(true);
+}
     public void mostrarDialogoPoliticas(JCheckBox chk) {
         setOscurecer(true);
         JDialog d = new JDialog(this, "Políticas", true);
