@@ -1,9 +1,9 @@
 package frontend.src.mainpackage;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import javax.swing.*;
 
 /**
  * Contenedor principal de administración.
@@ -52,7 +52,7 @@ public class ViewDashboard extends JPanel {
 
         // --- NAVEGACIÓN SUPERIOR ---
         // CUMPLIMIENTO REGLA DE ORO: Se pasa null para eliminar el icono
-        pClientes = crearItemSidebar("Gestión de Clientes", null, 80);
+        pClientes = crearItemSidebar("Gestión de Clientes", null, 90);
         pClientes.addMouseListener(new MouseAdapter() {
             @Override public void mouseClicked(MouseEvent e) {
                 itemPanelActual = pClientes;
@@ -62,7 +62,7 @@ public class ViewDashboard extends JPanel {
         });
         sidebar.add(pClientes);
 
-        JPanel pVideojuegos = crearItemSidebar("Videojuegos", null, 130);
+        JPanel pVideojuegos = crearItemSidebar("Videojuegos", null, 155);
         pVideojuegos.addMouseListener(new MouseAdapter() {
             @Override public void mouseClicked(MouseEvent e) {
                 itemPanelActual = pVideojuegos;
@@ -72,7 +72,7 @@ public class ViewDashboard extends JPanel {
         });
         sidebar.add(pVideojuegos);
 
-        JPanel pRentasCompras = crearItemSidebar("Rentas y Compras", null, 180);
+        JPanel pRentasCompras = crearItemSidebar("Rentas y Compras", null, 220);
         pRentasCompras.addMouseListener(new MouseAdapter() {
             @Override public void mouseClicked(MouseEvent e) {
                 itemPanelActual = pRentasCompras;
@@ -82,7 +82,7 @@ public class ViewDashboard extends JPanel {
         });
         sidebar.add(pRentasCompras);
 
-        pNuevaOperacion = crearItemSidebar("Nueva operacion", null, 230);
+        pNuevaOperacion = crearItemSidebar("Nueva operacion", null, 285);
         pNuevaOperacion.addMouseListener(new MouseAdapter() {
             @Override public void mouseClicked(MouseEvent e) {
                 mostrarNuevaOperacion();
@@ -91,8 +91,7 @@ public class ViewDashboard extends JPanel {
         sidebar.add(pNuevaOperacion);
 
         // --- BOTONES INFERIORES ---
-        // --- BOTONES INFERIORES ---
-        pPerfil = crearItemSidebar("Perfil", "/frontend/src/images/iconUser1.png", 470);
+        pPerfil = crearItemSidebar("Perfil", "/frontend/src/images/iconUser1.png", 430);
         pPerfil.addMouseListener(new MouseAdapter() {
             @Override public void mouseClicked(MouseEvent e) {
                 itemPanelActual = pPerfil;
@@ -102,7 +101,7 @@ public class ViewDashboard extends JPanel {
         });
         sidebar.add(pPerfil);
 
-        JPanel pAyuda = crearItemSidebar("Ayuda y preguntas", "/frontend/src/images/iconSettings.png", 515);
+        JPanel pAyuda = crearItemSidebar("Ayuda y preguntas", "/frontend/src/images/iconSettings.png", 480);
         pAyuda.addMouseListener(new MouseAdapter() {
             @Override public void mouseClicked(MouseEvent e) {
                 resaltarItem(pAyuda);
@@ -111,7 +110,7 @@ public class ViewDashboard extends JPanel {
         });
         sidebar.add(pAyuda);
 
-        JPanel pSalir = crearItemSidebar("Salir", "/frontend/src/images/iconExit1.png", 560);
+        JPanel pSalir = crearItemSidebar("Salir", "/frontend/src/images/iconExit1.png", 530);
         pSalir.addMouseListener(new MouseAdapter() {
             @Override public void mouseClicked(MouseEvent e) {
                 resaltarItem(pSalir);
