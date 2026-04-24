@@ -7,7 +7,6 @@ import javax.swing.*;
 
 /**
  * Contenedor principal de administración.
- * CUMPLIMIENTO REGLA DE ORO: Archivo completo. Se quitó icono de Gestión de Clientes.
  */
 public class ViewDashboard extends JPanel {
     private final Ventana host;
@@ -30,7 +29,7 @@ public class ViewDashboard extends JPanel {
         mainContent.setBackground(Ventana.CARD_WHITE);
         this.add(mainContent, BorderLayout.CENTER);
 
-        // Al inicio, el panel actual es Perfil
+        
         itemPanelActual = pPerfil;
         resaltarItem(pPerfil);
         setContenido(new PnlPerfil(this));
@@ -154,7 +153,7 @@ public class ViewDashboard extends JPanel {
                 p.add(ico);
             } catch (Exception e) {}
         } else {
-            textoX = 15; // Si no hay icono, el texto se mueve a la izquierda
+            textoX = 15; 
         }
 
         JLabel txt = new JLabel(texto);

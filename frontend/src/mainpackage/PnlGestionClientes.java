@@ -10,7 +10,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 /**
  * Módulo de Gestión de Clientes.
- * CUMPLIMIENTO REGLA DE ORO: Diseño fiel a Figma con todos los elementos visuales.
  */
 public class PnlGestionClientes extends JPanel {
     private final ViewDashboard parent;
@@ -41,7 +40,7 @@ public class PnlGestionClientes extends JPanel {
         // Panel principal con scroll
         JPanel panelPrincipal = new JPanel(null);
         panelPrincipal.setBackground(Ventana.CARD_WHITE);
-        panelPrincipal.setPreferredSize(new Dimension(950, 750)); // Tamaño que cabe en 980px disponibles
+        panelPrincipal.setPreferredSize(new Dimension(950, 750)); 
         
         // --- Barra Superior de Módulo ---
         JPanel topBar = createTopBar();

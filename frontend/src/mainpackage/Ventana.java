@@ -5,7 +5,6 @@ import javax.swing.*;
 
 /**
  * JFrame principal que actúa como host para las vistas y gestiona diálogos modales.
- * CUMPLIMIENTO REGLA DE ORO: Archivo 100% completo con todas las funciones restauradas.
  */
 public class Ventana extends JFrame {
     

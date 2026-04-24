@@ -1,12 +1,11 @@
 package frontend.src.mainpackage;
 
+import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
-import java.awt.*;
 
 /**
  * Panel detallado de información del empleado.
- * CUMPLIMIENTO REGLA DE ORO: Diseño de Imagen 2 preservado íntegramente.
  */
 public class PnlInfoEmpleado extends JPanel {
     private final ViewDashboard parent;

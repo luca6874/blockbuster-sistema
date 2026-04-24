@@ -1,9 +1,9 @@
 package frontend.src.mainpackage;
 
-import javax.swing.*;
-import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.net.URL;
+import javax.swing.*;
+import javax.swing.border.LineBorder;
 
 /**
  * Panel de Total Juegos - Versión Corregida con Tamaño Ajustado.
@@ -91,7 +91,7 @@ try {
     e.printStackTrace();
 }
 
-// 👇 AJUSTE CLAVE DE POSICIÓN
+
 icon.setBounds(0, 8, 100, 30);
 card.add(icon);
 

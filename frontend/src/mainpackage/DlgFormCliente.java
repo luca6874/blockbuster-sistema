@@ -1,12 +1,11 @@
 package frontend.src.mainpackage;
 
+import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
-import java.awt.*;
 
 /**
  * Diálogo para registrar o editar clientes.
- * CUMPLIMIENTO REGLA DE ORO: Diseño Card, sin "X", colores oficiales.
  */
 public class DlgFormCliente extends JDialog {
     private final Ventana host;
