@@ -86,50 +86,41 @@ public class PnlGestionClientes extends JPanel {
         return topBar;
     }
     
-    private JPanel createPanelFiltros() {
-        JPanel panel = new JPanel(null);
-        panel.setBackground(Ventana.CARD_WHITE);
-        panel.setBounds(0, 0, 1150, 50);
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 30, 10, 30));
-        
-        // Campo de búsqueda
-        txtBuscarCliente = new JTextField("Buscar por ID, nombre o email...");
-        txtBuscarCliente.setBounds(0, 15, 300, 30);
-        txtBuscarCliente.setBorder(new LineBorder(new Color(200, 200, 200), 1, true));
-        txtBuscarCliente.setBackground(Color.WHITE);
-        txtBuscarCliente.setFont(new Font("Arial", Font.PLAIN, 12));
-        panel.add(txtBuscarCliente);
-        
-        // Combo de estatus
-        comboEstatusCliente = new JComboBox<>(new String[]{"Todos", "Activo", "Inactivo", "Suspendido"});
-        comboEstatusCliente.setBounds(320, 15, 120, 30);
-        comboEstatusCliente.setBackground(Color.WHITE);
-        comboEstatusCliente.setBorder(new LineBorder(new Color(200, 200, 200), 1));
-        comboEstatusCliente.setFont(new Font("Arial", Font.PLAIN, 12));
-        panel.add(comboEstatusCliente);
-        
-        // Checkbox frecuentes
-        chkFrecuentes = new JCheckBox("Solo frecuentes");
-        chkFrecuentes.setBounds(460, 15, 120, 30);
-        chkFrecuentes.setBackground(Ventana.CARD_WHITE);
-        chkFrecuentes.setFont(new Font("Arial", Font.PLAIN, 12));
-        chkFrecuentes.setFocusPainted(false);
-        panel.add(chkFrecuentes);
-        
-        // Botón crear cliente
-        btnCrearCliente = new JButton("+ Crear cliente");
-        btnCrearCliente.setBounds(600, 15, 150, 30);
-        btnCrearCliente.setBackground(Ventana.ACCENT_RED);
-        btnCrearCliente.setForeground(Color.WHITE);
-        btnCrearCliente.setFocusPainted(false);
-        btnCrearCliente.setBorderPainted(false);
-        btnCrearCliente.setFont(new Font("Arial", Font.BOLD, 12));
-        btnCrearCliente.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnCrearCliente.addActionListener(e -> parent.getHost().mostrarFormCliente());
-        panel.add(btnCrearCliente);
-        
-        return panel;
-    }
+   private JPanel createPanelFiltros() {
+    JPanel panel = new JPanel(null);
+    panel.setBackground(Ventana.CARD_WHITE);
+    panel.setBounds(0, 0, 950, 50); 
+    
+    txtBuscarCliente = new JTextField("Buscar por ID, nombre o email...");
+    txtBuscarCliente.setBounds(20, 15, 280, 30);
+    txtBuscarCliente.setBorder(new LineBorder(new Color(200, 200, 200), 1, true));
+    panel.add(txtBuscarCliente);
+    
+    JLabel lblEstatus = new JLabel("Estatus:");
+    lblEstatus.setBounds(470, 15, 60, 30);
+    lblEstatus.setFont(new Font("Arial", Font.PLAIN, 12));
+    panel.add(lblEstatus);
+    
+    comboEstatusCliente = new JComboBox<>(new String[]{"Todos", "Activo", "Inactivo", "Suspendido"});
+    comboEstatusCliente.setBounds(530, 15, 110, 30);
+    panel.add(comboEstatusCliente);
+    
+    chkFrecuentes = new JCheckBox("Solo frecuentes");
+    chkFrecuentes.setBounds(660, 15, 130, 30);
+    chkFrecuentes.setBackground(Ventana.CARD_WHITE);
+    panel.add(chkFrecuentes);
+    
+    btnCrearCliente = new JButton("+ Crear cliente");
+    btnCrearCliente.setBounds(780, 15, 150, 30);
+    btnCrearCliente.setBackground(Ventana.ACCENT_RED);
+    btnCrearCliente.setForeground(Color.WHITE);
+    btnCrearCliente.setFont(new Font("Arial", Font.BOLD, 12));
+    btnCrearCliente.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    btnCrearCliente.addActionListener(e -> parent.getHost().mostrarFormCliente());
+    panel.add(btnCrearCliente);
+    
+    return panel;
+}
     
     private JPanel createPanelCentral() {
         JPanel panel = new JPanel(null);
@@ -236,71 +227,59 @@ public class PnlGestionClientes extends JPanel {
         
         return panel;
     }
-    
     private JPanel createPanelHistorial() {
         JPanel panel = new JPanel(null);
         panel.setBackground(Ventana.CARD_WHITE);
         panel.setBounds(0, 0, 630, 380);
-        
-        // Pestañas
         tabbedPane = new JTabbedPane();
         tabbedPane.setBounds(0, 0, 630, 380);
         tabbedPane.setFont(new Font("Arial", Font.PLAIN, 12));
         tabbedPane.setBackground(Color.WHITE);
-        
-        // Panel de historial de rentas
         JPanel panelRentas = createPanelContenidoHistorial();
         tabbedPane.addTab("Historial de Rentas", panelRentas);
-        
-        // Panel de historial de compras
         JPanel panelCompras = new JPanel();
         panelCompras.setBackground(Color.WHITE);
         panelCompras.add(new JLabel("Contenido de Historial de Compras"));
         tabbedPane.addTab("Historial de Compras", panelCompras);
-        
-        // Panel de descuentos
         JPanel panelDescuentos = new JPanel();
         panelDescuentos.setBackground(Color.WHITE);
         panelDescuentos.add(new JLabel("Contenido de Descuentos Aplicados"));
         tabbedPane.addTab("Descuentos Aplicados", panelDescuentos);
-        
         panel.add(tabbedPane);
-        
         return panel;
     }
     
     private JPanel createPanelContenidoHistorial() {
-        JPanel panel = new JPanel(null);
-        panel.setBackground(Color.WHITE);
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        
-        // Campo de búsqueda
-        txtBuscarHistorial = new JTextField("Buscar por ID, nombre o fecha");
-        txtBuscarHistorial.setBounds(0, 10, 250, 30);
-        txtBuscarHistorial.setBorder(new LineBorder(new Color(200, 200, 200), 1, true));
-        txtBuscarHistorial.setBackground(Color.WHITE);
-        txtBuscarHistorial.setFont(new Font("Arial", Font.PLAIN, 12));
-        panel.add(txtBuscarHistorial);
-        
-        // Combo de estatus
-        comboEstatusHistorial = new JComboBox<>(new String[]{"Todos", "Devuelto", "Pendiente", "Vencido"});
-        comboEstatusHistorial.setBounds(270, 10, 120, 30);
-        comboEstatusHistorial.setBackground(Color.WHITE);
-        comboEstatusHistorial.setBorder(new LineBorder(new Color(200, 200, 200), 1));
-        comboEstatusHistorial.setFont(new Font("Arial", Font.PLAIN, 12));
-        panel.add(comboEstatusHistorial);
-        
-        // Tabla de historial
-        initTablaHistorial();
-        
-        JScrollPane scroll = new JScrollPane(tablaHistorial);
-        scroll.setBounds(0, 50, 600, 280);
-        scroll.setBorder(new LineBorder(new Color(200, 200, 200), 1));
-        scroll.getViewport().setBackground(Color.WHITE);
-        panel.add(scroll);
-        
-        return panel;
-    }
+    JPanel panel = new JPanel(null);
+    panel.setBackground(Color.WHITE);
+    panel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0)); 
+    
+    txtBuscarHistorial = new JTextField("Buscar por ID, nombre o fecha...");
+    txtBuscarHistorial.setBounds(0, 10, 250, 30);
+    txtBuscarHistorial.setBorder(new LineBorder(new Color(200, 200, 200), 1, true));
+    txtBuscarHistorial.setFont(new Font("Arial", Font.PLAIN, 12));
+    panel.add(txtBuscarHistorial);
+    
+    JLabel lblEstatusHist = new JLabel("Estatus:");
+    lblEstatusHist.setBounds(270, 10, 60, 30);
+    lblEstatusHist.setFont(new Font("Arial", Font.PLAIN, 12));
+    panel.add(lblEstatusHist);
+    
+    comboEstatusHistorial = new JComboBox<>(new String[]{"Todos", "Devuelto", "Pendiente", "Vencido"});
+    comboEstatusHistorial.setBounds(330, 10, 110, 30);
+    comboEstatusHistorial.setBackground(Color.WHITE);
+    panel.add(comboEstatusHistorial);
+    
+    initTablaHistorial();
+    
+    JScrollPane scroll = new JScrollPane(tablaHistorial);
+    scroll.setBounds(0, 50, 600, 280);
+    scroll.setBorder(new LineBorder(new Color(200, 200, 200), 1));
+    scroll.getViewport().setBackground(Color.WHITE);
+    panel.add(scroll);
+    
+    return panel;
+}
     
     private JPanel createPanelJuegosVisuales() {
         JPanel panel = new JPanel(null);
