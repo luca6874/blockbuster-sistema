@@ -1,10 +1,5 @@
 package frontend.src.mainpackage;
 
-import javax.swing.*;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.border.LineBorder;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -12,6 +7,11 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.swing.*;
+import javax.swing.border.LineBorder;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableCellRenderer;
 
 /**
  * Módulo de Videojuegos.
@@ -84,12 +84,29 @@ public class PnlVideojuegos extends JPanel {
         txtBuscar.setFont(new Font("Arial", Font.PLAIN, 12));
         panel.add(txtBuscar);
 
-        comboPlataforma = new JComboBox<>(new String[]{"Todos", "PS5", "Xbox", "PC", "Switch"});
-        comboPlataforma.setBounds(370, 10, 120, 30);
+        JLabel lblPlataforma = new JLabel("Plataforma:");
+        lblPlataforma.setBounds(370, 10, 80, 30);
+        lblPlataforma.setFont(new Font("Arial", Font.BOLD, 12));
+        panel.add(lblPlataforma);
+
+        comboPlataforma = new JComboBox<>(new String[]{"Todos","Xbox 360", "SWITCH", "PS4", "Xbox ONE", "SWITCH 2", "PS5"});
+        comboPlataforma.setBounds(450, 10, 120, 30);
         comboPlataforma.setBorder(new LineBorder(new Color(200, 200, 200), 1));
         comboPlataforma.setBackground(Color.WHITE);
         comboPlataforma.setFont(new Font("Arial", Font.PLAIN, 12));
         panel.add(comboPlataforma);
+
+        JCheckBox chkFiltro = new JCheckBox();
+        chkFiltro.setBounds(580, 10, 25, 30);
+        chkFiltro.setBackground(Ventana.CARD_WHITE);
+        panel.add(chkFiltro);
+
+        JComboBox<String> comboEstado = new JComboBox<>(new String[]{"Ambos", "Disponible", "Agotado"});
+        comboEstado.setBounds(610, 10, 120, 30);
+        comboEstado.setBorder(new LineBorder(new Color(200, 200, 200), 1));
+        comboEstado.setBackground(Color.WHITE);
+        comboEstado.setFont(new Font("Arial", Font.PLAIN, 12));
+        panel.add(comboEstado);
 
         JButton btnAgregar = new JButton("+ Agregar título");
         btnAgregar.setBounds(790, 10, 140, 30);

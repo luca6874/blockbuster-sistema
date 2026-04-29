@@ -1,8 +1,7 @@
 package frontend.src.mainpackage;
-
+import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
-import java.awt.*;
 
 public class ViewRegister extends JPanel {
     private final Ventana host;
@@ -23,14 +22,17 @@ public class ViewRegister extends JPanel {
         };
         c.setBounds(350, 25, 500, 520); c.setOpaque(false);
 
-        JLabel tit = new JLabel("REGISTRO DE ADMINISTRADOR", SwingConstants.CENTER);
-        tit.setBounds(0, 20, 500, 30); tit.setFont(new Font("Serif", Font.BOLD, 18)); c.add(tit);
+        JLabel tit = new JLabel("REGISTRO DEL ADMINISTRADOR - NUEVO PERFIL", SwingConstants.CENTER);
+        tit.setBounds(0, 20, 500, 30); 
+        tit.setFont(new Font("Georgia", Font.PLAIN, 18)); 
+        tit.setForeground(Ventana.ACCENT_RED);
+        c.add(tit);
 
         crearCol("Nombres", 40, 80, 200, c); crearCol("Apellidos", 260, 80, 200, c);
         crearCol("E-mail", 40, 140, 420, c); crearCol("Contrasena", 40, 200, 200, c);
         crearCol("Confirmar", 260, 200, 200, c); crearCol("ID Empleado", 40, 290, 420, c);
 
-        chk = new JCheckBox("Confirmo ser personal autorizado");
+        chk = new JCheckBox("Al acceder, confirmo que soy personal autorizado");
         chk.setBounds(40, 360, 420, 25); chk.setOpaque(false); c.add(chk);
 
         JButton btnC = new JButton("Crear Perfil"); btnC.setBounds(40, 410, 420, 40);

@@ -5,7 +5,6 @@ import javax.swing.*;
 
 /**
  * JFrame principal que actúa como host para las vistas y gestiona diálogos modales.
- * CUMPLIMIENTO REGLA DE ORO: Archivo 100% completo con todas las funciones restauradas.
  */
 public class Ventana extends JFrame {
     
@@ -77,7 +76,7 @@ public class Ventana extends JFrame {
         new DlgFormCliente(this).setVisible(true);
     }
 
-    public void mostrarAvisoExitosoCliente(DlgFormCliente padre) {
+    public void mostrarAvisoExitosoCliente(JDialog padre) {
         JDialog d = new JDialog(padre, true);
         d.setUndecorated(true); d.setSize(400, 200); d.setLocationRelativeTo(padre);
         JPanel c = new JPanel(null) {
@@ -325,7 +324,7 @@ public class Ventana extends JFrame {
         d.add(c); d.setVisible(true);
     }
 
-    public void mostrarDialogoAyuda() {
+   public void mostrarDialogoAyuda() {
         setOscurecer(true);
         JDialog d = new JDialog(this, "Ayuda", true);
         d.setUndecorated(true); d.setSize(600, 400); d.setLocationRelativeTo(this);
@@ -336,17 +335,21 @@ public class Ventana extends JFrame {
         c.add(tit);
 
         String con = "<html><div style='font-family:Arial; font-size:10px; color:#333333;'>"
-                + "<b>Teléfono:</b> +52 (667) 845 9921<br>Soporte técnico:<br>soporte@briarbuster.dev<br><br>"
-                + "<b>Horario de atención:</b><br>Lunes a Viernes de 9:00 a 18:00 hrs</div></html>";
+                + "Teléfono: +52 (667) 845 9921<br>Soporte técnico:<br>soporte@briarbuster.dev<br>"
+                + "Atención general:<br>contacto@briarbuster.mx<br><br>"
+                + "Horario de atención:<br>Lunes a Viernes de 9:00 a 18:00 hrs<br>"
+                + "Sábados de 10:00 a 14:00 hrs</div></html>";
         JLabel lC = new JLabel(con); lC.setBounds(40, 100, 250, 200); lC.setVerticalAlignment(SwingConstants.TOP); c.add(lC);
         
         JSeparator s = new JSeparator(JSeparator.VERTICAL); s.setBounds(300, 80, 1, 200); c.add(s);
         
         String ubi = "<html><div style='font-family:Arial; font-size:10px; color:#333333;'>"
-                + "<b>Ubicación</b><br>Centro Tecnológico Altavista Digital<br>Av. Circuito Innovación #4582<br>México</div></html>";
+                + "Ubicación<br>Centro de Desarrollo Tecnológico Altavista Digital<br>"
+                + "Av. Circuito Innovación #4582, Piso 7<br>Col. Bosques del Horizonte<br>"
+                + "C.P. 90847<br>Ciudad Neotrópolis, Estado de Nova Sierra<br>México</div></html>";
         JLabel lU = new JLabel(ubi); lU.setBounds(320, 100, 250, 200); lU.setVerticalAlignment(SwingConstants.TOP); c.add(lU);
         
-        JButton bS = new JButton("Entendido"); bS.setBounds(225, 330, 150, 35); bS.setBackground(ACCENT_RED);
+        JButton bS = new JButton("Regresar"); bS.setBounds(225, 330, 150, 35); bS.setBackground(ACCENT_RED);
         bS.setForeground(Color.WHITE); bS.addActionListener(e -> { setOscurecer(false); d.dispose(); intentarRestaurarDashboard(); });
         c.add(bS);
         

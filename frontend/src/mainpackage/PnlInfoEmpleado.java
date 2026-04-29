@@ -1,12 +1,11 @@
 package frontend.src.mainpackage;
 
+import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
-import java.awt.*;
 
 /**
  * Panel detallado de información del empleado.
- * CUMPLIMIENTO REGLA DE ORO: Diseño de Imagen 2 preservado íntegramente.
  */
 public class PnlInfoEmpleado extends JPanel {
     private final ViewDashboard parent;
@@ -18,7 +17,7 @@ public class PnlInfoEmpleado extends JPanel {
 
         JPanel topBar = new JPanel(new BorderLayout());
         topBar.setBackground(new Color(110, 60, 70));
-        topBar.setBounds(0, 0, 780, 40);
+        topBar.setBounds(0, 0, 2000, 40);
         JLabel tB = new JLabel("  Perfil de Administrador - Información de Empleado", SwingConstants.LEFT);
         tB.setForeground(Color.WHITE);
         tB.setFont(new Font("Arial", Font.BOLD, 14));
