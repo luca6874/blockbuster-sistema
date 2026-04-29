@@ -76,7 +76,7 @@ public class Ventana extends JFrame {
         new DlgFormCliente(this).setVisible(true);
     }
 
-    public void mostrarAvisoExitosoCliente(DlgFormCliente padre) {
+    public void mostrarAvisoExitosoCliente(JDialog padre) {
         JDialog d = new JDialog(padre, true);
         d.setUndecorated(true); d.setSize(400, 200); d.setLocationRelativeTo(padre);
         JPanel c = new JPanel(null) {

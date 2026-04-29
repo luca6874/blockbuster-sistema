@@ -185,7 +185,7 @@ public class PnlGestionClientes extends JPanel {
         areaVacia.add(pnlTotalJuego);
 
         // Panel de resumen del cliente oculto al inicio
-        pnlResumenCliente = new PnlResumenCliente();
+        pnlResumenCliente = new PnlResumenCliente(parent);
         pnlResumenCliente.setBounds(0, 0, 250, 300);
         pnlResumenCliente.setVisible(false);
         areaVacia.add(pnlResumenCliente);
@@ -209,6 +209,18 @@ public class PnlGestionClientes extends JPanel {
             pnlResumenCliente.setVisible(true);
             lblTituloEstadisticas.setText("Resumen del cliente");
         }
+    }
+
+    private void abrirEditarCliente(String clienteId, String nombreCompleto, String email) {
+        // Dividir el nombre completo en nombres y apellidos
+        String[] partes = nombreCompleto.split(" ", 2);
+        String nombres = partes.length > 0 ? partes[0] : "";
+        String apellidos = partes.length > 1 ? partes[1] : "";
+
+        // Crear y mostrar el diálogo de edición
+        DlgEdicionCliente dlgEditar = new DlgEdicionCliente(parent.getHost(), clienteId, nombres, apellidos, email, "", "");
+        parent.getHost().setOscurecer(true);
+        dlgEditar.setVisible(true);
     }
     
     private JPanel createPanelInferior() {
@@ -408,8 +420,27 @@ public class PnlGestionClientes extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 int row = tablaClientes.rowAtPoint(e.getPoint());
+                int col = tablaClientes.columnAtPoint(e.getPoint());
                 if (row >= 0) {
-                    mostrarPanelResumenCliente();
+                    // Si el clic es en la columna de acciones (columna 5)
+                    if (col == 5) {
+                        // Obtener datos del cliente
+                        String clienteId = (String) tablaClientes.getValueAt(row, 0);
+                        String nombreCompleto = (String) tablaClientes.getValueAt(row, 1);
+                        String email = (String) tablaClientes.getValueAt(row, 2);
+                        
+                        // Detectar posición x del clic dentro de la celda para saber qué botón
+                        Rectangle cellRect = tablaClientes.getCellRect(row, col, true);
+                        int posX = e.getX() - cellRect.x;
+                        
+                        // Aproximadamente: botón ver (x < 25), botón editar (25-50), botón eliminar (> 50)
+                        if (posX > 20 && posX < 50) {
+                            // Botón editar
+                            abrirEditarCliente(clienteId, nombreCompleto, email);
+                        }
+                    } else {
+                        mostrarPanelResumenCliente();
+                    }
                 }
             }
         });
