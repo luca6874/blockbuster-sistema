@@ -1,12 +1,11 @@
 package frontend.src.mainpackage;
 
+import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
-import java.awt.*;
 
 /**
  * Modulo visual para registrar una nueva operacion.
- * Los controles se dejan sin logica funcional por ahora.
  */
 public class PnlNuevaOperacion extends JPanel {
     private static final Color TOP_BAR = new Color(110, 60, 70);

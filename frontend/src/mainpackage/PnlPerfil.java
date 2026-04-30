@@ -1,7 +1,7 @@
 package frontend.src.mainpackage;
 
-import javax.swing.*;
 import java.awt.*;
+import javax.swing.*;
 
 /**
  * Vista resumida del administrador dentro del Dashboard.
@@ -16,7 +16,7 @@ public class PnlPerfil extends JPanel {
 
         JPanel topBar = new JPanel(new BorderLayout());
         topBar.setBackground(new Color(110, 60, 70));
-        topBar.setBounds(0, 0, 780, 40);
+        topBar.setBounds(0, 0, 2000, 40);
         JLabel lblTitulo = new JLabel("  Perfil de Administrador", SwingConstants.LEFT);
         lblTitulo.setForeground(Color.WHITE);
         lblTitulo.setFont(new Font("Arial", Font.BOLD, 14));

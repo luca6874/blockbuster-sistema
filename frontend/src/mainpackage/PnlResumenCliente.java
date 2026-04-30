@@ -9,8 +9,10 @@ import java.net.URL;
  * Panel de Resumen del Cliente.
  */
 public class PnlResumenCliente extends JPanel {
+    private ViewDashboard parent;
 
-    public PnlResumenCliente() {
+    public PnlResumenCliente(ViewDashboard parent) {
+        this.parent = parent;
         this.setLayout(null);
         this.setBackground(Color.WHITE);
         this.setPreferredSize(new Dimension(250, 300));
@@ -115,6 +117,19 @@ public class PnlResumenCliente extends JPanel {
 
         JButton btnEditar = createActionButton("Editar cliente", new Color(46, 204, 113));
         btnEditar.setBounds(15, 235, 110, 26);
+        btnEditar.addActionListener(e -> {
+            // Obtener datos del cliente desde el panel
+            String clienteId = obtenerClienteId();
+            String nombres = obtenerNombres();
+            String apellidos = obtenerApellidos();
+            String email = obtenerEmail();
+            String telefono = obtenerTelefono();
+            String fechaNacimiento = obtenerFechaNacimiento();
+            
+            DlgEdicionCliente dlgEditar = new DlgEdicionCliente(parent.getHost(), clienteId, nombres, apellidos, email, telefono, fechaNacimiento);
+            parent.getHost().setOscurecer(true);
+            dlgEditar.setVisible(true);
+        });
         this.add(btnEditar);
 
         JButton btnEliminar = createActionButton("Eliminar cliente", new Color(231, 76, 60));
@@ -185,5 +200,30 @@ public class PnlResumenCliente extends JPanel {
         button.setBorderPainted(false);
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
         return button;
+    }
+
+    // Métodos para obtener datos del cliente (datos simulados)
+    private String obtenerClienteId() {
+        return "13587";
+    }
+
+    private String obtenerNombres() {
+        return "Luis";
+    }
+
+    private String obtenerApellidos() {
+        return "Spinetta";
+    }
+
+    private String obtenerEmail() {
+        return "pescado@rabioso.com";
+    }
+
+    private String obtenerTelefono() {
+        return "55 271 4314";
+    }
+
+    private String obtenerFechaNacimiento() {
+        return "05/02/2004";
     }
 }

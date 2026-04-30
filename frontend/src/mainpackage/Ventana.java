@@ -1,11 +1,9 @@
 package frontend.src.mainpackage;
-
 import java.awt.*;
 import javax.swing.*;
 
 /**
  * JFrame principal que actúa como host para las vistas y gestiona diálogos modales.
- * CUMPLIMIENTO REGLA DE ORO: Archivo 100% completo con todas las funciones restauradas.
  */
 public class Ventana extends JFrame {
     
@@ -77,7 +75,7 @@ public class Ventana extends JFrame {
         new DlgFormCliente(this).setVisible(true);
     }
 
-    public void mostrarAvisoExitosoCliente(DlgFormCliente padre) {
+    public void mostrarAvisoExitosoCliente(JDialog padre) {
         JDialog d = new JDialog(padre, true);
         d.setUndecorated(true); d.setSize(400, 200); d.setLocationRelativeTo(padre);
         JPanel c = new JPanel(null) {
@@ -239,34 +237,90 @@ public class Ventana extends JFrame {
 
     d.add(c); 
     d.setVisible(true);
-}
-    public void mostrarDialogoPoliticas(JCheckBox chk) {
-        setOscurecer(true);
-        JDialog d = new JDialog(this, "Políticas", true);
-        d.setUndecorated(true); d.setSize(600, 400); d.setLocationRelativeTo(this);
-        JPanel c = new JPanel(null); c.setBackground(CARD_WHITE); c.setBorder(BorderFactory.createLineBorder(ACCENT_RED, 2));
-
-        JLabel t = new JLabel("Políticas de Acceso y Uso", SwingConstants.CENTER);
-        t.setBounds(20, 20, 560, 30); t.setFont(new Font("Arial", Font.BOLD, 18)); t.setForeground(ACCENT_RED);
-        c.add(t);
-
-        JTextPane tp = new JTextPane();
-        tp.setText("Al aceptar, reconoce el uso limitado del sistema para personal autorizado.\n\n1. No compartirá credenciales.\n2. Uso ético de la información.\n3. Reportará fallos.");
-        tp.setEditable(false); tp.setBackground(CARD_WHITE);
-        JScrollPane s = new JScrollPane(tp); s.setBounds(30, 70, 540, 250); s.setBorder(null);
-        c.add(s);
-
-        JButton btnA = new JButton("Aceptar"); btnA.setBounds(280, 340, 130, 35); btnA.setBackground(ACCENT_RED);
-        btnA.setForeground(Color.WHITE); btnA.addActionListener(e -> { if(chk != null) chk.setSelected(true); setOscurecer(false); d.dispose(); intentarRestaurarDashboard(); });
-        c.add(btnA);
-
-        JButton btnR = new JButton("Rechazar"); btnR.setBounds(420, 340, 130, 35); btnR.setContentAreaFilled(false);
-        btnR.setForeground(ACCENT_RED); btnR.setBorder(BorderFactory.createLineBorder(ACCENT_RED, 1));
-        btnR.addActionListener(e -> { setOscurecer(false); d.dispose(); intentarRestaurarDashboard(); });
-        c.add(btnR);
-
-        d.add(c); d.setVisible(true);
     }
+
+    public void mostrarDialogoPoliticas(JCheckBox chk) {
+    setOscurecer(true);
+    Color ROJO_OSCURO = new Color(160, 33, 55); 
+    
+    JDialog d = new JDialog(this, "Políticas", true);
+    d.setUndecorated(true); 
+    d.setSize(600, 480);
+    d.setLocationRelativeTo(this);
+    
+    JPanel c = new JPanel(null); 
+    c.setBackground(Color.WHITE); 
+    c.setBorder(BorderFactory.createLineBorder(ROJO_OSCURO, 1));
+
+    JLabel t = new JLabel("Política de Acceso y Uso para Personal Autorizado");
+    t.setBounds(20, 20, 560, 30); 
+    t.setFont(new Font("Segoe UI", Font.PLAIN, 22)); 
+    t.setForeground(ROJO_OSCURO);
+    c.add(t);
+
+    JTextPane tp = new JTextPane();
+    tp.setContentType("text/html");
+    tp.setEditable(false);
+    tp.setFocusable(false);
+    
+    tp.setText(
+
+        "<html><body style='font-family:Sans-Serif; font-size:10pt; color:#333333;'>" +
+
+        "Al marcar la casilla de confirmación y acceder al sistema administrativo, usted reconoce y acepta que el uso de esta plataforma está estrictamente limitado a personal autorizado de la organización. Este acceso tiene como finalidad exclusiva la gestión, supervisión y operación interna del sistema.<br>" +
+
+        "El usuario declara que:<ul>" +
+
+        "<li>Cuenta con la debida autorización para acceder a funciones administrativas.</li>" +
+
+        "<li>Utilizará el sistema únicamente para fines laborales y legítimos.</li>" +
+
+        "<li>No compartirá sus credenciales de acceso con terceros bajo ninguna circunstancia.</li>" +
+
+        "<li>Es responsable de todas las acciones realizadas desde su cuenta.</li>" +
+
+        "</ul>Asimismo, el usuario se compromete a:<ul>" +
+
+        "<li>Proteger la confidencialidad de la información a la que tenga acceso, incluyendo datos de clientes, contenido del sistema y configuraciones internas.</li>" +
+
+        "<li>No modificar, eliminar o manipular información sin la debida autorización o fuera de sus funciones asignadas.</li>" +
+
+        "<li>Evitar el uso indebido del sistema, incluyendo intentos de vulnerar la seguridad, acceder a áreas restringidas o alterar el funcionamiento de la plataforma.</li>" +
+
+        "</ul>El incumplimiento de estas disposiciones puede derivar en consecuencias disciplinarias, incluyendo la suspensión o terminación del acceso, así como posibles acciones legales.<br>" +
+
+        "Al continuar, usted confirma que comprende y acepta estas condiciones, y que hará uso responsable y ético del sistema administrativo." +
+
+        "</body></html>"
+
+    );
+    JScrollPane s = new JScrollPane(tp); 
+    s.setBounds(30, 60, 540, 330); 
+    s.setBorder(null);
+    c.add(s);
+
+    
+    BotonRedondeado btnA = new BotonRedondeado("Aceptar", ROJO_OSCURO, Color.WHITE);
+    btnA.setBounds(320, 410, 120, 40); 
+    btnA.addActionListener(e -> { 
+        if(chk != null) chk.setSelected(true); 
+        setOscurecer(false); d.dispose(); intentarRestaurarDashboard(); 
+    });
+    c.add(btnA);
+
+    BotonRedondeado btnR = new BotonRedondeado("Rechazar", Color.WHITE, ROJO_OSCURO);
+    btnR.setConBorde(true);
+    btnR.setBounds(450, 410, 120, 40); 
+    btnR.addActionListener(e -> { 
+        setOscurecer(false); d.dispose(); intentarRestaurarDashboard(); 
+    });
+    c.add(btnR);
+
+    d.add(c); 
+    d.setVisible(true);
+    }
+
+
 
     public void mostrarConfirmacionCerrarSesion() {
         setOscurecer(true);
@@ -325,7 +379,7 @@ public class Ventana extends JFrame {
         d.add(c); d.setVisible(true);
     }
 
-    public void mostrarDialogoAyuda() {
+   public void mostrarDialogoAyuda() {
         setOscurecer(true);
         JDialog d = new JDialog(this, "Ayuda", true);
         d.setUndecorated(true); d.setSize(600, 400); d.setLocationRelativeTo(this);
@@ -336,17 +390,21 @@ public class Ventana extends JFrame {
         c.add(tit);
 
         String con = "<html><div style='font-family:Arial; font-size:10px; color:#333333;'>"
-                + "<b>Teléfono:</b> +52 (667) 845 9921<br>Soporte técnico:<br>soporte@briarbuster.dev<br><br>"
-                + "<b>Horario de atención:</b><br>Lunes a Viernes de 9:00 a 18:00 hrs</div></html>";
+                + "Teléfono: +52 (667) 845 9921<br>Soporte técnico:<br>soporte@briarbuster.dev<br>"
+                + "Atención general:<br>contacto@briarbuster.mx<br><br>"
+                + "Horario de atención:<br>Lunes a Viernes de 9:00 a 18:00 hrs<br>"
+                + "Sábados de 10:00 a 14:00 hrs</div></html>";
         JLabel lC = new JLabel(con); lC.setBounds(40, 100, 250, 200); lC.setVerticalAlignment(SwingConstants.TOP); c.add(lC);
         
         JSeparator s = new JSeparator(JSeparator.VERTICAL); s.setBounds(300, 80, 1, 200); c.add(s);
         
         String ubi = "<html><div style='font-family:Arial; font-size:10px; color:#333333;'>"
-                + "<b>Ubicación</b><br>Centro Tecnológico Altavista Digital<br>Av. Circuito Innovación #4582<br>México</div></html>";
+                + "Ubicación<br>Centro de Desarrollo Tecnológico Altavista Digital<br>"
+                + "Av. Circuito Innovación #4582, Piso 7<br>Col. Bosques del Horizonte<br>"
+                + "C.P. 90847<br>Ciudad Neotrópolis, Estado de Nova Sierra<br>México</div></html>";
         JLabel lU = new JLabel(ubi); lU.setBounds(320, 100, 250, 200); lU.setVerticalAlignment(SwingConstants.TOP); c.add(lU);
         
-        JButton bS = new JButton("Entendido"); bS.setBounds(225, 330, 150, 35); bS.setBackground(ACCENT_RED);
+        JButton bS = new JButton("Regresar"); bS.setBounds(225, 330, 150, 35); bS.setBackground(ACCENT_RED);
         bS.setForeground(Color.WHITE); bS.addActionListener(e -> { setOscurecer(false); d.dispose(); intentarRestaurarDashboard(); });
         c.add(bS);
         

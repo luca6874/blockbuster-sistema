@@ -1,9 +1,5 @@
 package frontend.src.mainpackage;
 
-import javax.swing.*;
-import javax.swing.border.LineBorder;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -12,11 +8,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import javax.swing.*;
+import javax.swing.border.LineBorder;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 
-/**
- * Modulo de Rentas y Compras.
- * Vista principal para consultar y detallar operaciones.
- */
 public class PnlRentasCompras extends JPanel {
     private static final int IDX_CLIENTE = 0;
     private static final int IDX_VIDEOJUEGO = 1;
@@ -105,21 +101,38 @@ public class PnlRentasCompras extends JPanel {
         panel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
 
         txtBuscarCliente = new JTextField("Buscar por cliente...");
-        txtBuscarCliente.setBounds(10, 10, 200, 30);
+        txtBuscarCliente.setBounds(10, 10, 160, 30);
         txtBuscarCliente.setBorder(new LineBorder(new Color(200, 200, 200), 1, true));
         txtBuscarCliente.setBackground(Color.WHITE);
         txtBuscarCliente.setFont(new Font("Arial", Font.PLAIN, 12));
         panel.add(txtBuscarCliente);
 
         txtBuscarVideojuego = new JTextField("Buscar por videojuego...");
-        txtBuscarVideojuego.setBounds(220, 10, 200, 30);
+        txtBuscarVideojuego.setBounds(180, 10, 160, 30);
         txtBuscarVideojuego.setBorder(new LineBorder(new Color(200, 200, 200), 1, true));
         txtBuscarVideojuego.setBackground(Color.WHITE);
         txtBuscarVideojuego.setFont(new Font("Arial", Font.PLAIN, 12));
         panel.add(txtBuscarVideojuego);
 
-        comboTipo = new JComboBox<>(new String[]{"Todos", "Renta", "Compra"});
-        comboTipo.setBounds(430, 10, 100, 30);
+        JLabel lblPlataforma = new JLabel("Plataforma:");
+        lblPlataforma.setBounds(350, 10, 70, 30);
+        lblPlataforma.setFont(new Font("Arial", Font.PLAIN, 12));
+        panel.add(lblPlataforma);
+
+        String[] plataformas = {"Todos","Xbox 360", "SWITCH", "PS4", "Xbox ONE", "SWITCH 2", "PS5"};
+        JComboBox<String> comboPlataforma = new JComboBox<>(plataformas);
+        comboPlataforma.setBounds(425, 10, 110, 30);
+        comboPlataforma.setBackground(Color.WHITE);
+        panel.add(comboPlataforma);
+
+        JCheckBox chkOperacion = new JCheckBox();
+        chkOperacion.setBounds(545, 15, 25, 20);
+        chkOperacion.setOpaque(false);
+        panel.add(chkOperacion);
+
+        String[] opcionesOperacion = {"Ambos", "Renta", "Venta"};
+        comboTipo = new JComboBox<>(opcionesOperacion);
+        comboTipo.setBounds(575, 10, 90, 30);
         comboTipo.setBorder(new LineBorder(new Color(200, 200, 200), 1));
         comboTipo.setBackground(Color.WHITE);
         comboTipo.setFont(new Font("Arial", Font.PLAIN, 12));
