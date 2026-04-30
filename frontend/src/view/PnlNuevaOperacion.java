@@ -1,4 +1,8 @@
-package frontend.src.mainpackage;
+package frontend.src.view;
+
+import frontend.src.controller.Ventana;
+import frontend.src.model.ClienteInfo;
+import frontend.src.model.VideojuegoInfo;
 
 import java.awt.*;
 import javax.swing.*;
@@ -18,8 +22,8 @@ public class PnlNuevaOperacion extends JPanel {
     private final ViewDashboard parent;
     private JButton btnSeleccionarCliente;
     private JButton btnSeleccionarVideojuego;
-    private DlgSeleccionClienteOperacion.ClienteInfo clienteSeleccionado;
-    private DlgSeleccionVideojuegoOperacion.VideojuegoInfo videojuegoSeleccionado;
+    private ClienteInfo clienteSeleccionado;
+    private VideojuegoInfo videojuegoSeleccionado;
 
     public PnlNuevaOperacion(ViewDashboard parent) {
         this.parent = parent;
@@ -204,7 +208,7 @@ public class PnlNuevaOperacion extends JPanel {
         dialogo.setVisible(true);
         parent.getHost().setOscurecer(false);
 
-        DlgSeleccionClienteOperacion.ClienteInfo seleccionado = dialogo.getClienteSeleccionado();
+        ClienteInfo seleccionado = dialogo.getClienteSeleccionado();
         if (seleccionado != null) {
             clienteSeleccionado = seleccionado;
             btnSeleccionarCliente.setText(seleccionado.getNombre());
@@ -218,7 +222,7 @@ public class PnlNuevaOperacion extends JPanel {
         dialogo.setVisible(true);
         parent.getHost().setOscurecer(false);
 
-        DlgSeleccionVideojuegoOperacion.VideojuegoInfo seleccionado = dialogo.getVideojuegoSeleccionado();
+        VideojuegoInfo seleccionado = dialogo.getVideojuegoSeleccionado();
         if (seleccionado != null) {
             videojuegoSeleccionado = seleccionado;
             btnSeleccionarVideojuego.setText(seleccionado.getTitulo() + " (" + seleccionado.getPlataforma() + ")");

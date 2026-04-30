@@ -1,4 +1,6 @@
-package frontend.src.mainpackage;
+package frontend.src.controller;
+
+import frontend.src.view.*;
 import java.awt.*;
 import javax.swing.*;
 

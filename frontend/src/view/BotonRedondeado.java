@@ -1,4 +1,6 @@
-package frontend.src.mainpackage;
+package frontend.src.view;
+
+import frontend.src.controller.Ventana;
 
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;

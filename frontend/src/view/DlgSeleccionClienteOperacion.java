@@ -1,4 +1,7 @@
-package frontend.src.mainpackage;
+package frontend.src.view;
+
+import frontend.src.controller.Ventana;
+import frontend.src.model.ClienteInfo;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -15,54 +18,6 @@ import java.util.Locale;
  * Selector visual de clientes para el modulo de nueva operacion.
  */
 public class DlgSeleccionClienteOperacion extends JDialog {
-    public static class ClienteInfo {
-        private final String id;
-        private final String nombre;
-        private final String email;
-        private final String estatus;
-        private final String nivel;
-        private final boolean frecuente;
-        private final String telefono;
-
-        public ClienteInfo(String id, String nombre, String email, String estatus, String nivel, boolean frecuente, String telefono) {
-            this.id = id;
-            this.nombre = nombre;
-            this.email = email;
-            this.estatus = estatus;
-            this.nivel = nivel;
-            this.frecuente = frecuente;
-            this.telefono = telefono;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public String getNombre() {
-            return nombre;
-        }
-
-        public String getEmail() {
-            return email;
-        }
-
-        public String getEstatus() {
-            return estatus;
-        }
-
-        public String getNivel() {
-            return nivel;
-        }
-
-        public boolean isFrecuente() {
-            return frecuente;
-        }
-
-        public String getTelefono() {
-            return telefono;
-        }
-    }
-
     private static final Color BORDER = new Color(214, 214, 214);
     private static final Color MUTED = new Color(110, 110, 110);
     private static final Color MAROON = new Color(110, 60, 70);

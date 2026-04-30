@@ -1,4 +1,4 @@
-package frontend.src.mainpackage;
+package frontend.src.controller;
 
 /**
  * Punto de entrada principal de la aplicación Briarbuster.
