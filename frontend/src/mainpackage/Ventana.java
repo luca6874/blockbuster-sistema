@@ -1,6 +1,5 @@
 package frontend.src.mainpackage;
 import java.awt.*;
-import java.awt.geom.RoundRectangle2D;
 import javax.swing.*;
 
 /**
@@ -238,10 +237,10 @@ public class Ventana extends JFrame {
 
     d.add(c); 
     d.setVisible(true);
-}
+    }
+
     public void mostrarDialogoPoliticas(JCheckBox chk) {
     setOscurecer(true);
-    
     Color ROJO_OSCURO = new Color(160, 33, 55); 
     
     JDialog d = new JDialog(this, "Políticas", true);
@@ -259,35 +258,49 @@ public class Ventana extends JFrame {
     t.setForeground(ROJO_OSCURO);
     c.add(t);
 
-   
     JTextPane tp = new JTextPane();
     tp.setContentType("text/html");
     tp.setEditable(false);
     tp.setFocusable(false);
-    tp.setText(
-        "<html><body style='font-family:Sans-Serif; font-size:10pt; color:#333333;'>" +
-        "Al marcar la casilla de confirmación y acceder al sistema administrativo, usted reconoce y acepta que el uso de esta plataforma está estrictamente limitado a personal autorizado de la organización. Este acceso tiene como finalidad exclusiva la gestión, supervisión y operación interna del sistema.<br>" +
-        "El usuario declara que:<ul>" +
-        "<li>Cuenta con la debida autorización para acceder a funciones administrativas.</li>" +
-        "<li>Utilizará el sistema únicamente para fines laborales y legítimos.</li>" +
-        "<li>No compartirá sus credenciales de acceso con terceros bajo ninguna circunstancia.</li>" +
-        "<li>Es responsable de todas las acciones realizadas desde su cuenta.</li>" +
-        "</ul>Asimismo, el usuario se compromete a:<ul>" +
-        "<li>Proteger la confidencialidad de la información a la que tenga acceso, incluyendo datos de clientes, contenido del sistema y configuraciones internas.</li>" +
-        "<li>No modificar, eliminar o manipular información sin la debida autorización o fuera de sus funciones asignadas.</li>" +
-        "<li>Evitar el uso indebido del sistema, incluyendo intentos de vulnerar la seguridad, acceder a áreas restringidas o alterar el funcionamiento de la plataforma.</li>" +
-        "</ul>El incumplimiento de estas disposiciones puede derivar en consecuencias disciplinarias, incluyendo la suspensión o terminación del acceso, así como posibles acciones legales.<br>" +
-        "Al continuar, usted confirma que comprende y acepta estas condiciones, y que hará uso responsable y ético del sistema administrativo." +
-        "</body></html>"
-    );
     
+    tp.setText(
+
+        "<html><body style='font-family:Sans-Serif; font-size:10pt; color:#333333;'>" +
+
+        "Al marcar la casilla de confirmación y acceder al sistema administrativo, usted reconoce y acepta que el uso de esta plataforma está estrictamente limitado a personal autorizado de la organización. Este acceso tiene como finalidad exclusiva la gestión, supervisión y operación interna del sistema.<br>" +
+
+        "El usuario declara que:<ul>" +
+
+        "<li>Cuenta con la debida autorización para acceder a funciones administrativas.</li>" +
+
+        "<li>Utilizará el sistema únicamente para fines laborales y legítimos.</li>" +
+
+        "<li>No compartirá sus credenciales de acceso con terceros bajo ninguna circunstancia.</li>" +
+
+        "<li>Es responsable de todas las acciones realizadas desde su cuenta.</li>" +
+
+        "</ul>Asimismo, el usuario se compromete a:<ul>" +
+
+        "<li>Proteger la confidencialidad de la información a la que tenga acceso, incluyendo datos de clientes, contenido del sistema y configuraciones internas.</li>" +
+
+        "<li>No modificar, eliminar o manipular información sin la debida autorización o fuera de sus funciones asignadas.</li>" +
+
+        "<li>Evitar el uso indebido del sistema, incluyendo intentos de vulnerar la seguridad, acceder a áreas restringidas o alterar el funcionamiento de la plataforma.</li>" +
+
+        "</ul>El incumplimiento de estas disposiciones puede derivar en consecuencias disciplinarias, incluyendo la suspensión o terminación del acceso, así como posibles acciones legales.<br>" +
+
+        "Al continuar, usted confirma que comprende y acepta estas condiciones, y que hará uso responsable y ético del sistema administrativo." +
+
+        "</body></html>"
+
+    );
     JScrollPane s = new JScrollPane(tp); 
     s.setBounds(30, 60, 540, 330); 
     s.setBorder(null);
     c.add(s);
 
     
-    JButton btnA = new BotonRedondeado("Aceptar", ROJO_OSCURO, Color.WHITE);
+    BotonRedondeado btnA = new BotonRedondeado("Aceptar", ROJO_OSCURO, Color.WHITE);
     btnA.setBounds(320, 410, 120, 40); 
     btnA.addActionListener(e -> { 
         if(chk != null) chk.setSelected(true); 
@@ -295,9 +308,8 @@ public class Ventana extends JFrame {
     });
     c.add(btnA);
 
-   
-    JButton btnR = new BotonRedondeado("Rechazar", Color.WHITE, ROJO_OSCURO);
-    ((BotonRedondeado)btnR).setConBorde(true);
+    BotonRedondeado btnR = new BotonRedondeado("Rechazar", Color.WHITE, ROJO_OSCURO);
+    btnR.setConBorde(true);
     btnR.setBounds(450, 410, 120, 40); 
     btnR.addActionListener(e -> { 
         setOscurecer(false); d.dispose(); intentarRestaurarDashboard(); 
@@ -306,47 +318,9 @@ public class Ventana extends JFrame {
 
     d.add(c); 
     d.setVisible(true);
-}
-
-
-class BotonRedondeado extends JButton {
-    private Color bg, fg;
-    private boolean conBorde = false;
-
-    public BotonRedondeado(String texto, Color bg, Color fg) {
-        super(texto);
-        this.bg = bg;
-        this.fg = fg;
-        setContentAreaFilled(false);
-        setBorderPainted(false);
-        setFocusPainted(false);
-        setForeground(fg);
-        setFont(new Font("SansSerif", Font.PLAIN, 15));
-        setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 
-    public void setConBorde(boolean b) { this.conBorde = b; }
 
-    @Override
-    protected void paintComponent(Graphics g) {
-        Graphics2D g2 = (Graphics2D) g.create();
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        
-        
-        g2.setColor(bg);
-        g2.fill(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), 15, 15));
-        
-       
-        if (conBorde) {
-            g2.setColor(fg);
-            g2.setStroke(new BasicStroke(1f));
-            g2.draw(new RoundRectangle2D.Double(0, 0, getWidth()-1, getHeight()-1, 15, 15));
-        }
-        
-        g2.dispose();
-        super.paintComponent(g);
-    }
-}
 
     public void mostrarConfirmacionCerrarSesion() {
         setOscurecer(true);
