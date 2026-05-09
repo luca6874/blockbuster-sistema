@@ -1,6 +1,8 @@
 package frontend.src.view;
 
 import frontend.src.controller.Ventana;
+import frontend.src.controller.LoginController;
+import frontend.src.model.UsuarioInfo;
 
 import java.awt.*;
 import javax.swing.*;
@@ -9,6 +11,8 @@ import javax.swing.border.MatteBorder;
 public class ViewLogin extends JPanel {
     private final Ventana host;
     private JCheckBox chkAutorizado;
+    private JTextField tfUsername;
+    private JTextField tfPassword;
 
     public ViewLogin(Ventana host) {
         this.host = host;
@@ -46,13 +50,15 @@ public class ViewLogin extends JPanel {
         };
         card.setBounds(150, 50, 400, 500); card.setOpaque(false);
         
-       JLabel t = new JLabel("ACCESO AL SISTEMA", SwingConstants.CENTER);
+        JLabel t = new JLabel("ACCESO AL SISTEMA", SwingConstants.CENTER);
         t.setBounds(0, 20, 400, 40); 
         t.setFont(new Font("Georgia", Font.BOLD, 26)); 
         t.setForeground(new Color(0x9C1D3A)); 
         card.add(t);
 
-        crearIn("Nombre", 80, card); crearIn("E-mail", 145, card); crearIn("Contraseña", 210, card);
+        tfUsername = crearIn("Nombre", 80, card);
+        crearIn("E-mail", 145, card);
+        tfPassword = crearIn("Contraseña", 210, card);
 
        
         chkAutorizado = new JCheckBox();
@@ -86,8 +92,45 @@ public class ViewLogin extends JPanel {
         JButton btnL = new JButton("Iniciar sesión"); btnL.setBounds(40, 350, 320, 40);
         btnL.setBackground(Ventana.ACCENT_RED); btnL.setForeground(Color.WHITE); btnL.setFocusPainted(false);
         btnL.addActionListener(e -> {
-            if(chkAutorizado.isSelected()) host.router("dashboard");
-            else host.mostrarAlertaAutorizacion();
+            // Validar checkbox de autorización
+            if (!chkAutorizado.isSelected()) {
+                host.mostrarAlertaAutorizacion();
+                return;
+            }
+
+            // Obtener credenciales de los campos
+            String username = tfUsername.getText().trim();
+            String password = tfPassword.getText().trim();
+
+            // Validar que no estén vacíos
+            if (username.isEmpty() || password.isEmpty()) {
+                JOptionPane.showMessageDialog(
+                    ViewLogin.this,
+                    "Por favor, ingresa usuario y contraseña",
+                    "Campos vacíos",
+                    JOptionPane.WARNING_MESSAGE
+                );
+                return;
+            }
+
+            // Llamar al controlador de login
+            UsuarioInfo usuario = LoginController.validarLogin(username, password);
+
+            // Procesar resultado
+            if (usuario != null) {
+                // Login exitoso: abrir dashboard
+                host.router("dashboard");
+            } else {
+                // Credenciales incorrectas
+                JOptionPane.showMessageDialog(
+                    ViewLogin.this,
+                    "Usuario o contraseña incorrectos",
+                    "Error de autenticación",
+                    JOptionPane.ERROR_MESSAGE
+                );
+                // Limpiar campos de password
+                tfPassword.setText("");
+            }
         });
         card.add(btnL);
 
@@ -100,10 +143,11 @@ public class ViewLogin extends JPanel {
         rp.add(card); this.add(rp);
     }
 
-    private void crearIn(String t, int y, JPanel p) {
+    private JTextField crearIn(String t, int y, JPanel p) {
         JLabel l = new JLabel(t); l.setBounds(40, y, 200, 20); l.setFont(new Font("Arial", Font.BOLD, 12)); p.add(l);
         JTextField f = t.equals("Contraseña") ? new JPasswordField() : new JTextField();
         f.setBounds(40, y + 20, 320, 25); f.setBorder(new MatteBorder(0,0,1,0, Color.BLACK));
         f.setBackground(Ventana.CARD_WHITE); p.add(f);
+        return f;
     }
 }
