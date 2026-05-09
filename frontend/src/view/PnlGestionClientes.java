@@ -1,6 +1,8 @@
 package frontend.src.view;
 
 import frontend.src.controller.Ventana;
+import frontend.src.controller.ClienteController;
+import frontend.src.model.ClienteInfo;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -10,6 +12,7 @@ import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.List;
 /**
  * Módulo de Gestión de Clientes.
  */
@@ -399,13 +402,14 @@ public class PnlGestionClientes extends JPanel {
     private void initTablaClientes() {
         String[] columnas = {"ID", "Nombre completo", "Email", "Estatus", "Nivel", "Acciones"};
         
-        Object[][] datos = {
-            {"CLI-001", "Caitlyn Kiramman", "caitlyn.k@email.com", "Activo", "Oro", "..."},
-            {"CLI-002", "Vi Enforcer", "vi.enforcer@email.com", "Activo", "Plata", "..."},
-            {"CLI-003", "Talía Braum", "talia.b@email.com", "Inactivo", "Bronce", "..."},
-            {"CLI-004", "Viktor Herald", "viktor.h@email.com", "Activo", "Oro", "..."},
-            {"CLI-005", "Jayce Tallis", "jayce.t@email.com", "Suspendido", "Plata", "..."}
-        };
+        // Obtener datos reales desde la BD a través del Controller
+        List<ClienteInfo> clientesDeBD = ClienteController.traerClientesDeBD();
+        Object[][] datos = convertirClientesAArray(clientesDeBD);
+        
+        // Actualizar etiqueta con cantidad real
+        if (lblTotalClientes != null) {
+            lblTotalClientes.setText("Lista de clientes (" + clientesDeBD.size() + ")");
+        }
         
         DefaultTableModel modelo = new DefaultTableModel(datos, columnas) {
             @Override public boolean isCellEditable(int r, int c) { return false; }
@@ -547,5 +551,31 @@ public class PnlGestionClientes extends JPanel {
         header.setFont(new Font("Arial", Font.BOLD, 11));
         header.setPreferredSize(new Dimension(0, 30));
         header.setReorderingAllowed(false);
+    }
+
+    /**
+     * Convierte una lista de ClienteInfo a un array de objetos para JTable.
+     * 
+     * @param clientes lista de ClienteInfo desde la BD
+     * @return array 2D con formato: {ID, Nombre, Email, Estatus, Nivel, "..."}
+     */
+    private Object[][] convertirClientesAArray(List<ClienteInfo> clientes) {
+        if (clientes == null || clientes.isEmpty()) {
+            return new Object[0][6];  // Array vacío
+        }
+
+        Object[][] datos = new Object[clientes.size()][6];
+        
+        for (int i = 0; i < clientes.size(); i++) {
+            ClienteInfo cliente = clientes.get(i);
+            datos[i][0] = cliente.getId();              // ID
+            datos[i][1] = cliente.getNombre();           // Nombre completo
+            datos[i][2] = cliente.getEmail();            // Email
+            datos[i][3] = cliente.getEstatus();          // Estatus
+            datos[i][4] = cliente.getNivel();            // Nivel fidelidad
+            datos[i][5] = "...";                         // Botones de acciones
+        }
+        
+        return datos;
     }
 }
