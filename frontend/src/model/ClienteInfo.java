@@ -9,11 +9,14 @@ package frontend.src.model;
 public class ClienteInfo {
     private String id;
     private String nombre;
+    private String primerApellido;
+    private String segundoApellido;
     private String email;
     private String estatus;
     private String nivel;
     private boolean frecuente;
     private String telefono;
+    private String fechaNacimiento;
 
     // Constructor vacío (para DAO)
     public ClienteInfo() {
@@ -37,7 +40,26 @@ public class ClienteInfo {
     }
 
     public String getNombre() {
+        StringBuilder nombreCompleto = new StringBuilder(nombre != null ? nombre : "");
+        if (primerApellido != null && !primerApellido.trim().isEmpty()) {
+            nombreCompleto.append(" ").append(primerApellido.trim());
+        }
+        if (segundoApellido != null && !segundoApellido.trim().isEmpty()) {
+            nombreCompleto.append(" ").append(segundoApellido.trim());
+        }
+        return nombreCompleto.toString().trim();
+    }
+
+    public String getNombres() {
         return nombre;
+    }
+
+    public String getPrimerApellido() {
+        return primerApellido;
+    }
+
+    public String getSegundoApellido() {
+        return segundoApellido;
     }
 
     public String getEmail() {
@@ -60,6 +82,10 @@ public class ClienteInfo {
         return telefono;
     }
 
+    public String getFechaNacimiento() {
+        return fechaNacimiento;
+    }
+
     // SETTERS (nuevos, no rompen nada)
     
     public void setId(String id) {
@@ -68,6 +94,14 @@ public class ClienteInfo {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+
+    public void setPrimerApellido(String primerApellido) {
+        this.primerApellido = primerApellido;
+    }
+
+    public void setSegundoApellido(String segundoApellido) {
+        this.segundoApellido = segundoApellido;
     }
 
     public void setEmail(String email) {
@@ -88,5 +122,9 @@ public class ClienteInfo {
 
     public void setTelefono(String telefono) {
         this.telefono = telefono;
+    }
+
+    public void setFechaNacimiento(String fechaNacimiento) {
+        this.fechaNacimiento = fechaNacimiento;
     }
 }

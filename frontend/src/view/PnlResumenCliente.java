@@ -222,7 +222,7 @@ public class PnlResumenCliente extends JPanel {
     }
 
     private String obtenerTelefono() {
-        return "55 271 4314";
+        return "5527144314";
     }
 
     private String obtenerFechaNacimiento() {

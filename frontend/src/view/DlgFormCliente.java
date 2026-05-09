@@ -1,7 +1,7 @@
 package frontend.src.view;
 
-import frontend.src.controller.Ventana;
 import frontend.src.controller.ClienteController;
+import frontend.src.controller.Ventana;
 import frontend.src.model.ClienteInfo;
 
 import java.awt.*;
@@ -12,7 +12,8 @@ public class DlgFormCliente extends JDialog {
     private final Ventana host;
     private PnlGestionClientes panelGestion;
     private JTextField txtNombres;
-    private JTextField txtApellidos;
+    private JTextField txtPrimerApellido;
+    private JTextField txtSegundoApellido;
     private JTextField txtEmail;
     private JTextField txtTelefono;
     private JTextField txtFechaNacimiento;
@@ -42,11 +43,12 @@ public class DlgFormCliente extends JDialog {
         content.add(lblTit);
 
         int y = 80;
-        txtNombres = crearCampo("Nombres del Cliente", 40, y, 280, content);
-        txtApellidos = crearCampo("Apellidos", 360, y, 280, content);
-        txtEmail = crearCampo("Correo Electrónico", 40, y + 70, 620, content);
-        txtTelefono = crearCampo("Teléfono de Contacto", 40, y + 140, 280, content);
-        txtFechaNacimiento = crearCampo("Fecha de nacimiento", 360, y + 140, 280, content);
+        txtNombres = crearCampo("Nombres del Cliente", 40, y, 190, content);
+        txtPrimerApellido = crearCampo("Primer apellido", 250, y, 180, content);
+        txtSegundoApellido = crearCampo("Segundo apellido", 450, y, 190, content);
+        txtEmail = crearCampo("Correo Electronico", 40, y + 70, 620, content);
+        txtTelefono = crearCampo("Telefono de Contacto", 40, y + 140, 280, content);
+        txtFechaNacimiento = crearCampo("Fecha de nacimiento (yyyy-mm-dd)", 360, y + 140, 280, content);
 
         JButton btnCan = new JButton("Cancelar");
         btnCan.setBounds(40, 420, 160, 40);
@@ -72,8 +74,8 @@ public class DlgFormCliente extends JDialog {
         linea.setForeground(new Color(210, 210, 210));
         content.add(linea);
 
-        JLabel lblId = new JLabel("ID generada: 35170");
-        lblId.setBounds(410, 420, 200, 40);
+        JLabel lblId = new JLabel("ID generada automaticamente");
+        lblId.setBounds(410, 420, 240, 40);
         lblId.setFont(new Font("Arial", Font.PLAIN, 16));
         lblId.setForeground(new Color(80, 80, 80));
         content.add(lblId);
@@ -81,52 +83,58 @@ public class DlgFormCliente extends JDialog {
         this.add(content);
     }
 
-    /**
-     * Guarda un nuevo cliente en la BD.
-     * Se llama al hacer clic en el botón "Confirmar".
-     */
     private void guardarNuevoCliente() {
-        // Validar campos requeridos
         String nombres = txtNombres.getText().trim();
-        String apellidos = txtApellidos.getText().trim();
+        String primerApellido = txtPrimerApellido.getText().trim();
+        String segundoApellido = txtSegundoApellido.getText().trim();
         String email = txtEmail.getText().trim();
-        String telefono = txtTelefono.getText().trim();
-        
-        if (nombres.isEmpty() || email.isEmpty()) {
+        String telefono = normalizarTelefono(txtTelefono.getText());
+        String fechaNacimiento = txtFechaNacimiento.getText().trim();
+
+        if (nombres.isEmpty() || primerApellido.isEmpty() || email.isEmpty()) {
             JOptionPane.showMessageDialog(
                 this,
-                "Por favor, completa los campos requeridos (Nombres y Email)",
+                "Por favor, completa los campos requeridos (Nombres, Primer apellido y Email)",
                 "Campos incompletos",
                 JOptionPane.WARNING_MESSAGE
             );
             return;
         }
-        
-        // Crear objeto ClienteInfo
+
+        if (!telefono.isEmpty() && !telefono.matches("\\d{10}")) {
+            JOptionPane.showMessageDialog(
+                this,
+                "El telefono debe tener 10 digitos",
+                "Telefono invalido",
+                JOptionPane.WARNING_MESSAGE
+            );
+            return;
+        }
+
         ClienteInfo nuevoCliente = new ClienteInfo();
-        nuevoCliente.setNombre(nombres + " " + apellidos);
+        nuevoCliente.setNombre(nombres);
+        nuevoCliente.setPrimerApellido(primerApellido);
+        nuevoCliente.setSegundoApellido(segundoApellido);
         nuevoCliente.setEmail(email);
         nuevoCliente.setTelefono(telefono);
+        nuevoCliente.setFechaNacimiento(fechaNacimiento);
         nuevoCliente.setNivel("Bronce");
         nuevoCliente.setEstatus("Activo");
-        
-        // Llamar al controlador para guardar
+
         boolean exito = ClienteController.agregarCliente(nuevoCliente);
-        
+
         if (exito) {
             JOptionPane.showMessageDialog(
                 this,
                 "Cliente agregado exitosamente",
-                "Éxito",
+                "Exito",
                 JOptionPane.INFORMATION_MESSAGE
             );
-            
-            // Refrescar tabla si hay referencia al panel
+
             if (panelGestion != null) {
                 panelGestion.refrescarTabla();
             }
-            
-            // Cerrar diálogo
+
             host.setOscurecer(false);
             this.dispose();
             host.intentarRestaurarDashboard();
@@ -150,5 +158,9 @@ public class DlgFormCliente extends JDialog {
         tf.setBorder(new LineBorder(new Color(220, 220, 220)));
         p.add(tf);
         return tf;
+    }
+
+    private String normalizarTelefono(String telefono) {
+        return telefono == null ? "" : telefono.replaceAll("\\D", "");
     }
 }

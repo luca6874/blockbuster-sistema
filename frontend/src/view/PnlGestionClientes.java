@@ -121,7 +121,10 @@ public class PnlGestionClientes extends JPanel {
     btnCrearCliente.setForeground(Color.WHITE);
     btnCrearCliente.setFont(new Font("Arial", Font.BOLD, 12));
     btnCrearCliente.setCursor(new Cursor(Cursor.HAND_CURSOR));
-    btnCrearCliente.addActionListener(e -> parent.getHost().mostrarFormCliente());
+    btnCrearCliente.addActionListener(e -> {
+        parent.getHost().setOscurecer(true);
+        new DlgFormCliente(parent.getHost(), this).setVisible(true);
+    });
     panel.add(btnCrearCliente);
     
     return panel;
@@ -216,14 +219,14 @@ public class PnlGestionClientes extends JPanel {
         }
     }
 
-    private void abrirEditarCliente(String clienteId, String nombreCompleto, String email) {
-        // Dividir el nombre completo en nombres y apellidos
-        String[] partes = nombreCompleto.split(" ", 2);
-        String nombres = partes.length > 0 ? partes[0] : "";
-        String apellidos = partes.length > 1 ? partes[1] : "";
+    private void abrirEditarCliente(String clienteId) {
+        ClienteInfo cliente = ClienteController.obtenerClientePorId(clienteId);
+        if (cliente == null) {
+            JOptionPane.showMessageDialog(this, "No se pudo cargar la informacion del cliente.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-        // Crear y mostrar el diálogo de edición, pasando referencia del panel
-        DlgEdicionCliente dlgEditar = new DlgEdicionCliente(parent.getHost(), clienteId, nombres, apellidos, email, "", "", this);
+        DlgEdicionCliente dlgEditar = new DlgEdicionCliente(parent.getHost(), cliente.getId(), cliente.getNombres(), cliente.getPrimerApellido(), cliente.getSegundoApellido(), cliente.getEmail(), cliente.getTelefono(), cliente.getFechaNacimiento(), this);
         parent.getHost().setOscurecer(true);
         dlgEditar.setVisible(true);
     }
@@ -493,7 +496,7 @@ public class PnlGestionClientes extends JPanel {
                             mostrarPanelResumenCliente();
                         } else if (posX > 20 && posX < 50) {
                             // Botón editar
-                            abrirEditarCliente(clienteId, nombreCompleto, email);
+                            abrirEditarCliente(clienteId);
                         } else if (posX > 50) {
                             // Botón eliminar
                             confirmarEliminarCliente(clienteId, nombreCompleto);

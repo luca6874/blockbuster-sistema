@@ -1,7 +1,7 @@
 package frontend.src.view;
 
-import frontend.src.controller.Ventana;
 import frontend.src.controller.ClienteController;
+import frontend.src.controller.Ventana;
 import frontend.src.model.ClienteInfo;
 
 import java.awt.*;
@@ -9,13 +9,14 @@ import javax.swing.*;
 import javax.swing.border.LineBorder;
 
 /**
- * Diálogo para editar información del cliente.
+ * Dialogo para editar informacion del cliente.
  */
 public class DlgEdicionCliente extends JDialog {
     private final Ventana host;
     private PnlGestionClientes panelGestion;
     private JTextField txtNombres;
-    private JTextField txtApellidos;
+    private JTextField txtPrimerApellido;
+    private JTextField txtSegundoApellido;
     private JTextField txtEmail;
     private JTextField txtTelefono;
     private JTextField txtFechaNacimiento;
@@ -23,8 +24,14 @@ public class DlgEdicionCliente extends JDialog {
     private JLabel lblFoto;
     private String clienteId;
 
-    public DlgEdicionCliente(Ventana host, String clienteId, String nombres, String apellidos, 
+    public DlgEdicionCliente(Ventana host, String clienteId, String nombres, String primerApellido,
                              String email, String telefono, String fechaNacimiento, PnlGestionClientes panelGestion) {
+        this(host, clienteId, nombres, primerApellido, "", email, telefono, fechaNacimiento, panelGestion);
+    }
+
+    public DlgEdicionCliente(Ventana host, String clienteId, String nombres, String primerApellido,
+                             String segundoApellido, String email, String telefono, String fechaNacimiento,
+                             PnlGestionClientes panelGestion) {
         super(host, true);
         this.host = host;
         this.panelGestion = panelGestion;
@@ -44,22 +51,18 @@ public class DlgEdicionCliente extends JDialog {
         };
         content.setOpaque(false);
 
-        // Título
-        JLabel lblTit = new JLabel("Editar información del cliente");
+        JLabel lblTit = new JLabel("Editar informacion del cliente");
         lblTit.setBounds(40, 20, 400, 25);
         lblTit.setFont(new Font("Arial", Font.BOLD, 18));
         lblTit.setForeground(Ventana.MAROON_BG);
         content.add(lblTit);
 
-        // Panel de foto de perfil
         JPanel fotoPanelBg = new JPanel(null) {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                
-                // Dibujar círculo
                 g2d.setColor(new Color(200, 200, 200));
                 g2d.fillOval(0, 0, 120, 120);
             }
@@ -67,7 +70,6 @@ public class DlgEdicionCliente extends JDialog {
         fotoPanelBg.setBounds(40, 60, 120, 120);
         content.add(fotoPanelBg);
 
-        // Foto de perfil (simulada con un color)
         lblFoto = new JLabel();
         lblFoto.setBounds(45, 65, 110, 110);
         lblFoto.setOpaque(true);
@@ -76,41 +78,29 @@ public class DlgEdicionCliente extends JDialog {
         lblFoto.setVerticalAlignment(SwingConstants.CENTER);
         lblFoto.setFont(new Font("Arial", Font.BOLD, 48));
         lblFoto.setForeground(new Color(150, 80, 80));
-        lblFoto.setText("👤");
+        lblFoto.setText("U");
         content.add(lblFoto);
 
-        // Botón cambiar foto
         JButton btnCambiar = new JButton("Cambiar");
         btnCambiar.setBounds(40, 190, 120, 30);
         btnCambiar.setBackground(Ventana.ACCENT_RED);
         btnCambiar.setForeground(Color.WHITE);
         btnCambiar.setFont(new Font("Arial", Font.BOLD, 12));
         btnCambiar.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnCambiar.addActionListener(e -> JOptionPane.showMessageDialog(this, "Funcionalidad de cambiar foto próximamente"));
+        btnCambiar.addActionListener(e -> JOptionPane.showMessageDialog(this, "Funcionalidad de cambiar foto proximamente"));
         content.add(btnCambiar);
 
-        // Campos de entrada
         int xDerecha = 180;
         int yInicio = 60;
-        int altoCampo = 30;
         int espaciado = 60;
 
-        // Nombres
-        crearCampo("Nombres", xDerecha, yInicio, 280, content, nombres, result -> txtNombres = result);
-        
-        // Apellidos
-        crearCampo("Apellidos", xDerecha + 320, yInicio, 180, content, apellidos, result -> txtApellidos = result);
-
-        // Email
+        crearCampo("Nombres", xDerecha, yInicio, 160, content, nombres, result -> txtNombres = result);
+        crearCampo("Primer apellido", xDerecha + 180, yInicio, 150, content, primerApellido, result -> txtPrimerApellido = result);
+        crearCampo("Segundo apellido", xDerecha + 350, yInicio, 150, content, segundoApellido, result -> txtSegundoApellido = result);
         crearCampo("E-mail", xDerecha, yInicio + espaciado, 520, content, email, result -> txtEmail = result);
+        crearCampo("Telefono", xDerecha, yInicio + espaciado * 2, 280, content, telefono, result -> txtTelefono = result);
+        crearCampo("Fecha nacimiento (dd-mm-yyyy)", xDerecha + 320, yInicio + espaciado * 2, 180, content, fechaNacimiento, result -> txtFechaNacimiento = result);
 
-        // Teléfono
-        crearCampo("Teléfono", xDerecha, yInicio + espaciado * 2, 280, content, telefono, result -> txtTelefono = result);
-
-        // Fecha de nacimiento
-        crearCampo("Fecha de nacimiento", xDerecha + 320, yInicio + espaciado * 2, 180, content, fechaNacimiento, result -> txtFechaNacimiento = result);
-
-        // ID
         JLabel lblIdLabel = new JLabel("ID:");
         lblIdLabel.setBounds(xDerecha, yInicio + espaciado * 3, 50, 25);
         lblIdLabel.setFont(new Font("Arial", Font.BOLD, 12));
@@ -122,7 +112,6 @@ public class DlgEdicionCliente extends JDialog {
         lblId.setForeground(new Color(80, 80, 80));
         content.add(lblId);
 
-        // Botones
         JButton btnCancelar = new JButton("Cancelar");
         btnCancelar.setBounds(40, 470, 300, 40);
         btnCancelar.setContentAreaFilled(false);
@@ -164,52 +153,58 @@ public class DlgEdicionCliente extends JDialog {
         setter.accept(tf);
     }
 
-    /**
-     * Guarda los cambios del cliente en la BD.
-     * Se llama al hacer clic en el botón "Confirmar".
-     */
     private void guardarCambios() {
-        // Validar que los campos requeridos no estén vacíos
         String nombres = txtNombres.getText().trim();
-        String apellidos = txtApellidos.getText().trim();
+        String primerApellido = txtPrimerApellido.getText().trim();
+        String segundoApellido = txtSegundoApellido.getText().trim();
         String email = txtEmail.getText().trim();
-        String telefono = txtTelefono.getText().trim();
-        
-        if (nombres.isEmpty() || email.isEmpty()) {
+        String telefono = normalizarTelefono(txtTelefono.getText());
+        String fechaNacimiento = txtFechaNacimiento.getText().trim();
+
+        if (nombres.isEmpty() || primerApellido.isEmpty() || email.isEmpty()) {
             JOptionPane.showMessageDialog(
                 this,
-                "Por favor, completa los campos requeridos (Nombres y Email)",
+                "Por favor, completa los campos requeridos (Nombres, Primer apellido y Email)",
                 "Campos incompletos",
                 JOptionPane.WARNING_MESSAGE
             );
             return;
         }
-        
-        // Crear objeto ClienteInfo con los datos modificados
+
+        if (!telefono.isEmpty() && !telefono.matches("\\d{10}")) {
+            JOptionPane.showMessageDialog(
+                this,
+                "El telefono debe tener 10 digitos",
+                "Telefono invalido",
+                JOptionPane.WARNING_MESSAGE
+            );
+            return;
+        }
+
         ClienteInfo clienteActualizado = new ClienteInfo();
         clienteActualizado.setId(clienteId);
-        clienteActualizado.setNombre(nombres + " " + apellidos);
+        clienteActualizado.setNombre(nombres);
+        clienteActualizado.setPrimerApellido(primerApellido);
+        clienteActualizado.setSegundoApellido(segundoApellido);
         clienteActualizado.setEmail(email);
         clienteActualizado.setTelefono(telefono);
+        clienteActualizado.setFechaNacimiento(fechaNacimiento);
         clienteActualizado.setNivel("Bronce");
-        
-        // Llamar al controlador para actualizar
+
         boolean exito = ClienteController.actualizarCliente(clienteActualizado);
-        
+
         if (exito) {
             JOptionPane.showMessageDialog(
                 this,
                 "Cliente actualizado exitosamente",
-                "Éxito",
+                "Exito",
                 JOptionPane.INFORMATION_MESSAGE
             );
-            
-            // Refrescar tabla si hay referencia al panel
+
             if (panelGestion != null) {
                 panelGestion.refrescarTabla();
             }
-            
-            // Cerrar diálogo
+
             host.setOscurecer(false);
             this.dispose();
             host.intentarRestaurarDashboard();
@@ -223,8 +218,13 @@ public class DlgEdicionCliente extends JDialog {
         }
     }
 
+    private String normalizarTelefono(String telefono) {
+        return telefono == null ? "" : telefono.replaceAll("\\D", "");
+    }
+
     public String getNombres() { return txtNombres.getText(); }
-    public String getApellidos() { return txtApellidos.getText(); }
+    public String getPrimerApellido() { return txtPrimerApellido.getText(); }
+    public String getSegundoApellido() { return txtSegundoApellido.getText(); }
     public String getEmail() { return txtEmail.getText(); }
     public String getTelefono() { return txtTelefono.getText(); }
     public String getFechaNacimiento() { return txtFechaNacimiento.getText(); }

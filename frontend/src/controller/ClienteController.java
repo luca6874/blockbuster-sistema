@@ -2,6 +2,9 @@ package frontend.src.controller;
 
 import frontend.src.dao.ClienteDAO;
 import frontend.src.model.ClienteInfo;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 /**
@@ -183,8 +186,13 @@ public class ClienteController {
         }
 
         // Validar nombre
-        if (cliente.getNombre() == null || cliente.getNombre().trim().isEmpty()) {
+        if (cliente.getNombres() == null || cliente.getNombres().trim().isEmpty()) {
             System.err.println("Error: Nombre es requerido");
+            return false;
+        }
+
+        if (cliente.getPrimerApellido() == null || cliente.getPrimerApellido().trim().isEmpty()) {
+            System.err.println("Error: Primer apellido es requerido");
             return false;
         }
 
@@ -200,7 +208,36 @@ public class ClienteController {
             return false;
         }
 
+        if (cliente.getTelefono() != null && !cliente.getTelefono().trim().isEmpty()
+                && !cliente.getTelefono().matches("\\d{10}")) {
+            System.err.println("Error: Telefono debe tener 10 digitos");
+            return false;
+        }
+
+        if (cliente.getFechaNacimiento() != null && !cliente.getFechaNacimiento().trim().isEmpty()
+                && !fechaNacimientoValida(cliente.getFechaNacimiento())) {
+            System.err.println("Error: Fecha de nacimiento invalida");
+            return false;
+        }
+
         System.out.println("Validación exitosa para: " + cliente.getNombre());
         return true;
+    }
+
+    private static boolean fechaNacimientoValida(String fecha) {
+        String valor = fecha.trim();
+        try {
+            LocalDate.parse(valor);
+            return true;
+        } catch (DateTimeParseException ignored) {
+        }
+
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            LocalDate.parse(valor, formatter);
+            return true;
+        } catch (DateTimeParseException ignored) {
+            return false;
+        }
     }
 }
