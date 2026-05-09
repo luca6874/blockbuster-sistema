@@ -74,7 +74,7 @@ public class Ventana extends JFrame {
 
     public void mostrarFormCliente() {
         setOscurecer(true);
-        new DlgFormCliente(this).setVisible(true);
+        new DlgFormCliente(this, null).setVisible(true);
     }
 
     public void mostrarAvisoExitosoCliente(JDialog padre) {

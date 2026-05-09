@@ -128,7 +128,7 @@ public class PnlResumenCliente extends JPanel {
             String telefono = obtenerTelefono();
             String fechaNacimiento = obtenerFechaNacimiento();
             
-            DlgEdicionCliente dlgEditar = new DlgEdicionCliente(parent.getHost(), clienteId, nombres, apellidos, email, telefono, fechaNacimiento);
+            DlgEdicionCliente dlgEditar = new DlgEdicionCliente(parent.getHost(), clienteId, nombres, apellidos, email, telefono, fechaNacimiento, null);
             parent.getHost().setOscurecer(true);
             dlgEditar.setVisible(true);
         });

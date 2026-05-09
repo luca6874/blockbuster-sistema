@@ -1,6 +1,8 @@
 package frontend.src.view;
 
 import frontend.src.controller.Ventana;
+import frontend.src.controller.ClienteController;
+import frontend.src.model.ClienteInfo;
 
 import java.awt.*;
 import javax.swing.*;
@@ -11,6 +13,7 @@ import javax.swing.border.LineBorder;
  */
 public class DlgEdicionCliente extends JDialog {
     private final Ventana host;
+    private PnlGestionClientes panelGestion;
     private JTextField txtNombres;
     private JTextField txtApellidos;
     private JTextField txtEmail;
@@ -21,9 +24,10 @@ public class DlgEdicionCliente extends JDialog {
     private String clienteId;
 
     public DlgEdicionCliente(Ventana host, String clienteId, String nombres, String apellidos, 
-                             String email, String telefono, String fechaNacimiento) {
+                             String email, String telefono, String fechaNacimiento, PnlGestionClientes panelGestion) {
         super(host, true);
         this.host = host;
+        this.panelGestion = panelGestion;
         this.clienteId = clienteId;
         this.setUndecorated(true);
         this.setSize(700, 550);
@@ -139,10 +143,7 @@ public class DlgEdicionCliente extends JDialog {
         btnConfirmar.setForeground(Color.WHITE);
         btnConfirmar.setFont(new Font("Arial", Font.BOLD, 12));
         btnConfirmar.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnConfirmar.addActionListener(e -> {
-            // Aquí puedes agregar la lógica para guardar los cambios
-            host.mostrarAvisoExitosoCliente(this);
-        });
+        btnConfirmar.addActionListener(e -> guardarCambios());
         content.add(btnConfirmar);
 
         this.add(content);
@@ -161,6 +162,65 @@ public class DlgEdicionCliente extends JDialog {
         tf.setFont(new Font("Arial", Font.PLAIN, 12));
         p.add(tf);
         setter.accept(tf);
+    }
+
+    /**
+     * Guarda los cambios del cliente en la BD.
+     * Se llama al hacer clic en el botón "Confirmar".
+     */
+    private void guardarCambios() {
+        // Validar que los campos requeridos no estén vacíos
+        String nombres = txtNombres.getText().trim();
+        String apellidos = txtApellidos.getText().trim();
+        String email = txtEmail.getText().trim();
+        String telefono = txtTelefono.getText().trim();
+        
+        if (nombres.isEmpty() || email.isEmpty()) {
+            JOptionPane.showMessageDialog(
+                this,
+                "Por favor, completa los campos requeridos (Nombres y Email)",
+                "Campos incompletos",
+                JOptionPane.WARNING_MESSAGE
+            );
+            return;
+        }
+        
+        // Crear objeto ClienteInfo con los datos modificados
+        ClienteInfo clienteActualizado = new ClienteInfo();
+        clienteActualizado.setId(clienteId);
+        clienteActualizado.setNombre(nombres + " " + apellidos);
+        clienteActualizado.setEmail(email);
+        clienteActualizado.setTelefono(telefono);
+        clienteActualizado.setNivel("Bronce");
+        
+        // Llamar al controlador para actualizar
+        boolean exito = ClienteController.actualizarCliente(clienteActualizado);
+        
+        if (exito) {
+            JOptionPane.showMessageDialog(
+                this,
+                "Cliente actualizado exitosamente",
+                "Éxito",
+                JOptionPane.INFORMATION_MESSAGE
+            );
+            
+            // Refrescar tabla si hay referencia al panel
+            if (panelGestion != null) {
+                panelGestion.refrescarTabla();
+            }
+            
+            // Cerrar diálogo
+            host.setOscurecer(false);
+            this.dispose();
+            host.intentarRestaurarDashboard();
+        } else {
+            JOptionPane.showMessageDialog(
+                this,
+                "Error al actualizar el cliente. Por favor, intenta de nuevo.",
+                "Error",
+                JOptionPane.ERROR_MESSAGE
+            );
+        }
     }
 
     public String getNombres() { return txtNombres.getText(); }

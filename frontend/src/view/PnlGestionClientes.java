@@ -222,10 +222,58 @@ public class PnlGestionClientes extends JPanel {
         String nombres = partes.length > 0 ? partes[0] : "";
         String apellidos = partes.length > 1 ? partes[1] : "";
 
-        // Crear y mostrar el diálogo de edición
-        DlgEdicionCliente dlgEditar = new DlgEdicionCliente(parent.getHost(), clienteId, nombres, apellidos, email, "", "");
+        // Crear y mostrar el diálogo de edición, pasando referencia del panel
+        DlgEdicionCliente dlgEditar = new DlgEdicionCliente(parent.getHost(), clienteId, nombres, apellidos, email, "", "", this);
         parent.getHost().setOscurecer(true);
         dlgEditar.setVisible(true);
+    }
+    
+    /**
+     * Refresca la tabla de clientes con datos actuales desde la BD.
+     * Se llama después de CRUD (agregar, editar, eliminar).
+     */
+    public void refrescarTabla() {
+        // Reconstruir la tabla con datos nuevos desde BD
+        initTablaClientes();
+        System.out.println("✓ Tabla de clientes refrescada");
+    }
+    
+    /**
+     * Muestra diálogo de confirmación y elimina un cliente.
+     * @param clienteId el ID del cliente a eliminar
+     * @param nombreCliente el nombre del cliente (para mostrar en el diálogo)
+     */
+    private void confirmarEliminarCliente(String clienteId, String nombreCliente) {
+        int respuesta = JOptionPane.showConfirmDialog(
+            this,
+            "¿Estás seguro de que deseas eliminar a " + nombreCliente + "?\n\nEsta acción no se puede deshacer.",
+            "Confirmar eliminación",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.WARNING_MESSAGE
+        );
+        
+        if (respuesta == JOptionPane.YES_OPTION) {
+            // Llamar al controlador para eliminar
+            boolean exito = ClienteController.eliminarCliente(clienteId);
+            
+            if (exito) {
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Cliente eliminado exitosamente",
+                    "Éxito",
+                    JOptionPane.INFORMATION_MESSAGE
+                );
+                // Refrescar tabla
+                refrescarTabla();
+            } else {
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Error al eliminar el cliente. Por favor, intenta de nuevo.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+                );
+            }
+        }
     }
     
     private JPanel createPanelInferior() {
@@ -439,10 +487,16 @@ public class PnlGestionClientes extends JPanel {
                         Rectangle cellRect = tablaClientes.getCellRect(row, col, true);
                         int posX = e.getX() - cellRect.x;
                         
-                        // Aproximadamente: botón ver (x < 25), botón editar (25-50), botón eliminar (> 50)
-                        if (posX > 20 && posX < 50) {
+                        // Botones: ver (x < 25), editar (25-50), eliminar (> 50)
+                        if (posX < 25) {
+                            // Botón ver - mostrar resumen
+                            mostrarPanelResumenCliente();
+                        } else if (posX > 20 && posX < 50) {
                             // Botón editar
                             abrirEditarCliente(clienteId, nombreCompleto, email);
+                        } else if (posX > 50) {
+                            // Botón eliminar
+                            confirmarEliminarCliente(clienteId, nombreCompleto);
                         }
                     } else {
                         mostrarPanelResumenCliente();
