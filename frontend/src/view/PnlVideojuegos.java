@@ -1,13 +1,14 @@
 package frontend.src.view;
 
 import frontend.src.controller.Ventana;
+import frontend.src.controller.VideojuegoController;
+import frontend.src.model.VideojuegoInfo;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -16,13 +17,14 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 
 /**
- * Módulo de Videojuegos.
+ * Modulo de Videojuegos.
  */
 public class PnlVideojuegos extends JPanel {
     private final ViewDashboard parent;
     private JTable tablaVideojuegos;
     private JTextField txtBuscar;
     private JComboBox<String> comboPlataforma;
+    private JLabel lblTituloTabla;
     private JLabel lblDetalleTitulo;
     private JLabel lblDetallePlataforma;
     private JLabel lblDetalleGenero;
@@ -34,8 +36,8 @@ public class PnlVideojuegos extends JPanel {
     private JLabel lblDetallePuntos;
     private JLabel lblDetalleStock;
     private JLabel lblDetalleImagen;
-    private List<String[]> datosVideojuegos;
-    private int filaSeleccionada = 0;
+    private List<VideojuegoInfo> datosVideojuegos = new ArrayList<>();
+    private int filaSeleccionada = -1;
 
     public PnlVideojuegos(ViewDashboard parent) {
         this.parent = parent;
@@ -65,7 +67,7 @@ public class PnlVideojuegos extends JPanel {
         topBar.setBackground(new Color(110, 60, 70));
         topBar.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
-        JLabel lblTitulo = new JLabel("Módulo de Videojuegos - Gestión de Videojuegos", SwingConstants.LEFT);
+        JLabel lblTitulo = new JLabel("Modulo de Videojuegos - Gestion de Videojuegos", SwingConstants.LEFT);
         lblTitulo.setForeground(Color.WHITE);
         lblTitulo.setFont(new Font("Arial", Font.BOLD, 16));
         lblTitulo.setBounds(0, 0, 700, 20);
@@ -79,7 +81,7 @@ public class PnlVideojuegos extends JPanel {
         panel.setBackground(Ventana.CARD_WHITE);
         panel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
 
-        txtBuscar = new JTextField("Buscar por nombre, genero, año...");
+        txtBuscar = new JTextField("Buscar por nombre, genero, anio...");
         txtBuscar.setBounds(10, 10, 350, 30);
         txtBuscar.setBorder(new LineBorder(new Color(200, 200, 200), 1, true));
         txtBuscar.setBackground(Color.WHITE);
@@ -91,7 +93,7 @@ public class PnlVideojuegos extends JPanel {
         lblPlataforma.setFont(new Font("Arial", Font.BOLD, 12));
         panel.add(lblPlataforma);
 
-        comboPlataforma = new JComboBox<>(new String[]{"Todos","Xbox 360", "SWITCH", "PS4", "Xbox ONE", "SWITCH 2", "PS5"});
+        comboPlataforma = new JComboBox<>(new String[]{"Todos", "Xbox 360", "SWITCH", "PS4", "Xbox ONE", "SWITCH 2", "PS5"});
         comboPlataforma.setBounds(450, 10, 120, 30);
         comboPlataforma.setBorder(new LineBorder(new Color(200, 200, 200), 1));
         comboPlataforma.setBackground(Color.WHITE);
@@ -110,7 +112,7 @@ public class PnlVideojuegos extends JPanel {
         comboEstado.setFont(new Font("Arial", Font.PLAIN, 12));
         panel.add(comboEstado);
 
-        JButton btnAgregar = new JButton("+ Agregar título");
+        JButton btnAgregar = new JButton("+ Agregar titulo");
         btnAgregar.setBounds(790, 10, 140, 30);
         btnAgregar.setBackground(new Color(152, 33, 54));
         btnAgregar.setForeground(Color.WHITE);
@@ -119,24 +121,11 @@ public class PnlVideojuegos extends JPanel {
         btnAgregar.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnAgregar.addActionListener(e -> {
             parent.getHost().setOscurecer(true);
-            new DlgAgregarVideojuego(parent.getHost(), this::actualizarTablaDespuesDeAgregar).setVisible(true);
+            new DlgAgregarVideojuego(parent.getHost(), this::refrescarTabla).setVisible(true);
         });
         panel.add(btnAgregar);
 
         return panel;
-    }
-
-    private void actualizarTablaDespuesDeAgregar() {
-        String[] nuevoJuego = new String[]{
-            "Nuevo Videojuego", "Género", "M (Mature)", "$0.00", "$0.00", "0", "", "", "2024", "Venta/Renta"
-        };
-        datosVideojuegos.add(nuevoJuego);
-        
-        DefaultTableModel modelo = (DefaultTableModel) tablaVideojuegos.getModel();
-        modelo.addRow(new Object[] { nuevoJuego[0], nuevoJuego[1], nuevoJuego[2], nuevoJuego[3], nuevoJuego[4], nuevoJuego[5] });
-        
-        mostrarDetalle(datosVideojuegos.size() - 1);
-        tablaVideojuegos.setRowSelectionInterval(datosVideojuegos.size() - 1, datosVideojuegos.size() - 1);
     }
 
     private JPanel createPanelCentral() {
@@ -158,7 +147,7 @@ public class PnlVideojuegos extends JPanel {
         JPanel panel = new JPanel(null);
         panel.setBackground(Ventana.CARD_WHITE);
 
-        JLabel lblTituloTabla = new JLabel("Listado de videojuegos (24)");
+        lblTituloTabla = new JLabel("Listado de videojuegos (0)");
         lblTituloTabla.setBounds(0, 0, 330, 25);
         lblTituloTabla.setFont(new Font("Arial", Font.BOLD, 14));
         lblTituloTabla.setForeground(Color.BLACK);
@@ -183,7 +172,6 @@ public class PnlVideojuegos extends JPanel {
         JPanel header = new JPanel(null);
         header.setBackground(new Color(245, 245, 245));
         header.setBounds(0, 0, 340, 45);
-        header.setBorder(new LineBorder(new Color(220, 220, 220), 0));
         panel.add(header);
 
         JLabel lblTitulo = new JLabel("Detalle del Videojuego");
@@ -232,33 +220,16 @@ public class PnlVideojuegos extends JPanel {
         btnDescargar.setForeground(Color.BLACK);
         btnDescargar.setBorder(new LineBorder(new Color(120, 120, 120), 1, true));
         btnDescargar.setBackground(new Color(230, 230, 230));
-        btnDescargar.setHorizontalTextPosition(SwingConstants.RIGHT);
-        btnDescargar.setIconTextGap(8);
-        try {
-            URL downloadIcon = getClass().getResource("/frontend/src/images/download.png");
-            if (downloadIcon != null) {
-                Image img = new ImageIcon(downloadIcon).getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH);
-                btnDescargar.setIcon(new ImageIcon(img));
-            }
-        } catch (Exception ignored) {}
         panel.add(btnDescargar);
 
         JButton btnEditar = createActionButton("Editar juego", new Color(46, 204, 113));
         btnEditar.setBounds(20, 360, 115, 28);
-        btnEditar.addActionListener(e -> {
-            parent.getHost().setOscurecer(true);
-            if (filaSeleccionada >= 0 && filaSeleccionada < datosVideojuegos.size()) {
-                new DlgEdicionVideojuego(parent.getHost(), datosVideojuegos.get(filaSeleccionada)).setVisible(true);
-            }
-        });
+        btnEditar.addActionListener(e -> abrirEditarSeleccionado());
         panel.add(btnEditar);
 
         JButton btnEliminar = createActionButton("Eliminar juego", new Color(231, 76, 60));
         btnEliminar.setBounds(145, 360, 115, 28);
-        btnEliminar.addActionListener(e -> {
-            parent.getHost().setOscurecer(true);
-            new DlgConfirmarEliminacionVideojuego(parent.getHost(), datosVideojuegos.get(filaSeleccionada), this::eliminarVideojuegoSeleccionado).setVisible(true);
-        });
+        btnEliminar.addActionListener(e -> confirmarEliminarSeleccionado());
         panel.add(btnEliminar);
 
         return panel;
@@ -284,17 +255,14 @@ public class PnlVideojuegos extends JPanel {
     }
 
     private void initTablaVideojuegos() {
-        String[] columnas = {"Título", "Género", "Clasificación", "Renta", "Compra", "Puntos"};
-        datosVideojuegos = new ArrayList<>(Arrays.asList(new String[][]{
-            {"The Evil Within", "Acción/Aventura", "M (Mature)", "$75.00", "$200.00", "10", "caratulaGame5.png", "Xbox 360", "2014", "Venta/Renta"},
-            {"Silent Hill", "Survival Horror", "M (Mature)", "$75.00", "$200.00", "10", "caratulagame2.png", "PS5", "2001", "Venta/Renta"},
-            {"Assassin's Creed IV", "Acción/Disparo", "M (Mature)", "$65.00", "$180.00", "8", "caratulaGame3.png", "PS4", "2013", "Venta/Renta"},
-            {"The Last of Us", "Aventura/Survival", "M (Mature)", "$80.00", "$220.00", "12", "caratulaGame4.png", "PS3", "2013", "Venta/Renta"},
-            {"Halo 3 ODST", "Acción/Disparo", "M (Mature)", "$75.00", "$200.00", "10", "caratulagame2.png", "Xbox 360", "2009", "Venta/Renta"},
-            {"God of War", "Acción/Aventura", "M (Mature)", "$85.00", "$230.00", "15", "caratulaGame1.png", "PS5", "2018", "Venta/Renta"}
-        }));
+        String[] columnas = {"Titulo", "Genero", "Clasificacion", "Renta", "Compra", "Puntos"};
 
-        DefaultTableModel modelo = new DefaultTableModel(datosVideojuegos.toArray(new String[0][]), columnas) {
+        datosVideojuegos = VideojuegoController.traerVideojuegosDeBD();
+        if (lblTituloTabla != null) {
+            lblTituloTabla.setText("Listado de videojuegos (" + datosVideojuegos.size() + ")");
+        }
+
+        DefaultTableModel modelo = new DefaultTableModel(convertirVideojuegosAArray(), columnas) {
             @Override public boolean isCellEditable(int r, int c) { return false; }
         };
 
@@ -332,53 +300,136 @@ public class PnlVideojuegos extends JPanel {
         header.setPreferredSize(new Dimension(0, 40));
         header.setReorderingAllowed(false);
 
-        mostrarDetalle(0);
+        if (datosVideojuegos.isEmpty()) {
+            limpiarDetalle();
+        } else {
+            mostrarDetalle(0);
+            tablaVideojuegos.setRowSelectionInterval(0, 0);
+        }
+    }
+
+    public void refrescarTabla() {
+        datosVideojuegos = VideojuegoController.traerVideojuegosDeBD();
+        DefaultTableModel modelo = (DefaultTableModel) tablaVideojuegos.getModel();
+        modelo.setDataVector(convertirVideojuegosAArray(), new String[]{"Titulo", "Genero", "Clasificacion", "Renta", "Compra", "Puntos"});
+        tablaVideojuegos.getColumnModel().getColumn(0).setPreferredWidth(180);
+        tablaVideojuegos.getColumnModel().getColumn(0).setCellRenderer(new TituloTableRenderer());
+        tablaVideojuegos.getColumnModel().getColumn(1).setPreferredWidth(100);
+        tablaVideojuegos.getColumnModel().getColumn(2).setPreferredWidth(90);
+        tablaVideojuegos.getColumnModel().getColumn(3).setPreferredWidth(70);
+        tablaVideojuegos.getColumnModel().getColumn(4).setPreferredWidth(70);
+        tablaVideojuegos.getColumnModel().getColumn(5).setPreferredWidth(50);
+
+        if (lblTituloTabla != null) {
+            lblTituloTabla.setText("Listado de videojuegos (" + datosVideojuegos.size() + ")");
+        }
+
+        if (datosVideojuegos.isEmpty()) {
+            filaSeleccionada = -1;
+            limpiarDetalle();
+        } else {
+            int nuevaFila = Math.min(Math.max(filaSeleccionada, 0), datosVideojuegos.size() - 1);
+            mostrarDetalle(nuevaFila);
+            tablaVideojuegos.setRowSelectionInterval(nuevaFila, nuevaFila);
+        }
+    }
+
+    private Object[][] convertirVideojuegosAArray() {
+        Object[][] datos = new Object[datosVideojuegos.size()][6];
+        for (int i = 0; i < datosVideojuegos.size(); i++) {
+            VideojuegoInfo videojuego = datosVideojuegos.get(i);
+            datos[i][0] = videojuego.getTitulo();
+            datos[i][1] = videojuego.getGenero();
+            datos[i][2] = videojuego.getClasificacion();
+            datos[i][3] = formatoMoneda(videojuego.getPrecioRenta());
+            datos[i][4] = formatoMoneda(videojuego.getPrecioCompra());
+            datos[i][5] = String.valueOf(videojuego.getPuntos());
+        }
+        return datos;
     }
 
     private void mostrarDetalle(int row) {
         if (row < 0 || row >= datosVideojuegos.size()) return;
         filaSeleccionada = row;
-        String[] fila = datosVideojuegos.get(row);
-        lblDetalleTitulo.setText("<html><b>" + fila[0] + "</b></html>");
-        lblDetallePlataforma.setText("<html>" + fila[7] + "</html>");
-        lblDetalleGenero.setText("<html>Género: " + fila[1] + "</html>");
-        lblDetalleClasificacion.setText("<html>Clasificación: " + fila[2] + "</html>");
-        lblDetalleAnno.setText("<html>Año: " + fila[8] + "</html>");
-        lblDetalleModo.setText("<html>Modo: " + fila[9] + "</html>");
-        lblDetalleRenta.setText("Renta: " + fila[3]);
-        lblDetalleCompra.setText("Venta: " + fila[4]);
-        lblDetallePuntos.setText("Puntos: " + fila[5]);
-        lblDetalleStock.setText("Stock: 10/25");
+        VideojuegoInfo videojuego = datosVideojuegos.get(row);
+
+        lblDetalleTitulo.setText("<html><b>" + videojuego.getTitulo() + "</b></html>");
+        lblDetallePlataforma.setText("<html>" + valor(videojuego.getPlataforma()) + "</html>");
+        lblDetalleGenero.setText("<html>Genero: " + valor(videojuego.getGenero()) + "</html>");
+        lblDetalleClasificacion.setText("<html>Clasificacion: " + valor(videojuego.getClasificacion()) + "</html>");
+        lblDetalleAnno.setText("<html>Anio: " + (videojuego.getAnioLanzamiento() > 0 ? videojuego.getAnioLanzamiento() : "-") + "</html>");
+        lblDetalleModo.setText("<html>Modo: " + obtenerModo(videojuego) + "</html>");
+        lblDetalleRenta.setText("Renta: " + formatoMoneda(videojuego.getPrecioRenta()));
+        lblDetalleCompra.setText("Venta: " + formatoMoneda(videojuego.getPrecioCompra()));
+        lblDetallePuntos.setText("Puntos: " + videojuego.getPuntos());
+        lblDetalleStock.setText("Stock: " + videojuego.getStock());
+        cargarImagenDetalle(videojuego.getImagenUrl());
+    }
+
+    private void abrirEditarSeleccionado() {
+        if (filaSeleccionada < 0 || filaSeleccionada >= datosVideojuegos.size()) {
+            return;
+        }
+
+        VideojuegoInfo videojuego = datosVideojuegos.get(filaSeleccionada);
+        parent.getHost().setOscurecer(true);
+        new DlgEdicionVideojuego(parent.getHost(), videojuego, this::refrescarTabla).setVisible(true);
+    }
+
+    private void confirmarEliminarSeleccionado() {
+        if (filaSeleccionada < 0 || filaSeleccionada >= datosVideojuegos.size()) {
+            return;
+        }
+
+        VideojuegoInfo videojuego = datosVideojuegos.get(filaSeleccionada);
+        parent.getHost().setOscurecer(true);
+        new DlgConfirmarEliminacionVideojuego(parent.getHost(), convertirVideojuegoADetalle(videojuego), () -> {
+            boolean eliminado = VideojuegoController.eliminarVideojuego(videojuego.getId());
+            if (eliminado) {
+                refrescarTabla();
+            } else {
+                JOptionPane.showMessageDialog(this, "Error al eliminar el videojuego.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }).setVisible(true);
+    }
+
+    private String[] convertirVideojuegoADetalle(VideojuegoInfo videojuego) {
+        return new String[]{
+            videojuego.getTitulo(),
+            videojuego.getGenero(),
+            videojuego.getClasificacion(),
+            formatoMoneda(videojuego.getPrecioRenta()),
+            formatoMoneda(videojuego.getPrecioCompra()),
+            String.valueOf(videojuego.getPuntos()),
+            videojuego.getImagenUrl() != null ? videojuego.getImagenUrl() : "",
+            videojuego.getPlataforma(),
+            videojuego.getAnioLanzamiento() > 0 ? String.valueOf(videojuego.getAnioLanzamiento()) : "",
+            obtenerModo(videojuego)
+        };
+    }
+
+    private void cargarImagenDetalle(String nombreImagen) {
+        lblDetalleImagen.setIcon(null);
+        lblDetalleImagen.setText("");
+
+        if (nombreImagen == null || nombreImagen.trim().isEmpty()) {
+            lblDetalleImagen.setText("Sin imagen");
+            lblDetalleImagen.setHorizontalAlignment(SwingConstants.CENTER);
+            return;
+        }
 
         try {
-            URL url = getClass().getResource("/frontend/src/images/" + fila[6]);
+            URL url = getClass().getResource("/frontend/src/images/" + nombreImagen);
             if (url != null) {
                 Image img = new ImageIcon(url).getImage().getScaledInstance(140, 180, Image.SCALE_SMOOTH);
                 lblDetalleImagen.setIcon(new ImageIcon(img));
             } else {
-                lblDetalleImagen.setIcon(null);
+                lblDetalleImagen.setText("Sin imagen");
+                lblDetalleImagen.setHorizontalAlignment(SwingConstants.CENTER);
             }
         } catch (Exception ex) {
-            lblDetalleImagen.setIcon(null);
-        }
-    }
-
-    private void eliminarVideojuegoSeleccionado() {
-        if (filaSeleccionada < 0 || filaSeleccionada >= datosVideojuegos.size()) return;
-        datosVideojuegos.remove(filaSeleccionada);
-        DefaultTableModel modelo = (DefaultTableModel) tablaVideojuegos.getModel();
-        modelo.setRowCount(0);
-        for (String[] fila : datosVideojuegos) {
-            modelo.addRow(new Object[] { fila[0], fila[1], fila[2], fila[3], fila[4], fila[5] });
-        }
-
-        if (datosVideojuegos.isEmpty()) {
-            limpiarDetalle();
-            filaSeleccionada = -1;
-        } else {
-            int nuevaFila = Math.min(filaSeleccionada, datosVideojuegos.size() - 1);
-            mostrarDetalle(nuevaFila);
-            tablaVideojuegos.setRowSelectionInterval(nuevaFila, nuevaFila);
+            lblDetalleImagen.setText("Sin imagen");
+            lblDetalleImagen.setHorizontalAlignment(SwingConstants.CENTER);
         }
     }
 
@@ -394,6 +445,24 @@ public class PnlVideojuegos extends JPanel {
         lblDetallePuntos.setText("");
         lblDetalleStock.setText("");
         lblDetalleImagen.setIcon(null);
+        lblDetalleImagen.setText("");
+    }
+
+    private String formatoMoneda(double valor) {
+        return String.format("$%.2f", valor);
+    }
+
+    private String valor(String valor) {
+        return valor == null || valor.trim().isEmpty() ? "-" : valor;
+    }
+
+    private String obtenerModo(VideojuegoInfo videojuego) {
+        boolean tieneRenta = videojuego.getPrecioRenta() > 0;
+        boolean tieneCompra = videojuego.getPrecioCompra() > 0;
+        if (tieneRenta && tieneCompra) return "Venta/Renta";
+        if (tieneRenta) return "Solo Renta";
+        if (tieneCompra) return "Solo Venta";
+        return "-";
     }
 
     private class TituloTableRenderer extends JPanel implements TableCellRenderer {
@@ -424,30 +493,28 @@ public class PnlVideojuegos extends JPanel {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            lblImagen.setIcon(null);
+            lblTitulo.setText("");
+            lblAnio.setText("");
+
             if (row >= 0 && row < datosVideojuegos.size()) {
-                String[] fila = datosVideojuegos.get(row);
-                lblTitulo.setText(fila[0]);
-                lblAnio.setText("(" + fila[8] + ")");
+                VideojuegoInfo videojuego = datosVideojuegos.get(row);
+                lblTitulo.setText(videojuego.getTitulo());
+                lblAnio.setText(videojuego.getAnioLanzamiento() > 0 ? "(" + videojuego.getAnioLanzamiento() + ")" : "");
 
                 try {
-                    URL url = getClass().getResource("/frontend/src/images/" + fila[6]);
+                    String imagen = videojuego.getImagenUrl();
+                    URL url = imagen != null ? getClass().getResource("/frontend/src/images/" + imagen) : null;
                     if (url != null) {
                         Image img = new ImageIcon(url).getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
                         lblImagen.setIcon(new ImageIcon(img));
-                    } else {
-                        lblImagen.setIcon(null);
                     }
-                } catch (Exception ex) {
+                } catch (Exception ignored) {
                     lblImagen.setIcon(null);
                 }
             }
 
-            if (isSelected) {
-                setBackground(new Color(152, 33, 54, 40));
-            } else {
-                setBackground(Color.WHITE);
-            }
-
+            setBackground(isSelected ? new Color(152, 33, 54, 40) : Color.WHITE);
             return this;
         }
     }
