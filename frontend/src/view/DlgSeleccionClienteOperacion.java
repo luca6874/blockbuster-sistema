@@ -1,6 +1,7 @@
 package frontend.src.view;
 
 import frontend.src.controller.Ventana;
+import frontend.src.dao.ClienteDAO;
 import frontend.src.model.ClienteInfo;
 
 import javax.swing.*;
@@ -168,15 +169,9 @@ public class DlgSeleccionClienteOperacion extends JDialog {
     }
 
     private void inicializarClientes() {
-        clientes.add(new ClienteInfo("13587", "Luis Spinetta", "pescado@rabioso.com", "Activo", "Frecuente", true, "55 271 4314"));
-        clientes.add(new ClienteInfo("34938", "Luca Reinaga", "f131@gmail.com", "Activo", "-", false, "55 882 1477"));
-        clientes.add(new ClienteInfo("03491", "Leonardo Mata", "ojala@gmail.com", "Activo", "-", false, "55 413 5678"));
-        clientes.add(new ClienteInfo("01990", "DArnell Aguilar", "denmedebaja@ladygaga.com", "Inactivo", "Frecuente", true, "55 904 1122"));
-        clientes.add(new ClienteInfo("79412", "Iran Ruiz Medellin", "iruiz@bb.com", "Inactivo", "-", false, "55 118 3477"));
-        clientes.add(new ClienteInfo("67924", "Charly Garcia", "saynomore@baby.com", "Activo", "-", false, "55 994 1266"));
-        clientes.add(new ClienteInfo("73469", "Saul Hernandez", "celula@caifanes.com", "Activo", "-", false, "55 677 0832"));
-        clientes.add(new ClienteInfo("80457", "Leon Larregui", "violateca@zoe.com", "Activo", "Frecuente", true, "55 625 9901"));
-        clientes.add(new ClienteInfo("80634", "Tyrone Gonzales", "can@serbero.com", "Inactivo", "-", false, "55 300 4410"));
+        // Cargar clientes reales desde MySQL usando ClienteDAO
+        List<ClienteInfo> clientesCargados = ClienteDAO.obtenerTodos();
+        clientes.addAll(clientesCargados);
     }
 
     private JPanel createResumenPanel() {

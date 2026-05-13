@@ -1,6 +1,7 @@
 package frontend.src.view;
 
 import frontend.src.controller.Ventana;
+import frontend.src.dao.VideojuegoDAO;
 import frontend.src.model.VideojuegoInfo;
 
 import javax.swing.*;
@@ -152,16 +153,9 @@ public class DlgSeleccionVideojuegoOperacion extends JDialog {
     }
 
     private void inicializarVideojuegos() {
-        videojuegos.add(new VideojuegoInfo("V001", "The Evil Within", "PS5", "Acción/Horror", "M Maduro", 75.00, 200.00, 10, 5, "the-evil-within.jpg"));
-        videojuegos.add(new VideojuegoInfo("V002", "Silent Hill", "PS5", "Horror", "M Maduro", 75.00, 200.00, 10, 3, "silent-hill.jpg"));
-        videojuegos.add(new VideojuegoInfo("V003", "Persona 5", "PS5", "RPG", "T Teen", 65.00, 180.00, 8, 7, "persona-5.jpg"));
-        videojuegos.add(new VideojuegoInfo("V004", "God of War", "PS5", "Acción/Aventura", "M Maduro", 70.00, 220.00, 12, 4, "god-of-war.jpg"));
-        videojuegos.add(new VideojuegoInfo("V005", "The Last of Us Part I", "PS5", "Acción/Aventura", "M Maduro", 75.00, 210.00, 11, 6, "the-last-of-us.jpg"));
-        videojuegos.add(new VideojuegoInfo("V006", "Halo Infinite", "Xbox", "FPS", "M Maduro", 70.00, 200.00, 10, 5, "halo-infinite.jpg"));
-        videojuegos.add(new VideojuegoInfo("V007", "Forza Motorsport", "Xbox", "Carreras", "E 3+", 65.00, 190.00, 9, 8, "forza-motorsport.jpg"));
-        videojuegos.add(new VideojuegoInfo("V008", "Elden Ring", "PC", "RPG/Acción", "M Maduro", 60.00, 185.00, 10, 4, "elden-ring.jpg"));
-        videojuegos.add(new VideojuegoInfo("V009", "Super Smash Bros Ultimate", "Switch", "Lucha", "T Teen", 55.00, 170.00, 7, 10, "smash-bros.jpg"));
-        videojuegos.add(new VideojuegoInfo("V010", "Mario Kart 8 Deluxe", "Switch", "Carreras", "E 3+", 50.00, 165.00, 6, 12, "mario-kart.jpg"));
+        // Cargar videojuegos reales desde MySQL usando VideojuegoDAO
+        List<VideojuegoInfo> videojuegosCargados = VideojuegoDAO.obtenerTodos();
+        videojuegos.addAll(videojuegosCargados);
     }
 
     private VideojuegoInfo buscarVideojuegoPorId(String id) {

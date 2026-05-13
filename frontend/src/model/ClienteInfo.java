@@ -3,8 +3,6 @@ package frontend.src.model;
 /**
  * Modelo MVC de Cliente.
  * Representa un cliente en la base de datos.
- * Compatible 100% con código existente (lectura).
- * Ahora soporta modificaciones también.
  */
 public class ClienteInfo {
     private String id;
@@ -22,7 +20,7 @@ public class ClienteInfo {
     public ClienteInfo() {
     }
 
-    // Constructor completo (mantiene compatibilidad)
+    // Constructor completo 
     public ClienteInfo(String id, String nombre, String email, String estatus, String nivel, boolean frecuente, String telefono) {
         this.id = id;
         this.nombre = nombre;
@@ -33,7 +31,7 @@ public class ClienteInfo {
         this.telefono = telefono;
     }
 
-    // GETTERS (mantiene exactamente lo que tenía antes)
+    // GETTERS 
     
     public String getId() {
         return id;

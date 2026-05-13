@@ -6,15 +6,13 @@ import java.sql.DriverManager;
 /**
  * ConexionBD - Conexión a la base de datos MySQL.
  * 
- * Proporciona un método estático para obtener conexiones a la BD.
- * Conexión simple sin patrones complejos.
  * 
  * Credenciales:
  * - Host: localhost
  * - Puerto: 3306
  * - Base datos: blockbuster
  * - Usuario: root
- * - Contraseña: Kenseigod_7
+ * - Contraseña: Kenseigod_7 <-- modifiquen esa contraseña con la que tienen en el workbench pa q les jale
  */
 public class ConexionBD {
     
