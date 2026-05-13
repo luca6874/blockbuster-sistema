@@ -16,6 +16,8 @@ import javax.swing.border.LineBorder;
 /**
  * Modulo visual para registrar una nueva operacion.
  */
+
+
 public class PnlNuevaOperacion extends JPanel {
     private static final Color TOP_BAR = new Color(110, 60, 70);
     private static final Color FORM_HEADER = new Color(104, 104, 104);
@@ -25,6 +27,7 @@ public class PnlNuevaOperacion extends JPanel {
     private static final Color RED_BTN = new Color(241, 182, 182);
 
     private final ViewDashboard parent;
+    private JTextArea taTicket;
     private JButton btnSeleccionarCliente;
     private JButton btnSeleccionarVideojuego;
     private ClienteInfo clienteSeleccionado;
@@ -32,6 +35,7 @@ public class PnlNuevaOperacion extends JPanel {
     private JComboBox<String> comboTipo;
     private JTextField txtDescuento;
     private JTextField txtFecha;
+    
 
     public PnlNuevaOperacion(ViewDashboard parent) {
         this.parent = parent;
@@ -167,6 +171,31 @@ public class PnlNuevaOperacion extends JPanel {
         JPanel panel = new JPanel(null);
         panel.setBackground(Color.WHITE);
         panel.setBorder(new LineBorder(BORDER, 1, true));
+        taTicket = new JTextArea();
+        taTicket.setEditable(false);
+        taTicket.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        taTicket.setBackground(Color.WHITE);
+
+         taTicket.setText("""
+        ========================
+            TICKET DIGITAL
+        ========================
+
+        Cliente:
+        Sin seleccionar
+
+        Juego:
+        Sin seleccionar
+
+        Tipo:
+        -
+
+        Total:
+        $0.00
+        """);
+
+        taTicket.setBounds(10, 10, 250, 300);
+        panel.add(taTicket);
         return panel;
     }
 
