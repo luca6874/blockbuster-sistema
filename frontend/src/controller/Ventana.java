@@ -1,5 +1,6 @@
 package frontend.src.controller;
 
+import frontend.src.model.UsuarioInfo;
 import frontend.src.view.*;
 import java.awt.*;
 import javax.swing.*;
@@ -14,6 +15,7 @@ public class Ventana extends JFrame {
     public static final Color CARD_WHITE = new Color(245, 245, 245);
     
     private JPanel glass;
+    private UsuarioInfo usuarioActual;
 
     public Ventana() {
         this.setSize(1200, 600); 
@@ -59,6 +61,14 @@ public class Ventana extends JFrame {
 
     public void setOscurecer(boolean activo) {
         glass.setVisible(activo);
+    }
+
+    public void setUsuarioActual(UsuarioInfo usuarioActual) {
+        this.usuarioActual = usuarioActual;
+    }
+
+    public UsuarioInfo getUsuarioActual() {
+        return usuarioActual;
     }
 
     public void intentarRestaurarDashboard() {

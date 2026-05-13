@@ -1,10 +1,15 @@
 package frontend.src.view;
 
 import frontend.src.controller.Ventana;
+import frontend.src.controller.OperacionController;
 import frontend.src.model.ClienteInfo;
+import frontend.src.model.UsuarioInfo;
 import frontend.src.model.VideojuegoInfo;
 
 import java.awt.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 
@@ -24,6 +29,9 @@ public class PnlNuevaOperacion extends JPanel {
     private JButton btnSeleccionarVideojuego;
     private ClienteInfo clienteSeleccionado;
     private VideojuegoInfo videojuegoSeleccionado;
+    private JComboBox<String> comboTipo;
+    private JTextField txtDescuento;
+    private JTextField txtFecha;
 
     public PnlNuevaOperacion(ViewDashboard parent) {
         this.parent = parent;
@@ -107,11 +115,12 @@ public class PnlNuevaOperacion extends JPanel {
 
         JComboBox<String> comboTipo = createComboBox(new String[]{
             "Seleccionar",
-            "Renta",
-            "Compra"
+            "RENTA",
+            "COMPRA"
         });
-        comboTipo.setBounds(16, 220, 170, 30);
-        panel.add(comboTipo);
+        this.comboTipo = comboTipo;
+        this.comboTipo.setBounds(16, 223, 180, 24);
+        panel.add(this.comboTipo);
 
         JLabel lblDescuento = createSectionLabel("Descuento", 290, 198, 90);
         panel.add(lblDescuento);
@@ -123,20 +132,29 @@ public class PnlNuevaOperacion extends JPanel {
         chkDescuento.setFont(new Font("Arial", Font.PLAIN, 10));
         panel.add(chkDescuento);
 
-        JTextField txtDescuento = createTextField();
-        txtDescuento.setBounds(435, 220, 72, 30);
-        panel.add(txtDescuento);
+        this.txtDescuento = createTextField();
+        this.txtDescuento.setBounds(290, 244, 80, 24);
+        this.txtDescuento.setEnabled(false);
+        panel.add(this.txtDescuento);
+        chkDescuento.addActionListener(e -> {
+            txtDescuento.setEnabled(chkDescuento.isSelected());
+            if (!chkDescuento.isSelected()) {
+                txtDescuento.setText("");
+            }
+        });
 
         JLabel lblFecha = createSectionLabel("Fecha de devolucion", 16, 266, 160);
         panel.add(lblFecha);
 
-        JTextField txtFecha = createTextField();
-        txtFecha.setBounds(16, 288, 170, 28);
-        panel.add(txtFecha);
+        this.txtFecha = createTextField();
+        this.txtFecha.setBounds(16, 286, 180, 24);
+        this.txtFecha.setToolTipText("Formato: dd/MM/yyyy");
+        panel.add(this.txtFecha);
 
-        JButton btnAgregar = createActionButton("Agregar al carrito", GREEN_BTN, new Color(57, 127, 58));
-        btnAgregar.setBounds(290, 286, 106, 28);
-        panel.add(btnAgregar);
+        JButton btnGuardar = createActionButton("Guardar operación", GREEN_BTN, new Color(57, 127, 58));
+        btnGuardar.setBounds(290, 286, 106, 28);
+        btnGuardar.addActionListener(e -> guardarOperacion());
+        panel.add(btnGuardar);
 
         JButton btnEliminar = createActionButton("Eliminar articulo", RED_BTN, new Color(156, 69, 69));
         btnEliminar.setBounds(404, 286, 104, 28);
@@ -225,8 +243,122 @@ public class PnlNuevaOperacion extends JPanel {
         VideojuegoInfo seleccionado = dialogo.getVideojuegoSeleccionado();
         if (seleccionado != null) {
             videojuegoSeleccionado = seleccionado;
-            btnSeleccionarVideojuego.setText(seleccionado.getTitulo() + " (" + seleccionado.getPlataforma() + ")");
+            btnSeleccionarVideojuego.setText(seleccionado.getTitulo());
             btnSeleccionarVideojuego.setForeground(Color.BLACK);
+        }
+    }
+
+    private void guardarOperacion() {
+        // Validar campos requeridos
+        if (clienteSeleccionado == null) {
+            JOptionPane.showMessageDialog(this, "Selecciona un cliente.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        if (videojuegoSeleccionado == null) {
+            JOptionPane.showMessageDialog(this, "Selecciona un videojuego.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        if (videojuegoSeleccionado.getStock() <= 0) {
+            JOptionPane.showMessageDialog(this, "No hay stock disponible para este videojuego.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        String tipoSeleccionado = (String) comboTipo.getSelectedItem();
+        if (tipoSeleccionado == null || tipoSeleccionado.equals("Seleccionar")) {
+            JOptionPane.showMessageDialog(this, "Selecciona el tipo de operación.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Obtener tipo (RENTA o COMPRA)
+        String tipo = tipoSeleccionado.toUpperCase();
+
+        // Calcular monto basado en el tipo y precio del videojuego
+        double monto = tipo.equals("RENTA") ? videojuegoSeleccionado.getPrecioRenta() : videojuegoSeleccionado.getPrecioCompra();
+
+        // Obtener descuento (si está vacío, es 0)
+        double descuento = 0;
+        if (!txtDescuento.getText().trim().isEmpty()) {
+            try {
+                descuento = Double.parseDouble(txtDescuento.getText().trim());
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "El descuento debe ser un número válido.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        }
+
+        if (descuento < 0 || descuento > monto) {
+            JOptionPane.showMessageDialog(this, "El descuento no puede ser negativo ni mayor al monto.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Obtener fecha de devolución (si es renta)
+        LocalDate fechaDevolucion = null;
+        if (tipo.equals("RENTA") && !txtFecha.getText().trim().isEmpty()) {
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                fechaDevolucion = LocalDate.parse(txtFecha.getText().trim(), formatter);
+            } catch (DateTimeParseException e) {
+                JOptionPane.showMessageDialog(this, "Formato de fecha inválido. Use dd/MM/yyyy.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        }
+
+        // Extraer IDs (el ClienteDAO los devuelve como "CLI-001", necesitamos el número)
+        int idCliente = extraerIdNumerico(clienteSeleccionado.getId());
+        int idVideojuego = extraerIdNumerico(videojuegoSeleccionado.getId());
+        UsuarioInfo usuarioActual = parent.getHost().getUsuarioActual();
+        int idUsuario = usuarioActual != null ? usuarioActual.getIdUsuario() : 0;
+
+        if (idCliente <= 0 || idVideojuego <= 0 || idUsuario <= 0) {
+            JOptionPane.showMessageDialog(this, "No se pudo obtener el cliente, videojuego o usuario de la operacion.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        LocalDate fechaOperacion = LocalDate.now();
+
+        // Guardar operación
+        String resultado = OperacionController.guardarOperacion(
+            idCliente,
+            idVideojuego,
+            idUsuario,
+            tipo,
+            monto,
+            descuento,
+            fechaOperacion,
+            fechaDevolucion
+        );
+
+        // Mostrar resultado
+        if (resultado.startsWith("Exito")) {
+            JOptionPane.showMessageDialog(this, resultado, "Exito", JOptionPane.INFORMATION_MESSAGE);
+            limpiarFormulario();
+        } else {
+            JOptionPane.showMessageDialog(this, resultado, "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void limpiarFormulario() {
+        clienteSeleccionado = null;
+        videojuegoSeleccionado = null;
+        btnSeleccionarCliente.setText("Seleccionar cliente");
+        btnSeleccionarCliente.setForeground(new Color(110, 110, 110));
+        btnSeleccionarVideojuego.setText("Seleccionar videojuego");
+        btnSeleccionarVideojuego.setForeground(new Color(110, 110, 110));
+        comboTipo.setSelectedIndex(0);
+        txtDescuento.setText("");
+        txtFecha.setText("");
+    }
+
+    private int extraerIdNumerico(String id) {
+        // Extrae el número de un ID como "CLI-001" → 1
+        if (id == null || id.isEmpty()) {
+            return 0;
+        }
+        try {
+            return Integer.parseInt(id.replaceAll("\\D+", ""));
+        } catch (NumberFormatException e) {
+            return 0;
         }
     }
 }

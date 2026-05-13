@@ -119,6 +119,7 @@ public class ViewLogin extends JPanel {
             // Procesar resultado
             if (usuario != null) {
                 // Login exitoso: abrir dashboard
+                host.setUsuarioActual(usuario);
                 host.router("dashboard");
             } else {
                 // Credenciales incorrectas
