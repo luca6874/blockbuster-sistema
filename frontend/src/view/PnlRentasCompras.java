@@ -1,5 +1,6 @@
 package frontend.src.view;
 
+import frontend.src.controller.OperacionController;
 import frontend.src.controller.Ventana;
 
 import java.awt.*;
@@ -7,7 +8,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.Normalizer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import javax.swing.*;
@@ -21,11 +21,14 @@ public class PnlRentasCompras extends JPanel {
     private static final int IDX_TIPO = 2;
     private static final int IDX_MONTO = 3;
     private static final int IDX_DESCUENTO = 4;
-    private static final int IDX_PUNTOS = 5;
-    private static final int IDX_ID = 6;
-    private static final int IDX_FECHA_OPERACION = 7;
+    private static final int IDX_FECHA_OPERACION = 5;
+    private static final int IDX_PUNTOS = 6;
+    private static final int IDX_ID = 7;
     private static final int IDX_FECHA_VENCIMIENTO = 8;
     private static final int IDX_ESTADO = 9;
+    private static final int IDX_CORREO = 10;
+    private static final int IDX_PLATAFORMA = 11;
+    private static final int IDX_IMAGEN = 12;
 
     private static final Color TOP_BAR = new Color(110, 60, 70);
     private static final Color DETAIL_BORDER = new Color(222, 214, 214);
@@ -392,23 +395,10 @@ public class PnlRentasCompras extends JPanel {
     }
 
     private void initTablaOperaciones() {
-        String[] columnas = {"Cliente", "Videojuego", "Tipo", "Monto", "Descuento", "Puntos"};
-        datosOperaciones = new ArrayList<>(Arrays.asList(new String[][]{
-            {"Luis sornoza", "Persona 5", "Renta", "$250.00", "N/A", "10", "01990", "01/01/2025", "15/01/2025", "Activa"},
-            {"Luis sornoza", "Persona 5", "Renta", "$250.00", "N/A", "10", "01991", "02/01/2025", "16/01/2025", "Activa"},
-            {"Luis sornoza", "Persona 5", "Renta", "$250.00", "N/A", "10", "01992", "03/01/2025", "17/01/2025", "Activa"},
-            {"Gustavo Cerati", "LEAGUE OF LEGENDS: El Rey Arruinado", "Compra", "$225.00", "10%", "15", "01993", "20/04/2025", "N/A", "Completada"},
-            {"Luis sornoza", "Persona 5", "Renta", "$250.00", "N/A", "10", "01994", "04/01/2025", "18/01/2025", "Pendiente"},
-            {"Luis sornoza", "Persona 5", "Renta", "$250.00", "N/A", "10", "01995", "05/01/2025", "19/01/2025", "Activa"},
-            {"Luis sornoza", "Persona 5", "Renta", "$250.00", "N/A", "10", "01996", "06/01/2025", "20/01/2025", "Activa"},
-            {"Luis sornoza", "Persona 5", "Renta", "$250.00", "N/A", "10", "01997", "07/01/2025", "21/01/2025", "Activa"},
-            {"Luis sornoza", "Persona 5", "Renta", "$250.00", "N/A", "10", "01998", "08/01/2025", "22/01/2025", "Activa"},
-            {"Luis sornoza", "Persona 5", "Renta", "$250.00", "N/A", "10", "01999", "09/01/2025", "23/01/2025", "Activa"},
-            {"Luis sornoza", "Persona 5", "Renta", "$250.00", "N/A", "10", "02000", "10/01/2025", "24/01/2025", "Activa"},
-            {"Luis sornoza", "Persona 5", "Renta", "$250.00", "N/A", "10", "02001", "11/01/2025", "25/01/2025", "Activa"}
-        }));
+        String[] columnas = {"Cliente", "Videojuego", "Tipo", "Monto", "Descuento", "Fecha"};
+        datosOperaciones = new ArrayList<>(OperacionController.obtenerTodas());
 
-        DefaultTableModel modelo = new DefaultTableModel(datosOperaciones.toArray(new String[0][]), columnas) {
+        DefaultTableModel modelo = new DefaultTableModel(crearFilasTabla(), columnas) {
             @Override
             public boolean isCellEditable(int r, int c) {
                 return false;
@@ -437,7 +427,7 @@ public class PnlRentasCompras extends JPanel {
         tablaOperaciones.getColumnModel().getColumn(2).setPreferredWidth(70);
         tablaOperaciones.getColumnModel().getColumn(3).setPreferredWidth(80);
         tablaOperaciones.getColumnModel().getColumn(4).setPreferredWidth(70);
-        tablaOperaciones.getColumnModel().getColumn(5).setPreferredWidth(50);
+        tablaOperaciones.getColumnModel().getColumn(5).setPreferredWidth(85);
 
         tablaOperaciones.addMouseListener(new MouseAdapter() {
             @Override
@@ -453,7 +443,23 @@ public class PnlRentasCompras extends JPanel {
         if (!datosOperaciones.isEmpty()) {
             tablaOperaciones.setRowSelectionInterval(0, 0);
             mostrarDetalle(0);
+        } else {
+            limpiarDetalle();
         }
+    }
+
+    private String[][] crearFilasTabla() {
+        String[][] filas = new String[datosOperaciones.size()][6];
+        for (int i = 0; i < datosOperaciones.size(); i++) {
+            String[] datos = datosOperaciones.get(i);
+            filas[i][0] = datos[IDX_CLIENTE];
+            filas[i][1] = datos[IDX_VIDEOJUEGO];
+            filas[i][2] = datos[IDX_TIPO];
+            filas[i][3] = datos[IDX_MONTO];
+            filas[i][4] = datos[IDX_DESCUENTO];
+            filas[i][5] = datos[IDX_FECHA_OPERACION];
+        }
+        return filas;
     }
 
     private void mostrarDetalle(int fila) {
@@ -469,18 +475,17 @@ public class PnlRentasCompras extends JPanel {
         String[] datos = datosOperaciones.get(fila);
         String cliente = datos[IDX_CLIENTE];
         String videojuego = datos[IDX_VIDEOJUEGO];
-        String[] juegoInfo = resolverFichaJuego(videojuego);
+        String[] juegoInfo = resolverFichaJuego(datos);
         String descuento = datos[IDX_DESCUENTO];
-        double totalPagado = parseCurrency(datos[IDX_MONTO]);
-        double porcentajeDescuento = parsePercentage(descuento);
-        double montoBase = porcentajeDescuento > 0.0 && porcentajeDescuento < 100.0
-            ? totalPagado / (1.0 - (porcentajeDescuento / 100.0))
-            : totalPagado;
-        double descuentoAplicado = Math.max(0.0, montoBase - totalPagado);
+        double montoBase = parseCurrency(datos[IDX_MONTO]);
+        double descuentoAplicado = parseCurrency(descuento);
+        double totalPagado = Math.max(0.0, montoBase - descuentoAplicado);
 
         lblDetalleID.setText("ID: " + datos[IDX_ID]);
         lblDetalleCliente.setText(cliente);
-        lblDetalleCorreo.setText(generarCorreo(cliente));
+        lblDetalleCorreo.setText(datos[IDX_CORREO] == null || datos[IDX_CORREO].trim().isEmpty()
+            ? generarCorreo(cliente)
+            : datos[IDX_CORREO]);
         lblDetalleAvatar.setText(obtenerIniciales(cliente));
 
         lblDetalleVideojuego.setText(juegoInfo[0]);
@@ -500,15 +505,17 @@ public class PnlRentasCompras extends JPanel {
         configurarBadgeEstado(datos[IDX_ESTADO]);
 
         lblDetalleMonto.setText(formatCurrency(montoBase));
-        if (porcentajeDescuento > 0.0) {
-            lblDetalleDescuento.setText("-" + formatCurrency(descuentoAplicado) + " (" + descuento + ")");
+        if (descuentoAplicado > 0.0) {
+            lblDetalleDescuento.setText("-" + formatCurrency(descuentoAplicado));
         } else {
             lblDetalleDescuento.setText("N/A");
         }
         lblDetalleTotal.setText(formatCurrency(totalPagado));
         lblDetallePuntos.setText(datos[IDX_PUNTOS]);
 
-        ImageIcon caratula = loadScaledIcon("/frontend/src/images/" + juegoInfo[3], 62, 86);
+        ImageIcon caratula = juegoInfo[3].trim().isEmpty()
+            ? null
+            : loadScaledIcon("/frontend/src/images/" + juegoInfo[3], 62, 86);
         if (caratula != null) {
             lblDetalleCaratula.setText("");
             lblDetalleCaratula.setIcon(caratula);
@@ -631,20 +638,13 @@ public class PnlRentasCompras extends JPanel {
         lblDetalleEstado.repaint();
     }
 
-    private String[] resolverFichaJuego(String videojuego) {
-        if ("LEAGUE OF LEGENDS: El Rey Arruinado".equalsIgnoreCase(videojuego)) {
-            return new String[]{"LEAGUE OF LEGENDS", "El Rey Arruinado", "Xbox One", "caratulagame2.png"};
-        }
-        if ("Persona 5".equalsIgnoreCase(videojuego)) {
-            return new String[]{"Persona 5", "Royal Edition", "PlayStation 5", "caratulaGame1.png"};
-        }
-        if ("God of War".equalsIgnoreCase(videojuego)) {
-            return new String[]{"God of War", "Saga nordica", "PS5", "caratulaGame1.png"};
-        }
-        if ("The Last of Us".equalsIgnoreCase(videojuego)) {
-            return new String[]{"The Last of Us", "Remastered", "PS4", "caratulaGame4.png"};
-        }
-        return new String[]{videojuego, "Edicion estandar", "Catalogo general", "caratulaGame3.png"};
+    private String[] resolverFichaJuego(String[] datos) {
+        return new String[]{
+            datos[IDX_VIDEOJUEGO],
+            "Operacion " + datos[IDX_TIPO].toLowerCase(Locale.ROOT),
+            datos[IDX_PLATAFORMA],
+            datos[IDX_IMAGEN]
+        };
     }
 
     private String obtenerIniciales(String nombre) {
@@ -688,23 +688,6 @@ public class PnlRentasCompras extends JPanel {
             return 0.0;
         }
         String limpio = texto.replace("$", "").replace(",", "").trim();
-        try {
-            return Double.parseDouble(limpio);
-        } catch (NumberFormatException e) {
-            return 0.0;
-        }
-    }
-
-    private double parsePercentage(String texto) {
-        if (texto == null) {
-            return 0.0;
-        }
-
-        String limpio = texto.replace("%", "").trim();
-        if (limpio.isEmpty() || "N/A".equalsIgnoreCase(limpio)) {
-            return 0.0;
-        }
-
         try {
             return Double.parseDouble(limpio);
         } catch (NumberFormatException e) {

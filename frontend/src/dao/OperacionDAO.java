@@ -25,7 +25,6 @@ public class OperacionDAO {
 
         try {
             conn = ConexionBD.conectar();
-            conn.setAutoCommit(false);
 
             String sql = "SELECT id_operacion, id_cliente, id_videojuego, id_usuario, tipo, " +
                          "monto, descuento, fecha_operacion, fecha_devolucion " +
@@ -44,6 +43,65 @@ public class OperacionDAO {
 
         } catch (Exception e) {
             System.err.println("Error en obtenerTodos operaciones: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            ConexionBD.cerrar(conn);
+        }
+
+        return operaciones;
+    }
+
+    public static List<String[]> obtenerTodas() {
+        List<String[]> operaciones = new ArrayList<>();
+        Connection conn = null;
+
+        try {
+            conn = ConexionBD.conectar();
+
+            String sql = "SELECT o.id_operacion, " +
+                         "CONCAT(c.nombre, ' ', c.primer_apellido, COALESCE(CONCAT(' ', c.segundo_apellido), '')) AS cliente, " +
+                         "c.correo_electronico, " +
+                         "v.nombre AS videojuego, v.plataforma, v.imagen, v.puntos, " +
+                         "u.username AS usuario, " +
+                         "o.tipo, o.monto, o.descuento, o.fecha_operacion, o.fecha_devolucion " +
+                         "FROM operaciones o " +
+                         "INNER JOIN clientes c ON o.id_cliente = c.id_cliente " +
+                         "INNER JOIN videojuegos v ON o.id_videojuego = v.id_videojuego " +
+                         "INNER JOIN usuarios u ON o.id_usuario = u.id_usuario " +
+                         "ORDER BY o.fecha_operacion DESC, o.id_operacion DESC";
+
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Date fechaOperacion = rs.getDate("fecha_operacion");
+                Date fechaDevolucion = rs.getDate("fecha_devolucion");
+                double monto = rs.getDouble("monto");
+                double descuento = rs.getDouble("descuento");
+
+                operaciones.add(new String[]{
+                    rs.getString("cliente"),
+                    rs.getString("videojuego"),
+                    rs.getString("tipo"),
+                    String.format("$%.2f", monto),
+                    descuento > 0 ? String.format("$%.2f", descuento) : "N/A",
+                    fechaOperacion != null ? fechaOperacion.toLocalDate().toString() : "N/A",
+                    String.valueOf(rs.getInt("puntos")),
+                    String.format("%05d", rs.getInt("id_operacion")),
+                    fechaDevolucion != null ? fechaDevolucion.toLocalDate().toString() : "N/A",
+                    "RENTA".equalsIgnoreCase(rs.getString("tipo")) ? "Activa" : "Completada",
+                    rs.getString("correo_electronico") != null ? rs.getString("correo_electronico") : "",
+                    rs.getString("plataforma") != null ? rs.getString("plataforma") : "Catalogo general",
+                    rs.getString("imagen") != null ? rs.getString("imagen") : "",
+                    rs.getString("usuario")
+                });
+            }
+
+            rs.close();
+            ps.close();
+
+        } catch (Exception e) {
+            System.err.println("Error en obtenerTodas operaciones: " + e.getMessage());
             e.printStackTrace();
         } finally {
             ConexionBD.cerrar(conn);

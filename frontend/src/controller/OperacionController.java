@@ -5,6 +5,7 @@ import frontend.src.dao.VideojuegoDAO;
 import frontend.src.model.OperacionInfo;
 import frontend.src.model.VideojuegoInfo;
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * OperacionController - Controlador para operaciones de renta y compra.
@@ -13,6 +14,10 @@ import java.time.LocalDate;
  * Coordina entre vistas y DAO.
  */
 public class OperacionController {
+
+    public static List<String[]> obtenerTodas() {
+        return OperacionDAO.obtenerTodas();
+    }
 
     /**
      * Guarda una nueva operación en la base de datos.
