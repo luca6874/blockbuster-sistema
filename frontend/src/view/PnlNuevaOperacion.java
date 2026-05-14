@@ -3,6 +3,7 @@ package frontend.src.view;
 import frontend.src.controller.Ventana;
 import frontend.src.controller.OperacionController;
 import frontend.src.model.ClienteInfo;
+import frontend.src.model.OperacionInfo;
 import frontend.src.model.UsuarioInfo;
 import frontend.src.model.VideojuegoInfo;
 
@@ -10,6 +11,8 @@ import java.awt.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 
@@ -35,6 +38,8 @@ public class PnlNuevaOperacion extends JPanel {
     private JComboBox<String> comboTipo;
     private JTextField txtDescuento;
     private JTextField txtFecha;
+    private List<OperacionInfo> carrito = new ArrayList<>();
+    private JButton btnConfirmar;
     
 
     public PnlNuevaOperacion(ViewDashboard parent) {
@@ -155,9 +160,9 @@ public class PnlNuevaOperacion extends JPanel {
         this.txtFecha.setToolTipText("Formato: dd/MM/yyyy");
         panel.add(this.txtFecha);
 
-        JButton btnGuardar = createActionButton("Guardar operación", GREEN_BTN, new Color(57, 127, 58));
+        JButton btnGuardar = createActionButton("Agregar al carrito", GREEN_BTN, new Color(57, 127, 58));
         btnGuardar.setBounds(290, 286, 106, 28);
-        btnGuardar.addActionListener(e -> guardarOperacion());
+        btnGuardar.addActionListener(e -> agregarAlCarrito());
         panel.add(btnGuardar);
 
         JButton btnEliminar = createActionButton("Eliminar articulo", RED_BTN, new Color(156, 69, 69));
@@ -173,29 +178,22 @@ public class PnlNuevaOperacion extends JPanel {
         panel.setBorder(new LineBorder(BORDER, 1, true));
         taTicket = new JTextArea();
         taTicket.setEditable(false);
-        taTicket.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        taTicket.setFont(new Font("Monospaced", Font.PLAIN, 10));
         taTicket.setBackground(Color.WHITE);
 
-         taTicket.setText("""
-        ========================
-            TICKET DIGITAL
-        ========================
+        JScrollPane scrollPane = new JScrollPane(taTicket);
+        scrollPane.setBounds(10, 10, 250, 270);
+        scrollPane.setBorder(null);
+        panel.add(scrollPane);
 
-        Cliente:
-        Sin seleccionar
+        actualizarTicket();
 
-        Juego:
-        Sin seleccionar
+        btnConfirmar = createActionButton("Confirmar operacion", GREEN_BTN, new Color(57, 127, 58));
+        btnConfirmar.setBounds(10, 290, 250, 28);
+        btnConfirmar.setEnabled(false);
+        btnConfirmar.addActionListener(e -> confirmarOperaciones());
+        panel.add(btnConfirmar);
 
-        Tipo:
-        -
-
-        Total:
-        $0.00
-        """);
-
-        taTicket.setBounds(10, 10, 250, 300);
-        panel.add(taTicket);
         return panel;
     }
 
@@ -277,7 +275,7 @@ public class PnlNuevaOperacion extends JPanel {
         }
     }
 
-    private void guardarOperacion() {
+    private void agregarAlCarrito() {
         // Validar campos requeridos
         if (clienteSeleccionado == null) {
             JOptionPane.showMessageDialog(this, "Selecciona un cliente.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -346,8 +344,8 @@ public class PnlNuevaOperacion extends JPanel {
         }
         LocalDate fechaOperacion = LocalDate.now();
 
-        // Guardar operación
-        String resultado = OperacionController.guardarOperacion(
+        // Crear objeto operación y agregarlo al carrito
+        OperacionInfo operacion = new OperacionInfo(
             idCliente,
             idVideojuego,
             idUsuario,
@@ -358,13 +356,13 @@ public class PnlNuevaOperacion extends JPanel {
             fechaDevolucion
         );
 
-        // Mostrar resultado
-        if (resultado.startsWith("Exito")) {
-            JOptionPane.showMessageDialog(this, resultado, "Exito", JOptionPane.INFORMATION_MESSAGE);
-            limpiarFormulario();
-        } else {
-            JOptionPane.showMessageDialog(this, resultado, "Error", JOptionPane.ERROR_MESSAGE);
-        }
+        carrito.add(operacion);
+
+        // Actualizar UI
+        actualizarTicket();
+        limpiarFormularioSinCarrito();
+
+        JOptionPane.showMessageDialog(this, "Videojuego agregado al carrito.", "Exito", JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void limpiarFormulario() {
@@ -377,6 +375,133 @@ public class PnlNuevaOperacion extends JPanel {
         comboTipo.setSelectedIndex(0);
         txtDescuento.setText("");
         txtFecha.setText("");
+    }
+
+    private void limpiarFormularioSinCarrito() {
+        videojuegoSeleccionado = null;
+        btnSeleccionarVideojuego.setText("Seleccionar videojuego");
+        btnSeleccionarVideojuego.setForeground(new Color(110, 110, 110));
+        comboTipo.setSelectedIndex(0);
+        txtDescuento.setText("");
+        txtFecha.setText("");
+    }
+
+    private void actualizarTicket() {
+        StringBuilder ticketText = new StringBuilder();
+        ticketText.append("========================\n");
+        ticketText.append("    TICKET DIGITAL\n");
+        ticketText.append("========================\n\n");
+
+        if (carrito.isEmpty()) {
+            ticketText.append("Carrito vacio\n");
+        } else {
+            // Obtener el cliente del primer item (todos comparten cliente)
+            OperacionInfo primerItem = carrito.get(0);
+            ticketText.append("Cliente: ").append(clienteSeleccionado != null ? clienteSeleccionado.getNombre() : "Sin cliente").append("\n\n");
+
+            // Mostrar cada item en el carrito
+            double totalGeneral = 0;
+            int itemNum = 1;
+            for (OperacionInfo item : carrito) {
+                // Obtener info del videojuego por ID (necesitaremos una función para esto)
+                ticketText.append(String.format("[%d] Tipo: %s\n", itemNum, item.getTipo()));
+                ticketText.append(String.format("    Monto: $%.2f\n", item.getMonto()));
+                ticketText.append(String.format("    Descto: $%.2f\n", item.getDescuento()));
+                ticketText.append(String.format("    Neto: $%.2f\n", item.getMonto() - item.getDescuento()));
+                ticketText.append("\n");
+                totalGeneral += (item.getMonto() - item.getDescuento());
+                itemNum++;
+            }
+
+            ticketText.append("------------------------\n");
+            ticketText.append(String.format("Total: $%.2f\n", totalGeneral));
+            ticketText.append("Items: ").append(carrito.size()).append("\n");
+        }
+
+        taTicket.setText(ticketText.toString());
+        if (btnConfirmar != null) {
+            btnConfirmar.setEnabled(!carrito.isEmpty());
+        }
+    }
+
+    private void confirmarOperaciones() {
+        if (carrito.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "El carrito está vacío.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        if (clienteSeleccionado == null) {
+            JOptionPane.showMessageDialog(this, "No hay cliente seleccionado.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Confirmar con el usuario
+        int opcion = JOptionPane.showConfirmDialog(
+            this,
+            "¿Confirmar operación con " + carrito.size() + " item(s)?",
+            "Confirmar",
+            JOptionPane.YES_NO_OPTION
+        );
+
+        if (opcion != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        // Guardar todas las operaciones del carrito
+        int exitosas = 0;
+        int fallidas = 0;
+
+        for (OperacionInfo operacion : carrito) {
+            String resultado = OperacionController.guardarOperacion(
+                operacion.getIdCliente(),
+                operacion.getIdVideojuego(),
+                operacion.getIdUsuario(),
+                operacion.getTipo(),
+                operacion.getMonto(),
+                operacion.getDescuento(),
+                operacion.getFechaOperacion(),
+                operacion.getFechaDevolucion()
+            );
+
+            if (resultado.startsWith("Exito")) {
+                exitosas++;
+            } else {
+                fallidas++;
+            }
+        }
+
+        // Mostrar resultado
+        String mensaje = "Operacion completada:\n" +
+                         "Exitosas: " + exitosas + "\n" +
+                         "Fallidas: " + fallidas;
+
+        if (fallidas == 0) {
+            JOptionPane.showMessageDialog(this, mensaje, "Exito", JOptionPane.INFORMATION_MESSAGE);
+            limpiarCarrito();
+        } else {
+            JOptionPane.showMessageDialog(this, mensaje, "Aviso", JOptionPane.WARNING_MESSAGE);
+            // Limpiar solo los exitosos del carrito
+            carrito.removeIf(op -> {
+                String resultado = OperacionController.guardarOperacion(
+                    op.getIdCliente(),
+                    op.getIdVideojuego(),
+                    op.getIdUsuario(),
+                    op.getTipo(),
+                    op.getMonto(),
+                    op.getDescuento(),
+                    op.getFechaOperacion(),
+                    op.getFechaDevolucion()
+                );
+                return resultado.startsWith("Exito");
+            });
+            actualizarTicket();
+        }
+    }
+
+    private void limpiarCarrito() {
+        carrito.clear();
+        limpiarFormulario();
+        actualizarTicket();
     }
 
     private int extraerIdNumerico(String id) {
