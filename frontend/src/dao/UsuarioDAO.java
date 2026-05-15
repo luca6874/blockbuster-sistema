@@ -258,4 +258,72 @@ public class UsuarioDAO {
 
         return false;
     }
+
+    /**
+     * Actualiza los datos de un usuario existente en la base de datos.
+     * 
+     * Campos que se pueden actualizar:
+     * - nombre
+     * - primer_apellido
+     * - segundo_apellido
+     * - fecha_nacimiento
+     * - password (solo si no es null/vacío)
+     * 
+     * Si password es null o vacío, se omite la actualización del password.
+     * 
+     * @param idUsuario el ID del usuario a actualizar
+     * @param nombre el nuevo nombre
+     * @param primerApellido el nuevo primer apellido
+     * @param segundoApellido el nuevo segundo apellido
+     * @param fechaNacimiento la nueva fecha de nacimiento
+     * @param password la nueva contraseña (puede ser null o vacío para omitir)
+     * @return true si la actualización fue exitosa, false si falla
+     */
+    public static boolean actualizar(int idUsuario, String nombre, String primerApellido, 
+                                      String segundoApellido, LocalDate fechaNacimiento, String password) {
+        Connection conn = null;
+
+        try {
+            conn = ConexionBD.conectar();
+
+            // Construir dinámicamente el SQL dependiendo de si se actualiza password o no
+            String sql;
+            if (password != null && !password.trim().isEmpty()) {
+                sql = "UPDATE usuarios SET nombre = ?, primer_apellido = ?, segundo_apellido = ?, " +
+                      "fecha_nacimiento = ?, password = ? WHERE id_usuario = ?";
+            } else {
+                sql = "UPDATE usuarios SET nombre = ?, primer_apellido = ?, segundo_apellido = ?, " +
+                      "fecha_nacimiento = ? WHERE id_usuario = ?";
+            }
+
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, nombre);
+            ps.setString(2, primerApellido);
+            ps.setString(3, segundoApellido);
+            ps.setDate(4, Date.valueOf(fechaNacimiento));
+
+            if (password != null && !password.trim().isEmpty()) {
+                ps.setString(5, password);
+                ps.setInt(6, idUsuario);
+            } else {
+                ps.setInt(5, idUsuario);
+            }
+
+            int filasAfectadas = ps.executeUpdate();
+            ps.close();
+
+            if (filasAfectadas > 0) {
+                System.out.println("✓ Usuario actualizado exitosamente (ID: " + idUsuario + ")");
+                return true;
+            }
+
+        } catch (Exception e) {
+            System.err.println("Error en actualizar: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            ConexionBD.cerrar(conn);
+        }
+
+        return false;
+    }
 }
