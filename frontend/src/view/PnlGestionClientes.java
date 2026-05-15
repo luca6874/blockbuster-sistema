@@ -211,12 +211,31 @@ public class PnlGestionClientes extends JPanel {
         }
     }
     
-    private void mostrarPanelResumenCliente() {
-        if (pnlTotalJuego != null && pnlResumenCliente != null) {
-            pnlTotalJuego.setVisible(false);
-            pnlResumenCliente.setVisible(true);
-            lblTituloEstadisticas.setText("Resumen del cliente");
+    private void mostrarPanelResumenCliente(String clienteId) {
+        if (pnlTotalJuego == null || pnlResumenCliente == null) {
+            return;
         }
+        
+        // Validar que haya un cliente seleccionado
+        if (clienteId == null || clienteId.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Por favor, selecciona un cliente primero.", "Sin cliente seleccionado", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        // Obtener el cliente desde la BD
+        ClienteInfo cliente = ClienteController.obtenerClientePorId(clienteId);
+        if (cliente == null) {
+            JOptionPane.showMessageDialog(this, "No se pudo cargar la información del cliente.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        // Actualizar el panel de resumen con los datos del cliente
+        pnlResumenCliente.actualizarConDatos(cliente);
+        
+        // Mostrar el panel de resumen y ocultar el de total juegos
+        pnlTotalJuego.setVisible(false);
+        pnlResumenCliente.setVisible(true);
+        lblTituloEstadisticas.setText("Resumen del cliente");
     }
 
     private void abrirEditarCliente(String clienteId) {
@@ -236,8 +255,55 @@ public class PnlGestionClientes extends JPanel {
      * Se llama después de CRUD (agregar, editar, eliminar).
      */
     public void refrescarTabla() {
-        // Reconstruir la tabla con datos nuevos desde BD
-        initTablaClientes();
+        if (tablaClientes == null) return;
+        
+        // Obtener datos nuevos desde BD
+        List<ClienteInfo> clientesDeBD = ClienteController.traerClientesDeBD();
+        Object[][] datos = convertirClientesAArray(clientesDeBD);
+        String[] columnas = {"ID", "Nombre completo", "Email", "Estatus", "Nivel", "Acciones"};
+        
+        // Actualizar el modelo de datos existente
+        DefaultTableModel modelo = (DefaultTableModel) tablaClientes.getModel();
+        modelo.setDataVector(datos, columnas);
+        
+        // Actualizar etiqueta con cantidad real
+        if (lblTotalClientes != null) {
+            lblTotalClientes.setText("Lista de clientes (" + clientesDeBD.size() + ")");
+        }
+        
+        // Reconfigurar renderizador de acciones (se pierde al actualizar modelo)
+        tablaClientes.getColumnModel().getColumn(5).setCellRenderer(new TableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
+                panel.setBackground(isSelected ? table.getSelectionBackground() : Color.WHITE);
+                
+                JButton btnVer = new JButton("👁");
+                btnVer.setBackground(Color.WHITE);
+                btnVer.setBorder(BorderFactory.createEmptyBorder());
+                btnVer.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                btnVer.setToolTipText("Ver detalles");
+                
+                JButton btnEditar = new JButton("✏");
+                btnEditar.setBackground(Color.WHITE);
+                btnEditar.setBorder(BorderFactory.createEmptyBorder());
+                btnEditar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                btnEditar.setToolTipText("Editar cliente");
+                
+                JButton btnEliminar = new JButton("🗑");
+                btnEliminar.setBackground(Color.WHITE);
+                btnEliminar.setBorder(BorderFactory.createEmptyBorder());
+                btnEliminar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                btnEliminar.setToolTipText("Eliminar cliente");
+                
+                panel.add(btnVer);
+                panel.add(btnEditar);
+                panel.add(btnEliminar);
+                
+                return panel;
+            }
+        });
+        
         System.out.println("✓ Tabla de clientes refrescada");
     }
     
@@ -479,21 +545,20 @@ public class PnlGestionClientes extends JPanel {
                 int row = tablaClientes.rowAtPoint(e.getPoint());
                 int col = tablaClientes.columnAtPoint(e.getPoint());
                 if (row >= 0) {
+                    // Obtener ID del cliente de la fila (siempre en la columna 0)
+                    String clienteId = (String) tablaClientes.getValueAt(row, 0);
+                    String nombreCompleto = (String) tablaClientes.getValueAt(row, 1);
+                    
                     // Si el clic es en la columna de acciones (columna 5)
                     if (col == 5) {
-                        // Obtener datos del cliente
-                        String clienteId = (String) tablaClientes.getValueAt(row, 0);
-                        String nombreCompleto = (String) tablaClientes.getValueAt(row, 1);
-                        String email = (String) tablaClientes.getValueAt(row, 2);
-                        
                         // Detectar posición x del clic dentro de la celda para saber qué botón
                         Rectangle cellRect = tablaClientes.getCellRect(row, col, true);
                         int posX = e.getX() - cellRect.x;
                         
                         // Botones: ver (x < 25), editar (25-50), eliminar (> 50)
                         if (posX < 25) {
-                            // Botón ver - mostrar resumen
-                            mostrarPanelResumenCliente();
+                            // Botón ver - mostrar resumen con datos del cliente
+                            mostrarPanelResumenCliente(clienteId);
                         } else if (posX > 20 && posX < 50) {
                             // Botón editar
                             abrirEditarCliente(clienteId);
@@ -502,7 +567,8 @@ public class PnlGestionClientes extends JPanel {
                             confirmarEliminarCliente(clienteId, nombreCompleto);
                         }
                     } else {
-                        mostrarPanelResumenCliente();
+                        // Clic en cualquier otra columna - mostrar resumen
+                        mostrarPanelResumenCliente(clienteId);
                     }
                 }
             }

@@ -12,6 +12,22 @@ import java.net.URL;
  */
 public class PnlResumenCliente extends JPanel {
     private ViewDashboard parent;
+    
+    // Referencias a labels para actualización dinámica
+    private JLabel lblFecha;
+    private JLabel lblNombre;
+    private JLabel lblEmail;
+    private JLabel lblId;
+    private JLabel lblTelefono;
+    private JLabel lblJuegosRentados;
+    private JLabel lblJuegosComprados;
+    private JLabel lblDescuentosUsados;
+    private JLabel lblDescFrecuencia;
+    private JLabel badgeEstatus;
+    private JLabel badgeFrecuente;
+    
+    // Datos del cliente actual
+    private frontend.src.model.ClienteInfo clienteActual;
 
     public PnlResumenCliente(ViewDashboard parent) {
         this.parent = parent;
@@ -36,7 +52,7 @@ public class PnlResumenCliente extends JPanel {
     }
 
     private void addFecha() {
-        JLabel lblFecha = new JLabel("05/02/2004", SwingConstants.RIGHT);
+        lblFecha = new JLabel("05/02/2004", SwingConstants.RIGHT);
         lblFecha.setFont(new Font("Arial", Font.PLAIN, 10));
         lblFecha.setForeground(new Color(100, 100, 100));
         lblFecha.setBounds(120, 10, 120, 16);
@@ -70,30 +86,32 @@ public class PnlResumenCliente extends JPanel {
         avatarCont.add(icon);
         this.add(avatarCont);
 
-        JLabel lblNombre = new JLabel("Luis Spinetta");
+        lblNombre = new JLabel("Luis Spinetta");
         lblNombre.setFont(new Font("Arial", Font.BOLD, 13));
         lblNombre.setForeground(Color.BLACK);
         lblNombre.setBounds(80, 30, 150, 18);
         this.add(lblNombre);
 
-        JLabel lblEmail = new JLabel("pescado@rabioso.com");
+        lblEmail = new JLabel("pescado@rabioso.com");
         lblEmail.setFont(new Font("Arial", Font.PLAIN, 10));
         lblEmail.setForeground(new Color(120, 120, 120));
         lblEmail.setBounds(80, 50, 150, 16);
         this.add(lblEmail);
 
-        this.add(createBadge("Activo", new Color(46, 204, 113), Color.WHITE, 80, 70, 65, 18));
-        this.add(createBadge("Cliente frecuente", new Color(245, 193, 65), new Color(80, 60, 20), 150, 70, 85, 18));
+        badgeEstatus = createBadge("Activo", new Color(46, 204, 113), Color.WHITE, 80, 70, 65, 18);
+        this.add(badgeEstatus);
+        badgeFrecuente = createBadge("Cliente frecuente", new Color(245, 193, 65), new Color(80, 60, 20), 150, 70, 85, 18);
+        this.add(badgeFrecuente);
     }
 
     private void addInformacionBasica() {
-        JLabel lblId = new JLabel("ID: 13587");
+        lblId = new JLabel("ID: 13587");
         lblId.setFont(new Font("Arial", Font.PLAIN, 11));
         lblId.setForeground(Color.BLACK);
         lblId.setBounds(15, 100, 110, 16);
         this.add(lblId);
 
-        JLabel lblTelefono = new JLabel("55 271 4314", SwingConstants.RIGHT);
+        lblTelefono = new JLabel("55 271 4314", SwingConstants.RIGHT);
         lblTelefono.setFont(new Font("Arial", Font.PLAIN, 11));
         lblTelefono.setForeground(Color.BLACK);
         lblTelefono.setBounds(130, 100, 105, 16);
@@ -102,10 +120,124 @@ public class PnlResumenCliente extends JPanel {
 
     private void addEstadisticas() {
         int y = 125;
-        this.add(createStatCard("/frontend/src/images/iconVideoGame1.png", "Juegos rentados", "3", 10, y));
-        this.add(createStatCard("/frontend/src/images/money.png", "Juegos comprados", "2", 67, y));
-        this.add(createStatCard("/frontend/src/images/discount.png", "Descuentos usados", "0", 124, y));
-        this.add(createStatCard("/frontend/src/images/level.png", "Desc. frecuencia", "SI", 181, y));
+        // Stat 1: Juegos rentados
+        JPanel card1 = new JPanel(null) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(Color.WHITE);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
+                g2.setColor(new Color(220, 220, 220));
+                g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 12, 12);
+            }
+        };
+        card1.setOpaque(false);
+        card1.setBounds(10, y, 55, 70);
+        JLabel icon1 = createIconLabel("/frontend/src/images/iconVideoGame1.png", 0, 4);
+        card1.add(icon1);
+        JLabel title1 = createTitleLabel("Juegos rentados", 2, 22);
+        card1.add(title1);
+        lblJuegosRentados = createValueLabel("3", 0, 46);
+        card1.add(lblJuegosRentados);
+        this.add(card1);
+        
+        // Stat 2: Juegos comprados
+        JPanel card2 = new JPanel(null) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(Color.WHITE);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
+                g2.setColor(new Color(220, 220, 220));
+                g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 12, 12);
+            }
+        };
+        card2.setOpaque(false);
+        card2.setBounds(67, y, 55, 70);
+        JLabel icon2 = createIconLabel("/frontend/src/images/money.png", 0, 4);
+        card2.add(icon2);
+        JLabel title2 = createTitleLabel("Juegos comprados", 2, 22);
+        card2.add(title2);
+        lblJuegosComprados = createValueLabel("2", 0, 46);
+        card2.add(lblJuegosComprados);
+        this.add(card2);
+        
+        // Stat 3: Descuentos usados
+        JPanel card3 = new JPanel(null) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(Color.WHITE);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
+                g2.setColor(new Color(220, 220, 220));
+                g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 12, 12);
+            }
+        };
+        card3.setOpaque(false);
+        card3.setBounds(124, y, 55, 70);
+        JLabel icon3 = createIconLabel("/frontend/src/images/discount.png", 0, 4);
+        card3.add(icon3);
+        JLabel title3 = createTitleLabel("Descuentos usados", 2, 22);
+        card3.add(title3);
+        lblDescuentosUsados = createValueLabel("0", 0, 46);
+        card3.add(lblDescuentosUsados);
+        this.add(card3);
+        
+        // Stat 4: Descuento frecuencia
+        JPanel card4 = new JPanel(null) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(Color.WHITE);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
+                g2.setColor(new Color(220, 220, 220));
+                g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 12, 12);
+            }
+        };
+        card4.setOpaque(false);
+        card4.setBounds(181, y, 55, 70);
+        JLabel icon4 = createIconLabel("/frontend/src/images/level.png", 0, 4);
+        card4.add(icon4);
+        JLabel title4 = createTitleLabel("Desc. frecuencia", 2, 22);
+        card4.add(title4);
+        lblDescFrecuencia = createValueLabel("SI", 0, 46);
+        card4.add(lblDescFrecuencia);
+        this.add(card4);
+    }
+    
+    private JLabel createIconLabel(String iconPath, int x, int y) {
+        JLabel icon = new JLabel();
+        icon.setHorizontalAlignment(SwingConstants.CENTER);
+        icon.setBounds(x, y, 55, 18);
+        try {
+            URL url = getClass().getResource(iconPath);
+            if (url != null) {
+                Image img = new ImageIcon(url).getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH);
+                icon.setIcon(new ImageIcon(img));
+            }
+        } catch (Exception ignored) {
+        }
+        return icon;
+    }
+    
+    private JLabel createTitleLabel(String title, int x, int y) {
+        JLabel lblTitle = new JLabel("<html><center>" + title + "</center></html>", SwingConstants.CENTER);
+        lblTitle.setFont(new Font("Arial", Font.PLAIN, 8));
+        lblTitle.setForeground(new Color(100, 100, 100));
+        lblTitle.setBounds(x, y, 51, 24);
+        return lblTitle;
+    }
+    
+    private JLabel createValueLabel(String value, int x, int y) {
+        JLabel lblValue = new JLabel(value, SwingConstants.CENTER);
+        lblValue.setFont(new Font("Arial", Font.BOLD, 14));
+        lblValue.setForeground(Color.BLACK);
+        lblValue.setBounds(x, y, 55, 22);
+        return lblValue;
     }
 
     private void addAcciones() {
@@ -139,48 +271,6 @@ public class PnlResumenCliente extends JPanel {
         this.add(btnEliminar);
     }
 
-    private JPanel createStatCard(String iconPath, String title, String value, int x, int y) {
-        JPanel card = new JPanel(null) {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g;
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(Color.WHITE);
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
-                g2.setColor(new Color(220, 220, 220));
-                g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 12, 12);
-            }
-        };
-        card.setOpaque(false);
-        card.setBounds(x, y, 55, 70);
-
-        JLabel icon = new JLabel();
-        icon.setHorizontalAlignment(SwingConstants.CENTER);
-        icon.setBounds(0, 4, 55, 18);
-        try {
-            URL url = getClass().getResource(iconPath);
-            if (url != null) {
-                Image img = new ImageIcon(url).getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH);
-                icon.setIcon(new ImageIcon(img));
-            }
-        } catch (Exception ignored) {
-        }
-        card.add(icon);
-
-        JLabel lblTitle = new JLabel("<html><center>" + title + "</center></html>", SwingConstants.CENTER);
-        lblTitle.setFont(new Font("Arial", Font.PLAIN, 8));
-        lblTitle.setForeground(new Color(100, 100, 100));
-        lblTitle.setBounds(2, 22, 51, 24);
-        card.add(lblTitle);
-
-        JLabel lblValue = new JLabel(value, SwingConstants.CENTER);
-        lblValue.setFont(new Font("Arial", Font.BOLD, 14));
-        lblValue.setForeground(Color.BLACK);
-        lblValue.setBounds(0, 46, 55, 22);
-        card.add(lblValue);
-
-        return card;
-    }
 
     private JLabel createBadge(String text, Color background, Color foreground, int x, int y, int width, int height) {
         JLabel badge = new JLabel(text, SwingConstants.CENTER);
@@ -204,28 +294,118 @@ public class PnlResumenCliente extends JPanel {
         return button;
     }
 
-    // Métodos para obtener datos del cliente (datos simulados)
+    // Métodos para obtener datos del cliente
     private String obtenerClienteId() {
-        return "13587";
+        return clienteActual != null ? clienteActual.getId() : "N/A";
     }
 
     private String obtenerNombres() {
-        return "Luis";
+        return clienteActual != null ? clienteActual.getNombres() : "Sin datos";
     }
 
     private String obtenerApellidos() {
-        return "Spinetta";
+        if (clienteActual == null) return "Sin datos";
+        StringBuilder apellidos = new StringBuilder();
+        if (clienteActual.getPrimerApellido() != null && !clienteActual.getPrimerApellido().isEmpty()) {
+            apellidos.append(clienteActual.getPrimerApellido());
+        }
+        if (clienteActual.getSegundoApellido() != null && !clienteActual.getSegundoApellido().isEmpty()) {
+            if (apellidos.length() > 0) apellidos.append(" ");
+            apellidos.append(clienteActual.getSegundoApellido());
+        }
+        return apellidos.length() > 0 ? apellidos.toString() : "Sin datos";
     }
 
     private String obtenerEmail() {
-        return "pescado@rabioso.com";
+        return clienteActual != null ? clienteActual.getEmail() : "N/A";
     }
 
     private String obtenerTelefono() {
-        return "5527144314";
+        return clienteActual != null && clienteActual.getTelefono() != null ? clienteActual.getTelefono() : "N/A";
     }
 
     private String obtenerFechaNacimiento() {
-        return "05/02/2004";
+        return clienteActual != null && clienteActual.getFechaNacimiento() != null ? clienteActual.getFechaNacimiento() : "N/A";
+    }
+    
+    /**
+     * Actualiza el panel con los datos de un cliente específico.
+     * 
+     * @param cliente ClienteInfo con los datos a mostrar
+     */
+    public void actualizarConDatos(frontend.src.model.ClienteInfo cliente) {
+        if (cliente == null) {
+            System.err.println("Cliente nulo en PnlResumenCliente");
+            return;
+        }
+        
+        this.clienteActual = cliente;
+        
+        // Actualizar nombre completo
+        if (lblNombre != null) {
+            lblNombre.setText(cliente.getNombre());
+        }
+        
+        // Actualizar email
+        if (lblEmail != null) {
+            lblEmail.setText(cliente.getEmail() != null ? cliente.getEmail() : "N/A");
+        }
+        
+        // Actualizar teléfono
+        if (lblTelefono != null) {
+            lblTelefono.setText(cliente.getTelefono() != null ? cliente.getTelefono() : "N/A");
+        }
+        
+        // Actualizar ID
+        if (lblId != null) {
+            lblId.setText("ID: " + (cliente.getId() != null ? cliente.getId() : "N/A"));
+        }
+        
+        // Actualizar fecha de nacimiento
+        if (lblFecha != null && cliente.getFechaNacimiento() != null) {
+            lblFecha.setText(cliente.getFechaNacimiento());
+        }
+        
+        // Actualizar badges de estatus y frecuencia
+        actualizarBadges();
+        
+        // Revalidar el panel para refrescar la UI
+        this.revalidate();
+        this.repaint();
+    }
+    
+    /**
+     * Actualiza los badges de estatus y frecuencia del cliente.
+     */
+    private void actualizarBadges() {
+        if (clienteActual == null) return;
+        
+        // Actualizar badge de estatus
+        if (badgeEstatus != null) {
+            String estatus = clienteActual.getEstatus();
+            if ("Activo".equals(estatus)) {
+                badgeEstatus.setBackground(new Color(46, 204, 113));
+                badgeEstatus.setForeground(Color.WHITE);
+                badgeEstatus.setText("Activo");
+            } else if ("Inactivo".equals(estatus)) {
+                badgeEstatus.setBackground(new Color(189, 195, 199));
+                badgeEstatus.setForeground(Color.BLACK);
+                badgeEstatus.setText("Inactivo");
+            } else if ("Suspendido".equals(estatus)) {
+                badgeEstatus.setBackground(new Color(231, 76, 60));
+                badgeEstatus.setForeground(Color.WHITE);
+                badgeEstatus.setText("Suspendido");
+            }
+        }
+        
+        // Actualizar badge de frecuencia
+        if (badgeFrecuente != null) {
+            if (clienteActual.isFrecuente()) {
+                badgeFrecuente.setVisible(true);
+                badgeFrecuente.setText("Cliente frecuente");
+            } else {
+                badgeFrecuente.setVisible(false);
+            }
+        }
     }
 }
