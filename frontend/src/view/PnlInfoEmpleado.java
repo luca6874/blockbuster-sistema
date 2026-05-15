@@ -1,6 +1,7 @@
 package frontend.src.view;
 
 import frontend.src.controller.Ventana;
+import frontend.src.model.UsuarioInfo;
 
 import java.awt.*;
 import javax.swing.*;
@@ -11,6 +12,11 @@ import javax.swing.border.LineBorder;
  */
 public class PnlInfoEmpleado extends JPanel {
     private final ViewDashboard parent;
+    private JTextField tfNombres;
+    private JTextField tfApellidos;
+    private JTextField tfEmail;
+    private JTextField tfPassword;
+    private JTextField tfFechaNacimiento;
 
     public PnlInfoEmpleado(ViewDashboard parent) {
         this.parent = parent;
@@ -45,11 +51,14 @@ public class PnlInfoEmpleado extends JPanel {
         card.add(s);
 
         int startX = 280;
-        crearCampo("Nombres", startX, 40, 200, card);
-        crearCampo("Apellidos", startX + 220, 40, 180, card);
-        crearCampo("E-mail", startX, 110, 400, card);
-        crearCampo("Contraseña", startX, 180, 300, card);
-        crearCampo("Fecha de nacimiento", startX, 250, 150, card);
+        tfNombres = crearCampo("Nombres", startX, 40, 200, card);
+        tfApellidos = crearCampo("Apellidos", startX + 220, 40, 180, card);
+        tfEmail = crearCampo("E-mail", startX, 110, 400, card);
+        tfPassword = crearCampo("Contraseña", startX, 180, 300, card);
+        tfFechaNacimiento = crearCampo("Fecha de nacimiento", startX, 250, 150, card);
+
+        // Llenar campos con datos del usuario actual
+        llenarCamposConDatosUsuario();
 
         JButton btnCambiar = new JButton("cambiar informacion");
         btnCambiar.setBounds(400, 400, 160, 35);
@@ -68,6 +77,20 @@ public class PnlInfoEmpleado extends JPanel {
         card.add(btnImprimir);
 
         this.add(card);
+    }
+
+    /**
+     * Llena los campos de texto con los datos del usuario autenticado.
+     */
+    private void llenarCamposConDatosUsuario() {
+        UsuarioInfo usuario = parent.getHost().getUsuarioActual();
+        
+        if (usuario != null) {
+            tfEmail.setText(usuario.getCorreo() != null ? usuario.getCorreo() : "");
+            tfPassword.setText(usuario.getPassword() != null ? usuario.getPassword() : "");
+            // Los campos Nombres, Apellidos y Fecha de nacimiento pueden rellenarse si hay datos adicionales
+            // Por ahora se dejan vacíos ya que UsuarioInfo solo tiene username, correo y password
+        }
     }
 
     private void initLadoIdentidad(JPanel card) {
@@ -92,7 +115,14 @@ public class PnlInfoEmpleado extends JPanel {
         e.printStackTrace();
     }
 
-    JLabel uBox = new JLabel("Username", SwingConstants.CENTER);
+    // Obtener usuario actual autenticado
+    UsuarioInfo usuario = parent.getHost().getUsuarioActual();
+    
+    // Usar datos reales o mostrar valores por defecto
+    String usernameDisplay = (usuario != null) ? usuario.getUsername() : "Sin usuario";
+    String idDisplay = (usuario != null) ? "ID: " + usuario.getIdUsuario() : "ID: N/A";
+
+    JLabel uBox = new JLabel(usernameDisplay, SwingConstants.CENTER);
     uBox.setOpaque(true); 
     uBox.setBackground(Ventana.ACCENT_RED);
     uBox.setForeground(Color.WHITE); 
@@ -100,7 +130,7 @@ public class PnlInfoEmpleado extends JPanel {
     uBox.setFont(new Font("Arial Black", Font.BOLD, 16));
     card.add(uBox);
 
-    JLabel lblID = new JLabel("ID: 524264262277", SwingConstants.CENTER);
+    JLabel lblID = new JLabel(idDisplay, SwingConstants.CENTER);
     lblID.setBounds(20, 275, 200, 20);
     card.add(lblID);
 
@@ -120,12 +150,13 @@ public class PnlInfoEmpleado extends JPanel {
     card.add(btnCerrar);
 }
 
-    private void crearCampo(String t, int x, int y, int w, JPanel p) {
+    private JTextField crearCampo(String t, int x, int y, int w, JPanel p) {
         JLabel l = new JLabel(t); l.setBounds(x, y, w, 20);
         l.setFont(new Font("Arial", Font.BOLD, 13)); p.add(l);
         JTextField tf = new JTextField();
         tf.setBounds(x, y + 22, w, 28);
         tf.setBorder(new LineBorder(new Color(200, 200, 200), 1, true));
         p.add(tf);
+        return tf;
     }
 }

@@ -1,6 +1,7 @@
 package frontend.src.view;
 
 import frontend.src.controller.Ventana;
+import frontend.src.model.UsuarioInfo;
 
 import java.awt.*;
 import javax.swing.*;
@@ -32,7 +33,14 @@ public class PnlPerfil extends JPanel {
             this.add(userPhoto);
         } catch (Exception e) {}
 
-        JLabel lblUserBox = new JLabel("Username", SwingConstants.CENTER);
+        // Obtener usuario actual autenticado
+        UsuarioInfo usuario = parent.getHost().getUsuarioActual();
+        
+        // Usar datos reales o mostrar valores por defecto si no hay usuario
+        String usernameDisplay = (usuario != null) ? usuario.getUsername() : "Sin usuario";
+        String idDisplay = (usuario != null) ? "ID: " + usuario.getIdUsuario() : "ID: N/A";
+
+        JLabel lblUserBox = new JLabel(usernameDisplay, SwingConstants.CENTER);
         lblUserBox.setOpaque(true);
         lblUserBox.setBackground(Ventana.ACCENT_RED); 
         lblUserBox.setForeground(Color.WHITE);
@@ -40,7 +48,7 @@ public class PnlPerfil extends JPanel {
         lblUserBox.setBounds(290, 280, 200, 35);
         this.add(lblUserBox);
 
-        JLabel lblID = new JLabel("ID: 524264262277", SwingConstants.CENTER);
+        JLabel lblID = new JLabel(idDisplay, SwingConstants.CENTER);
         lblID.setBounds(290, 320, 200, 25);
         this.add(lblID);
 
