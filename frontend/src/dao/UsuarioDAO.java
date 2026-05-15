@@ -110,4 +110,129 @@ public class UsuarioDAO {
 
         return usuario;
     }
+
+    /**
+     * Registra un nuevo usuario en la base de datos.
+     * 
+     * Validaciones:
+     * - Verifica que username sea único
+     * - Verifica que correo sea único
+     * - Inserta el usuario si pasa validaciones
+     * 
+     * @param username el nombre de usuario
+     * @param correo el correo del usuario
+     * @param password la contraseña del usuario
+     * @return UsuarioInfo si el registro fue exitoso, null si falla (usuario/correo duplicados o error BD)
+     */
+    public static UsuarioInfo registrar(String username, String correo, String password) {
+        Connection conn = null;
+
+        try {
+            conn = ConexionBD.conectar();
+
+            // Validación 1: Verificar que username sea único
+            if (existeUsername(conn, username)) {
+                System.out.println("Error: Username ya existe");
+                return null;
+            }
+
+            // Validación 2: Verificar que correo sea único
+            if (existeCorreo(conn, correo)) {
+                System.out.println("Error: Correo ya existe");
+                return null;
+            }
+
+            // Validación 3: Insertar nuevo usuario
+            String sql = "INSERT INTO usuarios (username, correo, password) VALUES (?, ?, ?)";
+            PreparedStatement ps = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+            ps.setString(1, username);
+            ps.setString(2, correo);
+            ps.setString(3, password);
+
+            int filasAfectadas = ps.executeUpdate();
+
+            if (filasAfectadas > 0) {
+                // Obtener el ID generado
+                ResultSet generatedKeys = ps.getGeneratedKeys();
+                if (generatedKeys.next()) {
+                    int idUsuario = generatedKeys.getInt(1);
+                    
+                    UsuarioInfo usuario = new UsuarioInfo();
+                    usuario.setIdUsuario(idUsuario);
+                    usuario.setUsername(username);
+                    usuario.setCorreo(correo);
+                    usuario.setPassword(password);
+
+                    System.out.println("✓ Usuario registrado exitosamente: " + username + " (ID: " + idUsuario + ")");
+                    return usuario;
+                }
+            }
+
+            ps.close();
+
+        } catch (Exception e) {
+            System.err.println("Error en registrar: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            ConexionBD.cerrar(conn);
+        }
+
+        return null;
+    }
+
+    /**
+     * Verifica si un username ya existe en la base de datos.
+     * 
+     * @param conn conexión a la BD (reutilizar de registrar())
+     * @param username el username a verificar
+     * @return true si existe, false si no
+     */
+    private static boolean existeUsername(Connection conn, String username) {
+        try {
+            String sql = "SELECT COUNT(*) FROM usuarios WHERE username = ?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, username);
+
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                int count = rs.getInt(1);
+                ps.close();
+                return count > 0;
+            }
+
+            ps.close();
+        } catch (Exception e) {
+            System.err.println("Error en existeUsername: " + e.getMessage());
+        }
+
+        return false;
+    }
+
+    /**
+     * Verifica si un correo ya existe en la base de datos.
+     * 
+     * @param conn conexión a la BD (reutilizar de registrar())
+     * @param correo el correo a verificar
+     * @return true si existe, false si no
+     */
+    private static boolean existeCorreo(Connection conn, String correo) {
+        try {
+            String sql = "SELECT COUNT(*) FROM usuarios WHERE correo = ?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, correo);
+
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                int count = rs.getInt(1);
+                ps.close();
+                return count > 0;
+            }
+
+            ps.close();
+        } catch (Exception e) {
+            System.err.println("Error en existeCorreo: " + e.getMessage());
+        }
+
+        return false;
+    }
 }
