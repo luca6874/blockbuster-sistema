@@ -2,8 +2,10 @@ package frontend.src.dao;
 
 import frontend.src.model.UsuarioInfo;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.time.LocalDate;
 
 /**
  * UsuarioDAO - Data Access Object para usuarios.
@@ -35,7 +37,8 @@ public class UsuarioDAO {
             conn = ConexionBD.conectar();
 
             // Usar PreparedStatement para evitar SQL injection
-            String sql = "SELECT id_usuario, username, correo, password " +
+            String sql = "SELECT id_usuario, nombre, primer_apellido, segundo_apellido, " +
+                         "username, correo, fecha_nacimiento, password " +
                          "FROM usuarios " +
                          "WHERE username = ? AND password = ?";
 
@@ -47,11 +50,7 @@ public class UsuarioDAO {
 
             // Si hay un resultado, mapear a UsuarioInfo
             if (rs.next()) {
-                usuario = new UsuarioInfo();
-                usuario.setIdUsuario(rs.getInt("id_usuario"));
-                usuario.setUsername(rs.getString("username"));
-                usuario.setCorreo(rs.getString("correo"));
-                usuario.setPassword(rs.getString("password"));
+                usuario = mapearUsuario(rs);
             }
 
             rs.close();
@@ -81,7 +80,8 @@ public class UsuarioDAO {
         try {
             conn = ConexionBD.conectar();
 
-            String sql = "SELECT id_usuario, username, correo, password " +
+            String sql = "SELECT id_usuario, nombre, primer_apellido, segundo_apellido, " +
+                         "username, correo, fecha_nacimiento, password " +
                          "FROM usuarios " +
                          "WHERE id_usuario = ?";
 
@@ -91,11 +91,7 @@ public class UsuarioDAO {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                usuario = new UsuarioInfo();
-                usuario.setIdUsuario(rs.getInt("id_usuario"));
-                usuario.setUsername(rs.getString("username"));
-                usuario.setCorreo(rs.getString("correo"));
-                usuario.setPassword(rs.getString("password"));
+                usuario = mapearUsuario(rs);
             }
 
             rs.close();
@@ -124,7 +120,8 @@ public class UsuarioDAO {
      * @param password la contraseña del usuario
      * @return UsuarioInfo si el registro fue exitoso, null si falla (usuario/correo duplicados o error BD)
      */
-    public static UsuarioInfo registrar(String username, String correo, String password) {
+    public static UsuarioInfo registrar(String nombre, String primerApellido, String segundoApellido,
+                                        String username, String correo, LocalDate fechaNacimiento, String password) {
         Connection conn = null;
 
         try {
@@ -143,11 +140,17 @@ public class UsuarioDAO {
             }
 
             // Validación 3: Insertar nuevo usuario
-            String sql = "INSERT INTO usuarios (username, correo, password) VALUES (?, ?, ?)";
+            String sql = "INSERT INTO usuarios " +
+                         "(nombre, primer_apellido, segundo_apellido, username, correo, fecha_nacimiento, password) " +
+                         "VALUES (?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement ps = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
-            ps.setString(1, username);
-            ps.setString(2, correo);
-            ps.setString(3, password);
+            ps.setString(1, nombre);
+            ps.setString(2, primerApellido);
+            ps.setString(3, segundoApellido);
+            ps.setString(4, username);
+            ps.setString(5, correo);
+            ps.setDate(6, Date.valueOf(fechaNacimiento));
+            ps.setString(7, password);
 
             int filasAfectadas = ps.executeUpdate();
 
@@ -159,8 +162,12 @@ public class UsuarioDAO {
                     
                     UsuarioInfo usuario = new UsuarioInfo();
                     usuario.setIdUsuario(idUsuario);
+                    usuario.setNombre(nombre);
+                    usuario.setPrimerApellido(primerApellido);
+                    usuario.setSegundoApellido(segundoApellido);
                     usuario.setUsername(username);
                     usuario.setCorreo(correo);
+                    usuario.setFechaNacimiento(fechaNacimiento);
                     usuario.setPassword(password);
 
                     System.out.println("✓ Usuario registrado exitosamente: " + username + " (ID: " + idUsuario + ")");
@@ -178,6 +185,22 @@ public class UsuarioDAO {
         }
 
         return null;
+    }
+
+    private static UsuarioInfo mapearUsuario(ResultSet rs) throws Exception {
+        UsuarioInfo usuario = new UsuarioInfo();
+        Date fechaNacimiento = rs.getDate("fecha_nacimiento");
+
+        usuario.setIdUsuario(rs.getInt("id_usuario"));
+        usuario.setNombre(rs.getString("nombre"));
+        usuario.setPrimerApellido(rs.getString("primer_apellido"));
+        usuario.setSegundoApellido(rs.getString("segundo_apellido"));
+        usuario.setUsername(rs.getString("username"));
+        usuario.setCorreo(rs.getString("correo"));
+        usuario.setFechaNacimiento(fechaNacimiento != null ? fechaNacimiento.toLocalDate() : null);
+        usuario.setPassword(rs.getString("password"));
+
+        return usuario;
     }
 
     /**

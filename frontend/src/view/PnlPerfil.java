@@ -37,7 +37,7 @@ public class PnlPerfil extends JPanel {
         UsuarioInfo usuario = parent.getHost().getUsuarioActual();
         
         // Usar datos reales o mostrar valores por defecto si no hay usuario
-        String usernameDisplay = (usuario != null) ? usuario.getUsername() : "Sin usuario";
+        String usernameDisplay = (usuario != null) ? usuario.getNombreCompletoVisible() : "Sin usuario";
         String idDisplay = (usuario != null) ? "ID: " + usuario.getIdUsuario() : "ID: N/A";
 
         JLabel lblUserBox = new JLabel(usernameDisplay, SwingConstants.CENTER);
