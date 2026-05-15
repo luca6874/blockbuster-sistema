@@ -22,6 +22,7 @@ public class ViewRegister extends JPanel {
     private JTextField tfEmail;
     private JPasswordField tfPassword;
     private JPasswordField tfPasswordConfirm;
+    private JTextField tfUsername;
 
     public ViewRegister(Ventana host) {
         this.host = host;
@@ -75,11 +76,12 @@ public class ViewRegister extends JPanel {
         tfSegundoApellido = crearCol("Segundo apellido", 260, 155, 200, c);
         tfFechaNacimiento = crearCol("Fecha nacimiento (AAAA-MM-DD)", 40, 210, 200, c);
         tfEmail = crearCol("E-mail", 260, 210, 200, c);
+        tfUsername = crearCol("Nombre de usuario", 40, 263, 420, c);
 
-        JLabel sub2 = new JLabel("Informacion de acceso");
+        /*JLabel sub2 = new JLabel("Informacion de acceso");
         sub2.setBounds(40, 270, 300, 30);
         sub2.setFont(new Font("Segoe UI", Font.PLAIN, 19));
-        c.add(sub2);
+        c.add(sub2);*/
 
         tfPassword = crearPasswordCol("Contrasena", 40, 305, 200, c);
         tfPasswordConfirm = crearPasswordCol("Confirmar contrasena", 260, 305, 200, c);
@@ -121,7 +123,7 @@ public class ViewRegister extends JPanel {
         String segundoApellido = tfSegundoApellido.getText().trim();
         String fechaNacimiento = tfFechaNacimiento.getText().trim();
         String correo = tfEmail.getText().trim();
-        String username = correo;
+        String username = tfUsername.getText().trim();
         String password = new String(tfPassword.getPassword()).trim();
         String passwordConfirm = new String(tfPasswordConfirm.getPassword()).trim();
 
