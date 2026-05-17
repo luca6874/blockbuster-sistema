@@ -25,6 +25,7 @@ public class PnlGestionClientes extends JPanel {
     private JTextField txtBuscarHistorial;
     private JComboBox<String> comboEstatusCliente;
     private JComboBox<String> comboEstatusHistorial;
+    private JComboBox<String> comboIDClientes;  // Nuevo: combo de IDs de clientes
     private JCheckBox chkFrecuentes;
     private JButton btnCrearCliente;
     private JLabel lblTotalClientes;
@@ -32,6 +33,7 @@ public class PnlGestionClientes extends JPanel {
     private JLabel lblJuegosPendientes;
     private PnlTotalJuego pnlTotalJuego;
     private PnlResumenCliente pnlResumenCliente;
+    private List<ClienteInfo> clientesActuales;  // Almacena clientes para filtrado
 
     public PnlGestionClientes(ViewDashboard parent) {
         this.parent = parent;
@@ -96,8 +98,20 @@ public class PnlGestionClientes extends JPanel {
     panel.setBackground(Ventana.CARD_WHITE);
     panel.setBounds(0, 0, 950, 50); 
     
+    // Etiqueta y combo de IDs de clientes (NUEVO)
+    JLabel lblSeleccionarID = new JLabel("Seleccionar por ID:");
+    lblSeleccionarID.setBounds(10, 15, 110, 30);
+    lblSeleccionarID.setFont(new Font("Arial", Font.PLAIN, 11));
+    panel.add(lblSeleccionarID);
+    
+    comboIDClientes = new JComboBox<>();
+    comboIDClientes.setBounds(120, 15, 120, 30);
+    cargarIDsClientes();  // Cargar IDs desde la BD
+    comboIDClientes.addActionListener(e -> manejarSeleccionID());
+    panel.add(comboIDClientes);
+    
     txtBuscarCliente = new JTextField("Buscar por ID, nombre o email...");
-    txtBuscarCliente.setBounds(20, 15, 280, 30);
+    txtBuscarCliente.setBounds(250, 15, 200, 30);
     txtBuscarCliente.setBorder(new LineBorder(new Color(200, 200, 200), 1, true));
     panel.add(txtBuscarCliente);
     
@@ -111,7 +125,7 @@ public class PnlGestionClientes extends JPanel {
     panel.add(comboEstatusCliente);
     
     chkFrecuentes = new JCheckBox("Solo frecuentes");
-    chkFrecuentes.setBounds(660, 15, 130, 30);
+    chkFrecuentes.setBounds(650, 15, 130, 30);
     chkFrecuentes.setBackground(Ventana.CARD_WHITE);
     panel.add(chkFrecuentes);
     
@@ -251,6 +265,124 @@ public class PnlGestionClientes extends JPanel {
     }
     
     /**
+     * Carga dinámicamente los IDs de clientes desde la BD al comboBox.
+     * Se llama al inicializar y al refrescar la tabla.
+     */
+    private void cargarIDsClientes() {
+        if (comboIDClientes == null) return;
+        
+        // Obtener lista de clientes desde BD
+        clientesActuales = ClienteController.traerClientesDeBD();
+        
+        // Limpiar combo y agregar opción inicial
+        comboIDClientes.removeAllItems();
+        comboIDClientes.addItem("-- Seleccionar cliente --");
+        
+        // Agregar IDs de clientes
+        if (clientesActuales != null && !clientesActuales.isEmpty()) {
+            for (ClienteInfo cliente : clientesActuales) {
+                if (cliente != null && cliente.getId() != null) {
+                    comboIDClientes.addItem(cliente.getId());
+                }
+            }
+        }
+        
+        System.out.println("✓ IDs de clientes cargados: " + (clientesActuales != null ? clientesActuales.size() : 0));
+    }
+    
+    /**
+     * Maneja la selección de un cliente en el comboBox de IDs.
+     * Filtra la tabla y actualiza el panel de resumen.
+     */
+    private void manejarSeleccionID() {
+        if (comboIDClientes == null || tablaClientes == null) return;
+        
+        Object seleccionado = comboIDClientes.getSelectedItem();
+        
+        // Validar que se haya seleccionado un ID válido
+        if (seleccionado == null || seleccionado.toString().startsWith("--")) {
+            // Mostrar todos los clientes si no hay selección
+            refrescarTabla();
+            mostrarPanelTotalJuego();
+            return;
+        }
+        
+        String clienteIdSeleccionado = seleccionado.toString();
+        
+        // Buscar el cliente en la lista cargada
+        ClienteInfo clienteSeleccionado = null;
+        if (clientesActuales != null) {
+            for (ClienteInfo cliente : clientesActuales) {
+                if (cliente != null && clienteIdSeleccionado.equals(cliente.getId())) {
+                    clienteSeleccionado = cliente;
+                    break;
+                }
+            }
+        }
+        
+        if (clienteSeleccionado == null) {
+            JOptionPane.showMessageDialog(this, "Cliente no encontrado en la BD.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        // Filtrar la tabla para mostrar solo este cliente
+        Object[][] datosCliente = new Object[1][6];
+        datosCliente[0][0] = clienteSeleccionado.getId();
+        datosCliente[0][1] = clienteSeleccionado.getNombre();
+        datosCliente[0][2] = clienteSeleccionado.getEmail();
+        datosCliente[0][3] = clienteSeleccionado.getEstatus();
+        datosCliente[0][4] = clienteSeleccionado.getNivel();
+        datosCliente[0][5] = "...";
+        
+        // Actualizar modelo de la tabla
+        DefaultTableModel modelo = (DefaultTableModel) tablaClientes.getModel();
+        modelo.setDataVector(datosCliente, new String[]{"ID", "Nombre completo", "Email", "Estatus", "Nivel", "Acciones"});
+        
+        // Reconfigurar renderizador de acciones
+        tablaClientes.getColumnModel().getColumn(5).setCellRenderer(new TableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
+                panel.setBackground(isSelected ? table.getSelectionBackground() : Color.WHITE);
+                
+                JButton btnVer = new JButton("👁");
+                btnVer.setBackground(Color.WHITE);
+                btnVer.setBorder(BorderFactory.createEmptyBorder());
+                btnVer.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                btnVer.setToolTipText("Ver detalles");
+                
+                JButton btnEditar = new JButton("✏");
+                btnEditar.setBackground(Color.WHITE);
+                btnEditar.setBorder(BorderFactory.createEmptyBorder());
+                btnEditar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                btnEditar.setToolTipText("Editar cliente");
+                
+                JButton btnEliminar = new JButton("🗑");
+                btnEliminar.setBackground(Color.WHITE);
+                btnEliminar.setBorder(BorderFactory.createEmptyBorder());
+                btnEliminar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                btnEliminar.setToolTipText("Eliminar cliente");
+                
+                panel.add(btnVer);
+                panel.add(btnEditar);
+                panel.add(btnEliminar);
+                
+                return panel;
+            }
+        });
+        
+        // Actualizar etiqueta con información filtrada
+        if (lblTotalClientes != null) {
+            lblTotalClientes.setText("Cliente seleccionado (1/" + (clientesActuales != null ? clientesActuales.size() : 0) + ")");
+        }
+        
+        // Mostrar resumen del cliente seleccionado
+        mostrarPanelResumenCliente(clienteIdSeleccionado);
+        
+        System.out.println("✓ Cliente filtrado: " + clienteIdSeleccionado);
+    }
+    
+    /**
      * Refresca la tabla de clientes con datos actuales desde la BD.
      * Se llama después de CRUD (agregar, editar, eliminar).
      */
@@ -270,6 +402,9 @@ public class PnlGestionClientes extends JPanel {
         if (lblTotalClientes != null) {
             lblTotalClientes.setText("Lista de clientes (" + clientesDeBD.size() + ")");
         }
+        
+        // Refrescar el comboBox de IDs
+        cargarIDsClientes();
         
         // Reconfigurar renderizador de acciones (se pierde al actualizar modelo)
         tablaClientes.getColumnModel().getColumn(5).setCellRenderer(new TableCellRenderer() {
