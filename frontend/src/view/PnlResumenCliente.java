@@ -13,6 +13,7 @@ import java.net.URL;
  */
 public class PnlResumenCliente extends JPanel {
     private ViewDashboard parent;
+    private PnlGestionClientes panelGestion;
     
     // Referencias a labels para actualización dinámica
     private JLabel lblFecha;
@@ -31,7 +32,12 @@ public class PnlResumenCliente extends JPanel {
     private frontend.src.model.ClienteInfo clienteActual;
 
     public PnlResumenCliente(ViewDashboard parent) {
+        this(parent, null);
+    }
+
+    public PnlResumenCliente(ViewDashboard parent, PnlGestionClientes panelGestion) {
         this.parent = parent;
+        this.panelGestion = panelGestion;
         this.setLayout(null);
         this.setBackground(Color.WHITE);
         this.setPreferredSize(new Dimension(250, 300));
@@ -262,7 +268,7 @@ public class PnlResumenCliente extends JPanel {
             String telefono = obtenerTelefono();
             String fechaNacimiento = obtenerFechaNacimiento();
             
-            DlgEdicionCliente dlgEditar = new DlgEdicionCliente(parent.getHost(), clienteId, nombres, primerApellido, segundoApellido, email, telefono, fechaNacimiento, null);
+            DlgEdicionCliente dlgEditar = new DlgEdicionCliente(parent.getHost(), clienteId, nombres, primerApellido, segundoApellido, email, telefono, fechaNacimiento, panelGestion);
             parent.getHost().setOscurecer(true);
             dlgEditar.setVisible(true);
         });
@@ -285,6 +291,10 @@ public class PnlResumenCliente extends JPanel {
             // Obtener datos del cliente
             String clienteId = obtenerClienteId();
             String nombreCliente = obtenerNombres();
+            if (panelGestion != null) {
+                panelGestion.confirmarEliminarCliente(clienteId, nombreCliente);
+                return;
+            }
             
             // Mostrar confirmación
             int respuesta = JOptionPane.showConfirmDialog(

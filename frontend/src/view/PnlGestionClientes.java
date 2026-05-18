@@ -6,17 +6,26 @@ import frontend.src.model.ClienteInfo;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 /**
  * Módulo de Gestión de Clientes.
  */
 public class PnlGestionClientes extends JPanel {
+    private static final String[] COLUMNAS_CLIENTES = {"ID", "Nombre completo", "Email", "Estatus", "Nivel", "Acciones"};
+    private static final String PLACEHOLDER_BUSQUEDA_CLIENTE = "Buscar por nombre o email...";
+
     private final ViewDashboard parent;
     private JTable tablaClientes;
     private JTable tablaHistorial;
@@ -34,6 +43,7 @@ public class PnlGestionClientes extends JPanel {
     private PnlTotalJuego pnlTotalJuego;
     private PnlResumenCliente pnlResumenCliente;
     private List<ClienteInfo> clientesActuales;  // Almacena clientes para filtrado
+    private boolean actualizandoComboClientes;
 
     public PnlGestionClientes(ViewDashboard parent) {
         this.parent = parent;
@@ -110,9 +120,29 @@ public class PnlGestionClientes extends JPanel {
     comboIDClientes.addActionListener(e -> manejarSeleccionID());
     panel.add(comboIDClientes);
     
-    txtBuscarCliente = new JTextField("Buscar por ID, nombre o email...");
+    txtBuscarCliente = new JTextField(PLACEHOLDER_BUSQUEDA_CLIENTE);
     txtBuscarCliente.setBounds(250, 15, 200, 30);
     txtBuscarCliente.setBorder(new LineBorder(new Color(200, 200, 200), 1, true));
+    txtBuscarCliente.addFocusListener(new FocusAdapter() {
+        @Override
+        public void focusGained(FocusEvent e) {
+            if (PLACEHOLDER_BUSQUEDA_CLIENTE.equals(txtBuscarCliente.getText())) {
+                txtBuscarCliente.setText("");
+            }
+        }
+
+        @Override
+        public void focusLost(FocusEvent e) {
+            if (txtBuscarCliente.getText().trim().isEmpty()) {
+                txtBuscarCliente.setText(PLACEHOLDER_BUSQUEDA_CLIENTE);
+            }
+        }
+    });
+    txtBuscarCliente.getDocument().addDocumentListener(new DocumentListener() {
+        @Override public void insertUpdate(DocumentEvent e) { aplicarFiltrosClientes(); }
+        @Override public void removeUpdate(DocumentEvent e) { aplicarFiltrosClientes(); }
+        @Override public void changedUpdate(DocumentEvent e) { aplicarFiltrosClientes(); }
+    });
     panel.add(txtBuscarCliente);
     
     JLabel lblEstatus = new JLabel("Estatus:");
@@ -122,11 +152,13 @@ public class PnlGestionClientes extends JPanel {
     
     comboEstatusCliente = new JComboBox<>(new String[]{"Todos", "Activo", "Inactivo", "Suspendido"});
     comboEstatusCliente.setBounds(530, 15, 110, 30);
+    comboEstatusCliente.addActionListener(e -> aplicarFiltrosClientes());
     panel.add(comboEstatusCliente);
     
     chkFrecuentes = new JCheckBox("Solo frecuentes");
     chkFrecuentes.setBounds(650, 15, 130, 30);
     chkFrecuentes.setBackground(Ventana.CARD_WHITE);
+    chkFrecuentes.addActionListener(e -> aplicarFiltrosClientes());
     panel.add(chkFrecuentes);
     
     btnCrearCliente = new JButton("+ Crear cliente");
@@ -207,7 +239,7 @@ public class PnlGestionClientes extends JPanel {
         areaVacia.add(pnlTotalJuego);
 
         // Panel de resumen del cliente oculto al inicio
-        pnlResumenCliente = new PnlResumenCliente(parent);
+        pnlResumenCliente = new PnlResumenCliente(parent, this);
         pnlResumenCliente.setBounds(0, 0, 250, 300);
         pnlResumenCliente.setVisible(false);
         areaVacia.add(pnlResumenCliente);
@@ -272,9 +304,12 @@ public class PnlGestionClientes extends JPanel {
         if (comboIDClientes == null) return;
         
         // Obtener lista de clientes desde BD
-        clientesActuales = ClienteController.traerClientesDeBD();
+        if (clientesActuales == null) {
+            cargarClientesDesdeBD();
+        }
         
         // Limpiar combo y agregar opción inicial
+        actualizandoComboClientes = true;
         comboIDClientes.removeAllItems();
         comboIDClientes.addItem("-- Seleccionar cliente --");
         
@@ -286,6 +321,7 @@ public class PnlGestionClientes extends JPanel {
                 }
             }
         }
+        actualizandoComboClientes = false;
         
         System.out.println("✓ IDs de clientes cargados: " + (clientesActuales != null ? clientesActuales.size() : 0));
     }
@@ -295,6 +331,7 @@ public class PnlGestionClientes extends JPanel {
      * Filtra la tabla y actualiza el panel de resumen.
      */
     private void manejarSeleccionID() {
+        if (actualizandoComboClientes) return;
         if (comboIDClientes == null || tablaClientes == null) return;
         
         Object seleccionado = comboIDClientes.getSelectedItem();
@@ -302,7 +339,7 @@ public class PnlGestionClientes extends JPanel {
         // Validar que se haya seleccionado un ID válido
         if (seleccionado == null || seleccionado.toString().startsWith("--")) {
             // Mostrar todos los clientes si no hay selección
-            refrescarTabla();
+            aplicarFiltrosClientes();
             mostrarPanelTotalJuego();
             return;
         }
@@ -390,9 +427,9 @@ public class PnlGestionClientes extends JPanel {
         if (tablaClientes == null) return;
         
         // Obtener datos nuevos desde BD
-        List<ClienteInfo> clientesDeBD = ClienteController.traerClientesDeBD();
-        Object[][] datos = convertirClientesAArray(clientesDeBD);
-        String[] columnas = {"ID", "Nombre completo", "Email", "Estatus", "Nivel", "Acciones"};
+        cargarClientesDesdeBD();
+        Object[][] datos = convertirClientesAArray(clientesActuales);
+        String[] columnas = COLUMNAS_CLIENTES;
         
         // Actualizar el modelo de datos existente
         DefaultTableModel modelo = (DefaultTableModel) tablaClientes.getModel();
@@ -400,11 +437,12 @@ public class PnlGestionClientes extends JPanel {
         
         // Actualizar etiqueta con cantidad real
         if (lblTotalClientes != null) {
-            lblTotalClientes.setText("Lista de clientes (" + clientesDeBD.size() + ")");
+            lblTotalClientes.setText("Lista de clientes (" + clientesActuales.size() + ")");
         }
         
         // Refrescar el comboBox de IDs
         cargarIDsClientes();
+        aplicarFiltrosClientes();
         
         // Reconfigurar renderizador de acciones (se pierde al actualizar modelo)
         tablaClientes.getColumnModel().getColumn(5).setCellRenderer(new TableCellRenderer() {
@@ -447,7 +485,12 @@ public class PnlGestionClientes extends JPanel {
      * @param clienteId el ID del cliente a eliminar
      * @param nombreCliente el nombre del cliente (para mostrar en el diálogo)
      */
-    private void confirmarEliminarCliente(String clienteId, String nombreCliente) {
+    public void confirmarEliminarCliente(String clienteId, String nombreCliente) {
+        if (clienteId == null || clienteId.trim().isEmpty() || clienteId.startsWith("N/A")) {
+            JOptionPane.showMessageDialog(this, "No hay un cliente valido seleccionado.", "Sin cliente seleccionado", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
         int respuesta = JOptionPane.showConfirmDialog(
             this,
             "¿Estás seguro de que deseas eliminar a " + nombreCliente + "?\n\nEsta acción no se puede deshacer.",
@@ -469,6 +512,7 @@ public class PnlGestionClientes extends JPanel {
                 );
                 // Refrescar tabla
                 refrescarTabla();
+                mostrarPanelTotalJuego();
             } else {
                 JOptionPane.showMessageDialog(
                     this,
@@ -655,12 +699,12 @@ public class PnlGestionClientes extends JPanel {
         String[] columnas = {"ID", "Nombre completo", "Email", "Estatus", "Nivel", "Acciones"};
         
         // Obtener datos reales desde la BD a través del Controller
-        List<ClienteInfo> clientesDeBD = ClienteController.traerClientesDeBD();
-        Object[][] datos = convertirClientesAArray(clientesDeBD);
+        cargarClientesDesdeBD();
+        Object[][] datos = convertirClientesAArray(clientesActuales);
         
         // Actualizar etiqueta con cantidad real
         if (lblTotalClientes != null) {
-            lblTotalClientes.setText("Lista de clientes (" + clientesDeBD.size() + ")");
+            lblTotalClientes.setText("Lista de clientes (" + clientesActuales.size() + ")");
         }
         
         DefaultTableModel modelo = new DefaultTableModel(datos, columnas) {
@@ -835,5 +879,113 @@ public class PnlGestionClientes extends JPanel {
         }
         
         return datos;
+    }
+
+    private void cargarClientesDesdeBD() {
+        clientesActuales = ClienteController.traerClientesDeBD();
+        if (clientesActuales == null) {
+            clientesActuales = new ArrayList<>();
+        }
+    }
+
+    private void aplicarFiltrosClientes() {
+        if (tablaClientes == null || clientesActuales == null) return;
+
+        String textoBusqueda = obtenerTextoBusquedaCliente();
+        String estatus = comboEstatusCliente != null ? String.valueOf(comboEstatusCliente.getSelectedItem()) : "Todos";
+        boolean soloFrecuentes = chkFrecuentes != null && chkFrecuentes.isSelected();
+        String idSeleccionado = obtenerIdSeleccionado();
+
+        List<ClienteInfo> filtrados = new ArrayList<>();
+        for (ClienteInfo cliente : clientesActuales) {
+            if (cliente == null) continue;
+
+            boolean coincideId = idSeleccionado.isEmpty() || idSeleccionado.equals(cliente.getId());
+            boolean coincideBusqueda = textoBusqueda.isEmpty()
+                    || contiene(cliente.getNombres(), textoBusqueda)
+                    || contiene(cliente.getPrimerApellido(), textoBusqueda)
+                    || contiene(cliente.getSegundoApellido(), textoBusqueda)
+                    || contiene(cliente.getEmail(), textoBusqueda);
+            boolean coincideEstatus = "Todos".equals(estatus) || estatus.equals(cliente.getEstatus());
+            boolean coincideFrecuencia = !soloFrecuentes || cliente.isFrecuente();
+
+            if (coincideId && coincideBusqueda && coincideEstatus && coincideFrecuencia) {
+                filtrados.add(cliente);
+            }
+        }
+
+        actualizarTablaClientes(filtrados);
+    }
+
+    private void actualizarTablaClientes(List<ClienteInfo> clientes) {
+        DefaultTableModel modelo = (DefaultTableModel) tablaClientes.getModel();
+        modelo.setDataVector(convertirClientesAArray(clientes), COLUMNAS_CLIENTES);
+
+        if (tablaClientes.getColumnModel().getColumnCount() > 5) {
+            tablaClientes.getColumnModel().getColumn(5).setCellRenderer(crearRenderizadorAcciones());
+        }
+
+        if (lblTotalClientes != null) {
+            int total = clientesActuales != null ? clientesActuales.size() : 0;
+            int visibles = clientes != null ? clientes.size() : 0;
+            lblTotalClientes.setText(visibles == total
+                    ? "Lista de clientes (" + total + ")"
+                    : "Lista de clientes (" + visibles + "/" + total + ")");
+        }
+    }
+
+    private String obtenerTextoBusquedaCliente() {
+        if (txtBuscarCliente == null) return "";
+        String texto = txtBuscarCliente.getText();
+        if (texto == null || PLACEHOLDER_BUSQUEDA_CLIENTE.equals(texto)) {
+            return "";
+        }
+        return texto.trim().toLowerCase(Locale.ROOT);
+    }
+
+    private String obtenerIdSeleccionado() {
+        if (comboIDClientes == null || comboIDClientes.getSelectedItem() == null) {
+            return "";
+        }
+        String seleccionado = comboIDClientes.getSelectedItem().toString();
+        return seleccionado.startsWith("--") ? "" : seleccionado;
+    }
+
+    private boolean contiene(String valor, String busqueda) {
+        return valor != null && valor.toLowerCase(Locale.ROOT).contains(busqueda);
+    }
+
+    private TableCellRenderer crearRenderizadorAcciones() {
+        return new TableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
+                panel.setBackground(isSelected ? table.getSelectionBackground() : Color.WHITE);
+
+                JButton btnVer = new JButton("...");
+                btnVer.setBackground(Color.WHITE);
+                btnVer.setBorder(BorderFactory.createEmptyBorder());
+                btnVer.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                btnVer.setToolTipText("Ver detalles");
+
+                JButton btnEditar = new JButton("E");
+                btnEditar.setBackground(Color.WHITE);
+                btnEditar.setBorder(BorderFactory.createEmptyBorder());
+                btnEditar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                btnEditar.setToolTipText("Editar cliente");
+
+                JButton btnEliminar = new JButton("X");
+                btnEliminar.setBackground(Color.WHITE);
+                btnEliminar.setBorder(BorderFactory.createEmptyBorder());
+                btnEliminar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                btnEliminar.setToolTipText("Eliminar cliente");
+
+                panel.add(btnVer);
+                panel.add(btnEditar);
+                panel.add(btnEliminar);
+
+                return panel;
+            }
+        };
     }
 }
