@@ -1,6 +1,7 @@
 package frontend.src.view;
 
 import frontend.src.controller.Ventana;
+import frontend.src.controller.ClienteController;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -269,6 +270,55 @@ public class PnlResumenCliente extends JPanel {
 
         JButton btnEliminar = createActionButton("Eliminar cliente", new Color(231, 76, 60));
         btnEliminar.setBounds(130, 235, 110, 26);
+        btnEliminar.addActionListener(e -> {
+            // Validar que haya cliente seleccionado
+            if (clienteActual == null) {
+                JOptionPane.showMessageDialog(
+                    this,
+                    "No hay cliente seleccionado",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+            
+            // Obtener datos del cliente
+            String clienteId = obtenerClienteId();
+            String nombreCliente = obtenerNombres();
+            
+            // Mostrar confirmación
+            int respuesta = JOptionPane.showConfirmDialog(
+                this,
+                "¿Deseas eliminar este cliente (" + nombreCliente + ")?\n\nEsta acción no se puede deshacer.",
+                "Confirmar eliminación",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE
+            );
+            
+            if (respuesta == JOptionPane.YES_OPTION) {
+                // Llamar al controlador para eliminar
+                boolean exito = ClienteController.eliminarCliente(clienteId);
+                
+                if (exito) {
+                    JOptionPane.showMessageDialog(
+                        this,
+                        "Cliente eliminado exitosamente",
+                        "Éxito",
+                        JOptionPane.INFORMATION_MESSAGE
+                    );
+                    
+                    // Refrescar la gestión de clientes
+                    parent.setContenido(new PnlGestionClientes(parent));
+                } else {
+                    JOptionPane.showMessageDialog(
+                        this,
+                        "Error al eliminar el cliente. Por favor, intenta de nuevo.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                }
+            }
+        });
         this.add(btnEliminar);
     }
 
