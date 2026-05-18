@@ -387,6 +387,7 @@ public class PnlVideojuegos extends JPanel {
             boolean eliminado = VideojuegoController.eliminarVideojuego(videojuego.getId());
             if (eliminado) {
                 refrescarTabla();
+                JOptionPane.showMessageDialog(this, "Videojuego eliminado exitosamente", "Exito", JOptionPane.INFORMATION_MESSAGE);
             } else {
                 JOptionPane.showMessageDialog(this, "Error al eliminar el videojuego.", "Error", JOptionPane.ERROR_MESSAGE);
             }

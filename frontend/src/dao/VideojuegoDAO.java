@@ -20,6 +20,7 @@ public class VideojuegoDAO {
             String sql = "SELECT id_videojuego, nombre, plataforma, genero, clasificacion, " +
                          "anio_lanzamiento, precio_renta, precio_compra, stock, imagen, puntos " +
                          "FROM videojuegos " +
+                         "WHERE activo = TRUE " +
                          "ORDER BY nombre ASC";
 
             PreparedStatement ps = conn.prepareStatement(sql);
@@ -52,7 +53,7 @@ public class VideojuegoDAO {
             String sql = "SELECT id_videojuego, nombre, plataforma, genero, clasificacion, " +
                          "anio_lanzamiento, precio_renta, precio_compra, stock, imagen, puntos " +
                          "FROM videojuegos " +
-                         "WHERE id_videojuego = ?";
+                         "WHERE id_videojuego = ? AND activo = TRUE";
 
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setInt(1, idNumerico);
@@ -153,7 +154,9 @@ public class VideojuegoDAO {
             conn = ConexionBD.conectar();
 
             int idNumerico = extraerIdNumerico(id);
-            String sql = "DELETE FROM videojuegos WHERE id_videojuego = ?";
+            String sql = "UPDATE videojuegos " +
+                         "SET activo = FALSE " +
+                         "WHERE id_videojuego = ? AND activo = TRUE";
 
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setInt(1, idNumerico);

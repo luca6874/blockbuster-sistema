@@ -234,7 +234,7 @@ public class OperacionDAO {
             }
 
             // Paso 3: Actualizar stock del videojuego
-            String sqlUpdate = "UPDATE videojuegos SET stock = stock - 1 WHERE id_videojuego = ? AND stock > 0";
+            String sqlUpdate = "UPDATE videojuegos SET stock = stock - 1 WHERE id_videojuego = ? AND stock > 0 AND activo = TRUE";
 
             PreparedStatement psUpdate = conn.prepareStatement(sqlUpdate);
             psUpdate.setInt(1, operacion.getIdVideojuego());
@@ -365,7 +365,7 @@ public class OperacionDAO {
      * Método privado para uso interno del DAO.
      */
     private static int obtenerStockVideojuego(Connection conn, int idVideojuego) throws Exception {
-        String sql = "SELECT stock FROM videojuegos WHERE id_videojuego = ?";
+        String sql = "SELECT stock FROM videojuegos WHERE id_videojuego = ? AND activo = TRUE";
         PreparedStatement ps = conn.prepareStatement(sql);
         ps.setInt(1, idVideojuego);
         ResultSet rs = ps.executeQuery();
