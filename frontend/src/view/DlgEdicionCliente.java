@@ -6,6 +6,7 @@ import frontend.src.model.ClienteInfo;
 
 import java.awt.*;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -207,17 +208,28 @@ public class DlgEdicionCliente extends JDialog {
 
         // NUEVA VALIDACIÓN: Fecha no puede ser futura
         if (!fechaNacimiento.isEmpty()) {
-            if (!fechaValida(fechaNacimiento)) {
+            LocalDate fecha = parseFechaNacimiento(fechaNacimiento);
+            if (fecha == null) {
                 JOptionPane.showMessageDialog(
                     this,
-                    "La fecha de nacimiento debe tener formato AAAA-MM-DD o dd-mm-yyyy",
+                    "La fecha de nacimiento debe tener formato AAAA-MM-DD o dd/MM/yyyy",
                     "Fecha inválida",
                     JOptionPane.WARNING_MESSAGE
                 );
                 return;
             }
             
-            if (fechaEsFutura(fechaNacimiento)) {
+            if (fecha.getYear() < 1900) {
+                JOptionPane.showMessageDialog(
+                    this,
+                    "La fecha no puede ser anterior a 1900",
+                    "Fecha invÃ¡lida",
+                    JOptionPane.WARNING_MESSAGE
+                );
+                return;
+            }
+
+            if (fecha.isAfter(LocalDate.now())) {
                 JOptionPane.showMessageDialog(
                     this,
                     "La fecha no puede ser futura",
@@ -291,13 +303,7 @@ public class DlgEdicionCliente extends JDialog {
      * @return true si es válida, false si no
      */
     private boolean fechaValida(String fechaString) {
-        try {
-            LocalDate.parse(fechaString);
-            return true;
-        } catch (DateTimeParseException ignored) {
-        }
-        // Intentar formato alternativo si es necesario
-        return true;
+        return parseFechaNacimiento(fechaString) != null;
     }
 
     /**
@@ -307,12 +313,22 @@ public class DlgEdicionCliente extends JDialog {
      * @return true si la fecha es futura, false si es pasada o actual
      */
     private boolean fechaEsFutura(String fechaString) {
+        LocalDate fecha = parseFechaNacimiento(fechaString);
+        return fecha != null && fecha.isAfter(LocalDate.now());
+    }
+
+    private LocalDate parseFechaNacimiento(String fechaString) {
         try {
-            LocalDate fecha = LocalDate.parse(fechaString);
-            return fecha.isAfter(LocalDate.now());
+            return LocalDate.parse(fechaString);
         } catch (DateTimeParseException ignored) {
         }
-        return false;
+
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            return LocalDate.parse(fechaString, formatter);
+        } catch (DateTimeParseException ignored) {
+            return null;
+        }
     }
 
     public String getNombres() { return txtNombres.getText(); }

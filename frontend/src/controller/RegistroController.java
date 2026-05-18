@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
  */
 public class RegistroController {
     public static final int PASSWORD_MIN_LENGTH = 6;
+    private static final int ANIO_MINIMO_FECHA_NACIMIENTO = 1900;
     
     // Patrón para validar nombres/apellidos: letras, espacios, acentos y ñ
     private static final Pattern PATRON_NOMBRE = Pattern.compile(
@@ -84,6 +85,11 @@ public class RegistroController {
             }
 
             //VALIDACIÓN: Fecha no puede ser futura
+            if (fechaNacimientoParseada.getYear() < ANIO_MINIMO_FECHA_NACIMIENTO) {
+                System.err.println("Error: fecha de nacimiento no puede ser anterior a 1900");
+                return null;
+            }
+
             if (!validarFechaNacimiento(fechaNacimientoParseada)) {
                 System.err.println("Error: fecha de nacimiento no puede ser futura");
                 return null;

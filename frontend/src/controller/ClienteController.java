@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
  * - Procesar errores
  */
 public class ClienteController {
+    private static final int ANIO_MINIMO_FECHA_NACIMIENTO = 1900;
     
     // Patrón para validar nombres/apellidos: letras, espacios, acentos y ñ
     private static final Pattern PATRON_NOMBRE = Pattern.compile(
@@ -248,6 +249,10 @@ public class ClienteController {
                 System.err.println("Error: Fecha de nacimiento invalida");
                 return false;
             }
+            if (fechaNacimientoEsAnteriorA1900(cliente.getFechaNacimiento())) {
+                System.err.println("Error: La fecha no puede ser anterior a 1900");
+                return false;
+            }
             if (fechaNacimientoEsFutura(cliente.getFechaNacimiento())) {
                 System.err.println("Error: Fecha de nacimiento no puede ser futura");
                 return false;
@@ -259,19 +264,24 @@ public class ClienteController {
     }
 
     private static boolean fechaNacimientoValida(String fecha) {
+        return parseFechaNacimiento(fecha) != null;
+    }
+
+    private static LocalDate parseFechaNacimiento(String fecha) {
+        if (fecha == null) {
+            return null;
+        }
         String valor = fecha.trim();
         try {
-            LocalDate.parse(valor);
-            return true;
+            return LocalDate.parse(valor);
         } catch (DateTimeParseException ignored) {
         }
 
         try {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            LocalDate.parse(valor, formatter);
-            return true;
+            return LocalDate.parse(valor, formatter);
         } catch (DateTimeParseException ignored) {
-            return false;
+            return null;
         }
     }
 
@@ -297,19 +307,12 @@ public class ClienteController {
      * @return true si la fecha es futura, false si es pasada o actual
      */
     private static boolean fechaNacimientoEsFutura(String fecha) {
-        String valor = fecha.trim();
-        try {
-            LocalDate fechaParsed = LocalDate.parse(valor);
-            return fechaParsed.isAfter(LocalDate.now());
-        } catch (DateTimeParseException ignored) {
-        }
+        LocalDate fechaParsed = parseFechaNacimiento(fecha);
+        return fechaParsed != null && fechaParsed.isAfter(LocalDate.now());
+    }
 
-        try {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            LocalDate fechaParsed = LocalDate.parse(valor, formatter);
-            return fechaParsed.isAfter(LocalDate.now());
-        } catch (DateTimeParseException ignored) {
-            return false;
-        }
+    private static boolean fechaNacimientoEsAnteriorA1900(String fecha) {
+        LocalDate fechaParsed = parseFechaNacimiento(fecha);
+        return fechaParsed != null && fechaParsed.getYear() < ANIO_MINIMO_FECHA_NACIMIENTO;
     }
 }

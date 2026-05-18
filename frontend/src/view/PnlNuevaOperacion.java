@@ -40,6 +40,7 @@ public class PnlNuevaOperacion extends JPanel {
     private JTextField txtFecha;
     private List<OperacionInfo> carrito = new ArrayList<>();
     private JButton btnConfirmar;
+    private JButton btnCancelarTicket;
     
 
     public PnlNuevaOperacion(ViewDashboard parent) {
@@ -189,10 +190,16 @@ public class PnlNuevaOperacion extends JPanel {
         actualizarTicket();
 
         btnConfirmar = createActionButton("Confirmar operacion", GREEN_BTN, new Color(57, 127, 58));
-        btnConfirmar.setBounds(10, 290, 250, 28);
+        btnConfirmar.setBounds(10, 290, 120, 28);
         btnConfirmar.setEnabled(false);
         btnConfirmar.addActionListener(e -> confirmarOperaciones());
         panel.add(btnConfirmar);
+
+        btnCancelarTicket = createActionButton("Cancelar", RED_BTN, new Color(156, 69, 69));
+        btnCancelarTicket.setBounds(140, 290, 120, 28);
+        btnCancelarTicket.setEnabled(false);
+        btnCancelarTicket.addActionListener(e -> cancelarTicket());
+        panel.add(btnCancelarTicket);
 
         return panel;
     }
@@ -258,6 +265,7 @@ public class PnlNuevaOperacion extends JPanel {
             clienteSeleccionado = seleccionado;
             btnSeleccionarCliente.setText(seleccionado.getNombre());
             btnSeleccionarCliente.setForeground(Color.BLACK);
+            actualizarTicket();
         }
     }
 
@@ -272,6 +280,7 @@ public class PnlNuevaOperacion extends JPanel {
             videojuegoSeleccionado = seleccionado;
             btnSeleccionarVideojuego.setText(seleccionado.getTitulo());
             btnSeleccionarVideojuego.setForeground(Color.BLACK);
+            actualizarTicket();
         }
     }
 
@@ -422,6 +431,15 @@ public class PnlNuevaOperacion extends JPanel {
         if (btnConfirmar != null) {
             btnConfirmar.setEnabled(!carrito.isEmpty());
         }
+        if (btnCancelarTicket != null) {
+            btnCancelarTicket.setEnabled(!carrito.isEmpty() || clienteSeleccionado != null || videojuegoSeleccionado != null);
+        }
+    }
+
+    private void cancelarTicket() {
+        carrito.clear();
+        limpiarFormulario();
+        actualizarTicket();
     }
 
     private void confirmarOperaciones() {

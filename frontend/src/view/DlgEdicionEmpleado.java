@@ -1,7 +1,7 @@
 package frontend.src.view;
 
 import frontend.src.controller.Ventana;
-import frontend.src.dao.UsuarioDAO;
+import frontend.src.controller.UsuarioController;
 import frontend.src.model.UsuarioInfo;
 
 import javax.swing.*;
@@ -134,6 +134,16 @@ public class DlgEdicionEmpleado extends JDialog {
         }
 
         // Validar contraseña si se intenta cambiar
+        if (fechaNacimiento.getYear() < 1900) {
+            JOptionPane.showMessageDialog(this, "La fecha no puede ser anterior a 1900", "ValidaciÃ³n", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        if (fechaNacimiento.isAfter(LocalDate.now())) {
+            JOptionPane.showMessageDialog(this, "La fecha no puede ser futura", "ValidaciÃ³n", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
         if (!password.isEmpty() || !confirmarPassword.isEmpty()) {
             if (!password.equals(confirmarPassword)) {
                 JOptionPane.showMessageDialog(this, "Las contraseñas no coinciden", "Validación", JOptionPane.WARNING_MESSAGE);
@@ -150,8 +160,8 @@ public class DlgEdicionEmpleado extends JDialog {
         String passwordActualizar = password.isEmpty() ? null : password;
 
         // Realizar actualización
-        boolean exito = UsuarioDAO.actualizar(usuario.getIdUsuario(), nombre, primerApellido, 
-                                              segundoApellido, fechaNacimiento, passwordActualizar);
+        boolean exito = UsuarioController.actualizarUsuario(usuario.getIdUsuario(), nombre, primerApellido,
+                                                            segundoApellido, fechaNacimiento, passwordActualizar);
 
         if (exito) {
             // Actualizar usuario en memoria

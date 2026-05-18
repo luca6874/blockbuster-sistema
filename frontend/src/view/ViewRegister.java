@@ -173,8 +173,12 @@ public class ViewRegister extends JPanel {
         }
 
         // Validar que fecha no sea futura
+        if (fechaValida(fechaNacimiento) && fechaAnteriorA1900(fechaNacimiento)) {
+            return "La fecha no puede ser anterior a 1900";
+        }
+
         if (fechaValida(fechaNacimiento) && fechaEsFutura(fechaNacimiento)) {
-            return "La fecha de nacimiento no puede ser futura";
+            return "La fecha no puede ser futura";
         }
 
         if (!password.equals(passwordConfirm)) {
@@ -230,6 +234,15 @@ public class ViewRegister extends JPanel {
         try {
             LocalDate fecha = LocalDate.parse(fechaString);
             return fecha.isAfter(LocalDate.now());
+        } catch (DateTimeParseException e) {
+            return false;
+        }
+    }
+
+    private boolean fechaAnteriorA1900(String fechaString) {
+        try {
+            LocalDate fecha = LocalDate.parse(fechaString);
+            return fecha.getYear() < 1900;
         } catch (DateTimeParseException e) {
             return false;
         }

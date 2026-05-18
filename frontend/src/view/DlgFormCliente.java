@@ -5,6 +5,8 @@ import frontend.src.controller.Ventana;
 import frontend.src.model.ClienteInfo;
 
 import java.awt.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 
@@ -111,6 +113,39 @@ public class DlgFormCliente extends JDialog {
             return;
         }
 
+        if (!fechaNacimiento.isEmpty()) {
+            LocalDate fecha = parseFechaNacimiento(fechaNacimiento);
+            if (fecha == null) {
+                JOptionPane.showMessageDialog(
+                    this,
+                    "La fecha de nacimiento debe tener formato AAAA-MM-DD",
+                    "Fecha invalida",
+                    JOptionPane.WARNING_MESSAGE
+                );
+                return;
+            }
+
+            if (fecha.getYear() < 1900) {
+                JOptionPane.showMessageDialog(
+                    this,
+                    "La fecha no puede ser anterior a 1900",
+                    "Fecha invalida",
+                    JOptionPane.WARNING_MESSAGE
+                );
+                return;
+            }
+
+            if (fecha.isAfter(LocalDate.now())) {
+                JOptionPane.showMessageDialog(
+                    this,
+                    "La fecha no puede ser futura",
+                    "Fecha invalida",
+                    JOptionPane.WARNING_MESSAGE
+                );
+                return;
+            }
+        }
+
         ClienteInfo nuevoCliente = new ClienteInfo();
         nuevoCliente.setNombre(nombres);
         nuevoCliente.setPrimerApellido(primerApellido);
@@ -162,5 +197,13 @@ public class DlgFormCliente extends JDialog {
 
     private String normalizarTelefono(String telefono) {
         return telefono == null ? "" : telefono.replaceAll("\\D", "");
+    }
+
+    private LocalDate parseFechaNacimiento(String fechaNacimiento) {
+        try {
+            return LocalDate.parse(fechaNacimiento);
+        } catch (DateTimeParseException e) {
+            return null;
+        }
     }
 }
