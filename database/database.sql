@@ -33,8 +33,18 @@ CREATE TABLE `clientes` (
   `lvl_fidelidad` int DEFAULT '0',
   PRIMARY KEY (`id_cliente`),
   UNIQUE KEY `correo_electronico` (`correo_electronico`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `clientes`
+--
+
+LOCK TABLES `clientes` WRITE;
+/*!40000 ALTER TABLE `clientes` DISABLE KEYS */;
+INSERT INTO `clientes` VALUES (2,'Jesus Iran','Ruiz','Medellin','soimediocre@hotmail.com','2026-05-09','1122334455',0),(3,'Darnell sueño','Aguilar','Ramirez','wasa@sueñomail.com','2001-09-11','1234567890',0),(4,'leonardazo','pichard','colon','LeonardoChickcrAzy@hotmail.com','2001-09-11','6122333612',0);
+/*!40000 ALTER TABLE `clientes` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `operaciones`
@@ -60,8 +70,17 @@ CREATE TABLE `operaciones` (
   CONSTRAINT `operaciones_ibfk_1` FOREIGN KEY (`id_cliente`) REFERENCES `clientes` (`id_cliente`),
   CONSTRAINT `operaciones_ibfk_2` FOREIGN KEY (`id_videojuego`) REFERENCES `videojuegos` (`id_videojuego`),
   CONSTRAINT `operaciones_ibfk_3` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `operaciones`
+--
+
+LOCK TABLES `operaciones` WRITE;
+/*!40000 ALTER TABLE `operaciones` DISABLE KEYS */;
+/*!40000 ALTER TABLE `operaciones` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `usuarios`
@@ -82,8 +101,18 @@ CREATE TABLE `usuarios` (
   PRIMARY KEY (`id_usuario`),
   UNIQUE KEY `username` (`username`),
   UNIQUE KEY `correo` (`correo`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `usuarios`
+--
+
+LOCK TABLES `usuarios` WRITE;
+/*!40000 ALTER TABLE `usuarios` DISABLE KEYS */;
+INSERT INTO `usuarios` VALUES (1,NULL,NULL,NULL,'asdfgj','waltuh@mail.com',NULL,'1234'),(2,'Luca Alexander','Reinaga','Genesta','luca','lucapro@mail.com','2006-06-29','1234'),(3,NULL,NULL,NULL,'DArnel','atun@frijolmail.com',NULL,'1234'),(4,NULL,NULL,NULL,'5','leonardo@jotmail.com',NULL,'123456'),(6,'Mata','manzana','escritorio','leo@jotmail.com','leo@jotmail.com','2001-09-11','123456'),(7,'Iran','ruiz','medellin','chopon','ruiz@jotmail','2001-09-11','1234567'),(8,'olaaaa','was','waaa','juanjo','juan123@mail.com','2025-06-12','1234567890');
+/*!40000 ALTER TABLE `usuarios` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `videojuegos`
@@ -95,7 +124,7 @@ DROP TABLE IF EXISTS `videojuegos`;
 CREATE TABLE `videojuegos` (
   `id_videojuego` int NOT NULL AUTO_INCREMENT,
   `nombre` varchar(100) NOT NULL,
-  `plataforma` varchar(20) DEFAULT NULL,
+  `plataforma` varchar(45) DEFAULT NULL,
   `genero` varchar(50) DEFAULT NULL,
   `clasificacion` enum('E','T','M') DEFAULT NULL,
   `anio_lanzamiento` year DEFAULT NULL,
@@ -104,9 +133,20 @@ CREATE TABLE `videojuegos` (
   `stock` int NOT NULL,
   `imagen` varchar(255) DEFAULT NULL,
   `puntos` int DEFAULT '0',
+  `activo` tinyint(1) DEFAULT '1',
   PRIMARY KEY (`id_videojuego`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `videojuegos`
+--
+
+LOCK TABLES `videojuegos` WRITE;
+/*!40000 ALTER TABLE `videojuegos` DISABLE KEYS */;
+INSERT INTO `videojuegos` VALUES (1,'Halo 3 ODST','XBOX','FPS','M',2009,117.00,343.00,67,'caratulaGame3.png',77,1),(2,'The Evil Within','Xbox','Terror','E',2014,123.00,321.00,14,'caratulaGame5.png',10,1);
+/*!40000 ALTER TABLE `videojuegos` ENABLE KEYS */;
+UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -117,4 +157,4 @@ CREATE TABLE `videojuegos` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-05-15  4:02:04
+-- Dump completed on 2026-05-18 16:10:50
