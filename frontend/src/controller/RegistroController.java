@@ -4,6 +4,7 @@ import frontend.src.dao.UsuarioDAO;
 import frontend.src.model.UsuarioInfo;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.regex.Pattern;
 
 /**
  * Controlador de registro de usuarios.
@@ -11,6 +12,11 @@ import java.time.format.DateTimeParseException;
  */
 public class RegistroController {
     public static final int PASSWORD_MIN_LENGTH = 6;
+    
+    // Patrón para validar nombres/apellidos: letras, espacios, acentos y ñ
+    private static final Pattern PATRON_NOMBRE = Pattern.compile(
+        "^[a-zA-ZáéíóúñüÁÉÍÓÚÑÜàèìòùÀÈÌÒÙäëïöÄËÏÖ ]+$"
+    );
 
     public static UsuarioInfo registrar(String nombre, String primerApellido, String segundoApellido,
                                         String fechaNacimiento, String username, String correo,
@@ -38,6 +44,22 @@ public class RegistroController {
                 return null;
             }
 
+            // NUEVA VALIDACIÓN: Nombre y apellidos solo letras
+            if (!validarNombreYApellidos(nombre)) {
+                System.err.println("Error: nombre contiene caracteres inválidos");
+                return null;
+            }
+            
+            if (!validarNombreYApellidos(primerApellido)) {
+                System.err.println("Error: primer apellido contiene caracteres inválidos");
+                return null;
+            }
+            
+            if (!validarNombreYApellidos(segundoApellido)) {
+                System.err.println("Error: segundo apellido contiene caracteres inválidos");
+                return null;
+            }
+
             if (!password.equals(passwordConfirm)) {
                 System.err.println("Error: las contrasenas no coinciden");
                 return null;
@@ -58,6 +80,12 @@ public class RegistroController {
                 fechaNacimientoParseada = LocalDate.parse(fechaNacimiento);
             } catch (DateTimeParseException e) {
                 System.err.println("Error: fecha de nacimiento invalida");
+                return null;
+            }
+
+            // NUEVA VALIDACIÓN: Fecha no puede ser futura
+            if (!validarFechaNacimiento(fechaNacimientoParseada)) {
+                System.err.println("Error: fecha de nacimiento no puede ser futura");
                 return null;
             }
 
@@ -87,5 +115,35 @@ public class RegistroController {
 
     public static boolean esValido(UsuarioInfo usuario) {
         return usuario != null && usuario.getIdUsuario() > 0;
+    }
+
+    /**
+     * Valida que un nombre/apellido solo contenga letras, espacios, acentos y ñ.
+     * No permite números, símbolos ni caracteres especiales.
+     * 
+     * Ejemplos válidos: "Luca", "José", "María Fernanda", "Muñoz"
+     * Ejemplos inválidos: "Luca123", "@#$%", "43t3+32"
+     * 
+     * @param texto el texto a validar
+     * @return true si es válido, false si contiene caracteres inválidos
+     */
+    private static boolean validarNombreYApellidos(String texto) {
+        if (texto == null || texto.isEmpty()) {
+            return false;
+        }
+        return PATRON_NOMBRE.matcher(texto).matches();
+    }
+
+    /**
+     * Valida que la fecha de nacimiento no sea futura.
+     * 
+     * @param fechaNacimiento la fecha a validar
+     * @return true si la fecha es válida (no es futura), false si es futura
+     */
+    private static boolean validarFechaNacimiento(LocalDate fechaNacimiento) {
+        if (fechaNacimiento == null) {
+            return false;
+        }
+        return !fechaNacimiento.isAfter(LocalDate.now());
     }
 }

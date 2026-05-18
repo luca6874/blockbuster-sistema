@@ -166,6 +166,17 @@ public class ViewRegister extends JPanel {
             return "Por favor, rellena todos los campos";
         }
 
+        // Validar nombres y apellidos (solo letras, espacios, acentos)
+        if (!validarNombreFormato(nombre) || !validarNombreFormato(primerApellido) || 
+            !validarNombreFormato(segundoApellido)) {
+            return "Nombre y apellidos solo pueden contener letras";
+        }
+
+        // Validar que fecha no sea futura
+        if (fechaValida(fechaNacimiento) && fechaEsFutura(fechaNacimiento)) {
+            return "La fecha de nacimiento no puede ser futura";
+        }
+
         if (!password.equals(passwordConfirm)) {
             return "Las contrasenas no coinciden";
         }
@@ -189,6 +200,36 @@ public class ViewRegister extends JPanel {
         try {
             LocalDate.parse(fechaNacimiento);
             return true;
+        } catch (DateTimeParseException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Valida que un nombre/apellido solo contenga letras, espacios, acentos y ñ.
+     * No permite números, símbolos ni caracteres especiales.
+     * 
+     * @param texto el texto a validar
+     * @return true si es válido, false si contiene caracteres inválidos
+     */
+    private boolean validarNombreFormato(String texto) {
+        if (texto == null || texto.isEmpty()) {
+            return false;
+        }
+        // Patrón: solo letras (incluyendo acentos), ñ, y espacios
+        return texto.matches("^[a-zA-ZáéíóúñüÁÉÍÓÚÑÜàèìòùÀÈÌÒÙäëïöÄËÏÖ ]+$");
+    }
+
+    /**
+     * Verifica si una fecha es futura comparándola con la fecha actual.
+     * 
+     * @param fechaString la fecha en formato AAAA-MM-DD
+     * @return true si la fecha es futura, false si es pasada o actual
+     */
+    private boolean fechaEsFutura(String fechaString) {
+        try {
+            LocalDate fecha = LocalDate.parse(fechaString);
+            return fecha.isAfter(LocalDate.now());
         } catch (DateTimeParseException e) {
             return false;
         }
