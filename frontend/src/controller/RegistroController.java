@@ -44,7 +44,7 @@ public class RegistroController {
                 return null;
             }
 
-            // NUEVA VALIDACIÓN: Nombre y apellidos solo letras
+            //VALIDACIÓN: Nombre y apellidos solo letras
             if (!validarNombreYApellidos(nombre)) {
                 System.err.println("Error: nombre contiene caracteres inválidos");
                 return null;
@@ -83,7 +83,7 @@ public class RegistroController {
                 return null;
             }
 
-            // NUEVA VALIDACIÓN: Fecha no puede ser futura
+            //VALIDACIÓN: Fecha no puede ser futura
             if (!validarFechaNacimiento(fechaNacimientoParseada)) {
                 System.err.println("Error: fecha de nacimiento no puede ser futura");
                 return null;
@@ -120,10 +120,7 @@ public class RegistroController {
     /**
      * Valida que un nombre/apellido solo contenga letras, espacios, acentos y ñ.
      * No permite números, símbolos ni caracteres especiales.
-     * 
-     * Ejemplos válidos: "Luca", "José", "María Fernanda", "Muñoz"
-     * Ejemplos inválidos: "Luca123", "@#$%", "43t3+32"
-     * 
+     *  
      * @param texto el texto a validar
      * @return true si es válido, false si contiene caracteres inválidos
      */

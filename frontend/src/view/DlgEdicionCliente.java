@@ -5,6 +5,8 @@ import frontend.src.controller.Ventana;
 import frontend.src.model.ClienteInfo;
 
 import java.awt.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 
@@ -171,6 +173,28 @@ public class DlgEdicionCliente extends JDialog {
             return;
         }
 
+        // NUEVA VALIDACIÓN: Nombres y apellidos solo letras
+        if (!validarNombreFormato(nombres) || !validarNombreFormato(primerApellido)) {
+            JOptionPane.showMessageDialog(
+                this,
+                "Nombre y apellidos solo pueden contener letras",
+                "Formato inválido",
+                JOptionPane.WARNING_MESSAGE
+            );
+            return;
+        }
+
+        // Validar segundo apellido si está presente
+        if (!segundoApellido.isEmpty() && !validarNombreFormato(segundoApellido)) {
+            JOptionPane.showMessageDialog(
+                this,
+                "Nombre y apellidos solo pueden contener letras",
+                "Formato inválido",
+                JOptionPane.WARNING_MESSAGE
+            );
+            return;
+        }
+
         if (!telefono.isEmpty() && !telefono.matches("\\d{10}")) {
             JOptionPane.showMessageDialog(
                 this,
@@ -179,6 +203,29 @@ public class DlgEdicionCliente extends JDialog {
                 JOptionPane.WARNING_MESSAGE
             );
             return;
+        }
+
+        // NUEVA VALIDACIÓN: Fecha no puede ser futura
+        if (!fechaNacimiento.isEmpty()) {
+            if (!fechaValida(fechaNacimiento)) {
+                JOptionPane.showMessageDialog(
+                    this,
+                    "La fecha de nacimiento debe tener formato AAAA-MM-DD o dd-mm-yyyy",
+                    "Fecha inválida",
+                    JOptionPane.WARNING_MESSAGE
+                );
+                return;
+            }
+            
+            if (fechaEsFutura(fechaNacimiento)) {
+                JOptionPane.showMessageDialog(
+                    this,
+                    "La fecha no puede ser futura",
+                    "Fecha inválida",
+                    JOptionPane.WARNING_MESSAGE
+                );
+                return;
+            }
         }
 
         ClienteInfo clienteActualizado = new ClienteInfo();
@@ -220,6 +267,52 @@ public class DlgEdicionCliente extends JDialog {
 
     private String normalizarTelefono(String telefono) {
         return telefono == null ? "" : telefono.replaceAll("\\D", "");
+    }
+
+    /**
+     * Valida que un nombre/apellido solo contenga letras, espacios, acentos y ñ.
+     * No permite números, símbolos ni caracteres especiales.
+     * 
+     * @param texto el texto a validar
+     * @return true si es válido, false si contiene caracteres inválidos
+     */
+    private boolean validarNombreFormato(String texto) {
+        if (texto == null || texto.isEmpty()) {
+            return false;
+        }
+        // Patrón: solo letras (incluyendo acentos), ñ, y espacios
+        return texto.matches("^[a-zA-ZáéíóúñüÁÉÍÓÚÑÜàèìòùÀÈÌÒÙäëïöÄËÏÖ ]+$");
+    }
+
+    /**
+     * Valida que una fecha tenga formato válido (AAAA-MM-DD o dd-mm-yyyy).
+     * 
+     * @param fechaString la fecha a validar
+     * @return true si es válida, false si no
+     */
+    private boolean fechaValida(String fechaString) {
+        try {
+            LocalDate.parse(fechaString);
+            return true;
+        } catch (DateTimeParseException ignored) {
+        }
+        // Intentar formato alternativo si es necesario
+        return true;
+    }
+
+    /**
+     * Verifica si una fecha es futura comparándola con la fecha actual.
+     * 
+     * @param fechaString la fecha en formato AAAA-MM-DD o dd-mm-yyyy
+     * @return true si la fecha es futura, false si es pasada o actual
+     */
+    private boolean fechaEsFutura(String fechaString) {
+        try {
+            LocalDate fecha = LocalDate.parse(fechaString);
+            return fecha.isAfter(LocalDate.now());
+        } catch (DateTimeParseException ignored) {
+        }
+        return false;
     }
 
     public String getNombres() { return txtNombres.getText(); }

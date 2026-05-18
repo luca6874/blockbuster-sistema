@@ -255,12 +255,13 @@ public class PnlResumenCliente extends JPanel {
             // Obtener datos del cliente desde el panel
             String clienteId = obtenerClienteId();
             String nombres = obtenerNombres();
-            String apellidos = obtenerApellidos();
+            String primerApellido = clienteActual != null ? (clienteActual.getPrimerApellido() != null ? clienteActual.getPrimerApellido() : "") : "";
+            String segundoApellido = clienteActual != null ? (clienteActual.getSegundoApellido() != null ? clienteActual.getSegundoApellido() : "") : "";
             String email = obtenerEmail();
             String telefono = obtenerTelefono();
             String fechaNacimiento = obtenerFechaNacimiento();
             
-            DlgEdicionCliente dlgEditar = new DlgEdicionCliente(parent.getHost(), clienteId, nombres, apellidos, email, telefono, fechaNacimiento, null);
+            DlgEdicionCliente dlgEditar = new DlgEdicionCliente(parent.getHost(), clienteId, nombres, primerApellido, segundoApellido, email, telefono, fechaNacimiento, null);
             parent.getHost().setOscurecer(true);
             dlgEditar.setVisible(true);
         });

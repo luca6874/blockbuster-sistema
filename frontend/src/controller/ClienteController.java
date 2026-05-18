@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * ClienteController - Controlador de clientes.
@@ -19,6 +20,11 @@ import java.util.List;
  * - Procesar errores
  */
 public class ClienteController {
+    
+    // Patrón para validar nombres/apellidos: letras, espacios, acentos y ñ
+    private static final Pattern PATRON_NOMBRE = Pattern.compile(
+        "^[a-zA-ZáéíóúñüÁÉÍÓÚÑÜàèìòùÀÈÌÒÙäëïöÄËÏÖ ]+$"
+    );
 
     /**
      * Obtiene la lista de todos los clientes desde la BD.
@@ -173,8 +179,10 @@ public class ClienteController {
      * 
      * Verifica:
      * - Nombre no vacío
+     * - Nombres/apellidos solo contienen letras, acentos y ñ
      * - Email no vacío
      * - Teléfono no vacío (opcional)
+     * - Fecha no futura
      * 
      * @param cliente el ClienteInfo a validar
      * @return true si los datos son válidos, false si no
@@ -191,9 +199,29 @@ public class ClienteController {
             return false;
         }
 
+        // NUEVA VALIDACIÓN: Nombre solo letras/acentos
+        if (!validarNombreYApellidos(cliente.getNombres())) {
+            System.err.println("Error: Nombre contiene caracteres inválidos");
+            return false;
+        }
+
         if (cliente.getPrimerApellido() == null || cliente.getPrimerApellido().trim().isEmpty()) {
             System.err.println("Error: Primer apellido es requerido");
             return false;
+        }
+
+        // NUEVA VALIDACIÓN: Primer apellido solo letras/acentos
+        if (!validarNombreYApellidos(cliente.getPrimerApellido())) {
+            System.err.println("Error: Primer apellido contiene caracteres inválidos");
+            return false;
+        }
+
+        // NUEVA VALIDACIÓN: Segundo apellido solo letras/acentos (si está presente)
+        if (cliente.getSegundoApellido() != null && !cliente.getSegundoApellido().trim().isEmpty()) {
+            if (!validarNombreYApellidos(cliente.getSegundoApellido())) {
+                System.err.println("Error: Segundo apellido contiene caracteres inválidos");
+                return false;
+            }
         }
 
         // Validar email
@@ -214,10 +242,16 @@ public class ClienteController {
             return false;
         }
 
-        if (cliente.getFechaNacimiento() != null && !cliente.getFechaNacimiento().trim().isEmpty()
-                && !fechaNacimientoValida(cliente.getFechaNacimiento())) {
-            System.err.println("Error: Fecha de nacimiento invalida");
-            return false;
+        // NUEVA VALIDACIÓN: Fecha no puede ser futura
+        if (cliente.getFechaNacimiento() != null && !cliente.getFechaNacimiento().trim().isEmpty()) {
+            if (!fechaNacimientoValida(cliente.getFechaNacimiento())) {
+                System.err.println("Error: Fecha de nacimiento invalida");
+                return false;
+            }
+            if (fechaNacimientoEsFutura(cliente.getFechaNacimiento())) {
+                System.err.println("Error: Fecha de nacimiento no puede ser futura");
+                return false;
+            }
         }
 
         System.out.println("Validación exitosa para: " + cliente.getNombre());
@@ -236,6 +270,44 @@ public class ClienteController {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             LocalDate.parse(valor, formatter);
             return true;
+        } catch (DateTimeParseException ignored) {
+            return false;
+        }
+    }
+
+    /**
+     * Valida que un nombre/apellido solo contenga letras, espacios, acentos y ñ.
+     * No permite números, símbolos ni caracteres especiales.
+     * 
+     * @param texto el texto a validar
+     * @return true si es válido, false si contiene caracteres inválidos
+     */
+    private static boolean validarNombreYApellidos(String texto) {
+        if (texto == null || texto.isEmpty()) {
+            return false;
+        }
+        return PATRON_NOMBRE.matcher(texto).matches();
+    }
+
+    /**
+     * Verifica si una fecha de nacimiento es futura.
+     * Maneja múltiples formatos (YYYY-MM-DD y dd/MM/yyyy).
+     * 
+     * @param fecha la fecha a validar
+     * @return true si la fecha es futura, false si es pasada o actual
+     */
+    private static boolean fechaNacimientoEsFutura(String fecha) {
+        String valor = fecha.trim();
+        try {
+            LocalDate fechaParsed = LocalDate.parse(valor);
+            return fechaParsed.isAfter(LocalDate.now());
+        } catch (DateTimeParseException ignored) {
+        }
+
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            LocalDate fechaParsed = LocalDate.parse(valor, formatter);
+            return fechaParsed.isAfter(LocalDate.now());
         } catch (DateTimeParseException ignored) {
             return false;
         }
