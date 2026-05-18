@@ -962,19 +962,19 @@ public class PnlGestionClientes extends JPanel {
                 JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
                 panel.setBackground(isSelected ? table.getSelectionBackground() : Color.WHITE);
 
-                JButton btnVer = new JButton("...");
+                JButton btnVer = new JButton("👁");
                 btnVer.setBackground(Color.WHITE);
                 btnVer.setBorder(BorderFactory.createEmptyBorder());
                 btnVer.setCursor(new Cursor(Cursor.HAND_CURSOR));
                 btnVer.setToolTipText("Ver detalles");
 
-                JButton btnEditar = new JButton("E");
+                JButton btnEditar = new JButton("✏");
                 btnEditar.setBackground(Color.WHITE);
                 btnEditar.setBorder(BorderFactory.createEmptyBorder());
                 btnEditar.setCursor(new Cursor(Cursor.HAND_CURSOR));
                 btnEditar.setToolTipText("Editar cliente");
 
-                JButton btnEliminar = new JButton("X");
+                JButton btnEliminar = new JButton("🗑");
                 btnEliminar.setBackground(Color.WHITE);
                 btnEliminar.setBorder(BorderFactory.createEmptyBorder());
                 btnEliminar.setCursor(new Cursor(Cursor.HAND_CURSOR));
