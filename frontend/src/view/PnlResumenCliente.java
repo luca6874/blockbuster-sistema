@@ -193,7 +193,7 @@ public class PnlResumenCliente extends JPanel {
         card3.add(lblDescuentosUsados);
         this.add(card3);
         
-        // Stat 4: Descuento frecuencia
+        //Puntos acumulados
         JPanel card4 = new JPanel(null) {
             @Override
             protected void paintComponent(Graphics g) {
@@ -209,9 +209,9 @@ public class PnlResumenCliente extends JPanel {
         card4.setBounds(181, y, 55, 70);
         JLabel icon4 = createIconLabel("/frontend/src/images/level.png", 0, 4);
         card4.add(icon4);
-        JLabel title4 = createTitleLabel("Desc. frecuencia", 2, 22);
+        JLabel title4 = createTitleLabel("Puntos acumulados", 2, 22);
         card4.add(title4);
-        lblDescFrecuencia = createValueLabel("SI", 0, 46);
+        lblDescFrecuencia = createValueLabel("0", 0, 46);
         card4.add(lblDescFrecuencia);
         this.add(card4);
     }
@@ -427,6 +427,9 @@ public class PnlResumenCliente extends JPanel {
             lblFecha.setText(cliente.getFechaNacimiento());
         }
         
+        // Actualizar estadísticas de juegos y puntos
+        actualizarEstadisticas();
+        
         // Actualizar badges de estatus y frecuencia
         actualizarBadges();
         
@@ -435,6 +438,27 @@ public class PnlResumenCliente extends JPanel {
         this.repaint();
     }
     
+    /**
+     * Actualiza las estadísticas de juegos rentados, comprados, descuentos usados y puntos acumulados.
+     */
+    private void actualizarEstadisticas() {
+        if (clienteActual == null) {
+            // Si no hay cliente, mostrar valores por defecto
+            if (lblJuegosRentados != null) lblJuegosRentados.setText("0");
+            if (lblJuegosComprados != null) lblJuegosComprados.setText("0");
+            if (lblDescuentosUsados != null) lblDescuentosUsados.setText("0");
+            if (lblDescFrecuencia != null) lblDescFrecuencia.setText("0");
+            return;
+        }
+        
+        // Actualizar puntos acumulados desde el cliente
+        if (lblDescFrecuencia != null) {
+            int puntos = clienteActual.getPuntos();
+            lblDescFrecuencia.setText(String.valueOf(puntos));
+        }
+        
+    }
+
     /**
      * Actualiza los badges de estatus y frecuencia del cliente.
      */
