@@ -308,26 +308,35 @@ public class PnlResumenCliente extends JPanel {
             
             if (respuesta == JOptionPane.YES_OPTION) {
                 // Llamar al controlador para eliminar
-                boolean exito = ClienteController.eliminarCliente(clienteId);
-                
-                if (exito) {
+                String resultado = ClienteController.eliminarCliente(clienteId);
+                if ("OK".equals(resultado)) {
+
                     JOptionPane.showMessageDialog(
                         this,
-                        "Cliente eliminado exitosamente",
-                        "Éxito",
+               "Cliente eliminado exitosamente",
+                 "Éxito",
                         JOptionPane.INFORMATION_MESSAGE
                     );
-                    
-                    // Refrescar la gestión de clientes
+
                     parent.setContenido(new PnlGestionClientes(parent));
+
+                } else if ("OPERACIONES".equals(resultado)) {
+
+                        JOptionPane.showMessageDialog(
+                            this,
+                   "Este cliente no puede eliminarse porque tiene operaciones registradas.",
+                     "Operación no permitida",
+                            JOptionPane.WARNING_MESSAGE
+                        );
                 } else {
                     JOptionPane.showMessageDialog(
                         this,
-                        "Error al eliminar el cliente. Por favor, intenta de nuevo.",
-                        "Error",
+              "Error al eliminar el cliente. Por favor, intenta de nuevo.",
+                "Error",
                         JOptionPane.ERROR_MESSAGE
                     );
-                }
+
+                        }                                     
             }
         });
         this.add(btnEliminar);

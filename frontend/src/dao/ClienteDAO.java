@@ -6,6 +6,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Types;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -179,6 +180,8 @@ public class ClienteDAO {
 
             return filasAfectadas > 0;
 
+        } catch (SQLIntegrityConstraintViolationException e) {
+            throw new RuntimeException("CLIENTE_CON_OPERACIONES");
         } catch (Exception e) {
             System.err.println("Error en eliminar: " + e.getMessage());
             e.printStackTrace();

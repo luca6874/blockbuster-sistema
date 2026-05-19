@@ -1,5 +1,6 @@
 package frontend.src.controller;
 
+import frontend.src.dao.ClienteDAO;
 import frontend.src.dao.OperacionDAO;
 import frontend.src.dao.VideojuegoDAO;
 import frontend.src.model.OperacionInfo;
@@ -141,5 +142,33 @@ public class OperacionController {
         }
 
         return ""; // Válido
+
+
+        
     }
+
+
+    public static String eliminarCliente(String id) {
+    try {
+        boolean eliminado = ClienteDAO.eliminar(id);
+
+        if (eliminado) {
+            return "OK";
+        }
+
+        return "ERROR";
+
+    } catch (RuntimeException e) {
+
+        if ("CLIENTE_CON_OPERACIONES".equals(e.getMessage())) {
+            return "OPERACIONES";
+        }
+
+        return "ERROR";
+    }
+}
+
+
+
+
 }

@@ -151,11 +151,11 @@ public class ClienteController {
      * @param id el ID del cliente a eliminar
      * @return true si fue exitoso, false si hubo error
      */
-    public static boolean eliminarCliente(String id) {
+    public static String eliminarCliente(String id) {
         try {
             if (id == null || id.isEmpty()) {
                 System.err.println("ID de cliente inválido");
-                return false;
+                return "ERROR";
             }
             
             boolean resultado = ClienteDAO.eliminar(id);
@@ -166,12 +166,12 @@ public class ClienteController {
                 System.err.println("No se pudo eliminar el cliente");
             }
             
-            return resultado;
+            return "OK";
             
         } catch (Exception e) {
             System.err.println("Error al eliminar cliente: " + e.getMessage());
             e.printStackTrace();
-            return false;
+            return "ERROR";
         }
     }
 

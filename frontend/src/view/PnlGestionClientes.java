@@ -501,9 +501,9 @@ public class PnlGestionClientes extends JPanel {
         
         if (respuesta == JOptionPane.YES_OPTION) {
             // Llamar al controlador para eliminar
-            boolean exito = ClienteController.eliminarCliente(clienteId);
+            String exito = ClienteController.eliminarCliente(clienteId);
             
-            if (exito) {
+            if ("OK".equals(exito)) {
                 JOptionPane.showMessageDialog(
                     this,
                     "Cliente eliminado exitosamente",
@@ -516,7 +516,7 @@ public class PnlGestionClientes extends JPanel {
             } else {
                 JOptionPane.showMessageDialog(
                     this,
-                    "Error al eliminar el cliente. Por favor, intenta de nuevo.",
+                   "Este cliente no puede eliminarse porque tiene operaciones registradas.",
                     "Error",
                     JOptionPane.ERROR_MESSAGE
                 );
