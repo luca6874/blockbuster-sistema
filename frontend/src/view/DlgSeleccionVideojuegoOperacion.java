@@ -34,7 +34,6 @@ public class DlgSeleccionVideojuegoOperacion extends JDialog {
     private JLabel lblResumenGenero;
     private JLabel lblResumenClasificacion;
     private JLabel lblResumenPrecio;
-    private JLabel lblResumenPuntos;
     private JLabel lblResumenStock;
     private VideojuegoInfo videojuegoSeleccionado;
 
@@ -206,18 +205,12 @@ public class DlgSeleccionVideojuegoOperacion extends JDialog {
         lblResumenPrecio.setForeground(MUTED);
         panel.add(lblResumenPrecio);
 
-        lblResumenPuntos = new JLabel("Puntos: --");
-        lblResumenPuntos.setBounds(10, 111, 235, 14);
-        lblResumenPuntos.setFont(new Font("Arial", Font.BOLD, 10));
-        lblResumenPuntos.setForeground(MAROON);
-        panel.add(lblResumenPuntos);
-
         return panel;
     }
 
     private void initTablaVideojuegos() {
         DefaultTableModel model = new DefaultTableModel(
-            new Object[]{"Título", "Plataforma", "Género", "Clasificación", "Renta ($)", "Compra ($)", "Puntos"}, 0) {
+            new Object[]{"Título", "Plataforma", "Género", "Clasificación", "Renta ($)", "Compra ($)"}, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
@@ -246,7 +239,6 @@ public class DlgSeleccionVideojuegoOperacion extends JDialog {
         tablaVideojuegos.getColumnModel().getColumn(3).setPreferredWidth(75);
         tablaVideojuegos.getColumnModel().getColumn(4).setPreferredWidth(60);
         tablaVideojuegos.getColumnModel().getColumn(5).setPreferredWidth(65);
-        tablaVideojuegos.getColumnModel().getColumn(6).setPreferredWidth(55);
 
         tablaVideojuegos.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
@@ -293,8 +285,7 @@ public class DlgSeleccionVideojuegoOperacion extends JDialog {
                 videojuego.getGenero(),
                 videojuego.getClasificacion(),
                 String.format("$%.2f", videojuego.getPrecioRenta()),
-                String.format("$%.2f", videojuego.getPrecioCompra()),
-                videojuego.getPuntos()
+                String.format("$%.2f", videojuego.getPrecioCompra())
             });
         }
 
@@ -331,7 +322,6 @@ public class DlgSeleccionVideojuegoOperacion extends JDialog {
         lblResumenStock.setText("Stock: " + videojuego.getStock() + " disponibles");
         lblResumenPrecio.setText(String.format("Renta: $%.2f | Compra: $%.2f", 
             videojuego.getPrecioRenta(), videojuego.getPrecioCompra()));
-        lblResumenPuntos.setText("Puntos: " + videojuego.getPuntos());
         videojuegoSeleccionado = videojuego;
     }
 
@@ -341,7 +331,6 @@ public class DlgSeleccionVideojuegoOperacion extends JDialog {
         lblResumenClasificacion.setText("Clasificación: --");
         lblResumenStock.setText("Stock: --");
         lblResumenPrecio.setText("Renta: $-- | Compra: $--");
-        lblResumenPuntos.setText("Puntos: --");
     }
 
     private void seleccionarVideojuegoEnTabla(String id) {

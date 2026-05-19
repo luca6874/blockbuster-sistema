@@ -32,7 +32,7 @@ public class DlgConfirmarEliminacionVideojuego extends JDialog {
 
         if (datosVideojuego != null) {
             try {
-                URL url = getClass().getResource("/frontend/src/images/" + datosVideojuego[6]);
+                URL url = getClass().getResource("/frontend/src/images/" + datosVideojuego[5]);
                 if (url != null) {
                     Image img = new ImageIcon(url).getImage().getScaledInstance(240, 280, Image.SCALE_SMOOTH);
                     lblImagen.setIcon(new ImageIcon(img));
@@ -51,7 +51,7 @@ public class DlgConfirmarEliminacionVideojuego extends JDialog {
         lblNombre.setFont(new Font("Arial", Font.BOLD, 14));
         detalle.add(lblNombre);
 
-        JLabel lblPlataforma = new JLabel(datosVideojuego != null ? datosVideojuego[7] : "");
+        JLabel lblPlataforma = new JLabel(datosVideojuego != null ? datosVideojuego[6] : "");
         lblPlataforma.setBounds(30, 42, 300, 18);
         lblPlataforma.setFont(new Font("Arial", Font.PLAIN, 12));
         detalle.add(lblPlataforma);
@@ -66,12 +66,12 @@ public class DlgConfirmarEliminacionVideojuego extends JDialog {
         lblClasificacion.setFont(new Font("Arial", Font.PLAIN, 12));
         detalle.add(lblClasificacion);
 
-        JLabel lblAnio = new JLabel(datosVideojuego != null ? "Año: " + datosVideojuego[8] : "");
+        JLabel lblAnio = new JLabel(datosVideojuego != null ? "Año: " + datosVideojuego[7] : "");
         lblAnio.setBounds(30, 114, 300, 18);
         lblAnio.setFont(new Font("Arial", Font.PLAIN, 12));
         detalle.add(lblAnio);
 
-        JLabel lblModo = new JLabel(datosVideojuego != null ? "Modo: " + datosVideojuego[9] : "");
+        JLabel lblModo = new JLabel(datosVideojuego != null ? "Modo: " + datosVideojuego[8] : "");
         lblModo.setBounds(30, 136, 300, 18);
         lblModo.setFont(new Font("Arial", Font.PLAIN, 12));
         detalle.add(lblModo);

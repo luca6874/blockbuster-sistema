@@ -28,7 +28,7 @@ public class ClienteDAO {
             conn = ConexionBD.conectar();
 
             String sql = "SELECT id_cliente, nombre, primer_apellido, segundo_apellido, " +
-                         "correo_electronico, fecha_nacimiento, telefono, lvl_fidelidad " +
+                         "correo_electronico, fecha_nacimiento, telefono, lvl_fidelidad, puntos " +
                          "FROM clientes " +
                          "ORDER BY nombre ASC";
 
@@ -63,7 +63,7 @@ public class ClienteDAO {
             int idNumerico = Integer.parseInt(id.replace("CLI-", ""));
 
             String sql = "SELECT id_cliente, nombre, primer_apellido, segundo_apellido, " +
-                         "correo_electronico, fecha_nacimiento, telefono, lvl_fidelidad " +
+                         "correo_electronico, fecha_nacimiento, telefono, lvl_fidelidad, puntos " +
                          "FROM clientes " +
                          "WHERE id_cliente = ?";
 
@@ -198,6 +198,7 @@ public class ClienteDAO {
         cliente.setEstatus("Activo");
         cliente.setNivel(obtenerNivelFidelidad(rs.getInt("lvl_fidelidad")));
         cliente.setFrecuente(rs.getInt("lvl_fidelidad") > 0);
+        cliente.setPuntos(rs.getInt("puntos"));
         cliente.setTelefono(rs.getString("telefono"));
 
         Date fechaNacimiento = rs.getDate("fecha_nacimiento");

@@ -424,6 +424,9 @@ public class PnlNuevaOperacion extends JPanel {
 
             ticketText.append("------------------------\n");
             ticketText.append(String.format("Total: $%.2f\n", totalGeneral));
+            ticketText.append("Puntos ganados: ")
+                .append(OperacionController.calcularPuntosGanados(totalGeneral))
+                .append("\n");
             ticketText.append("Items: ").append(carrito.size()).append("\n");
         }
 
@@ -468,6 +471,8 @@ public class PnlNuevaOperacion extends JPanel {
         // Guardar todas las operaciones del carrito
         int exitosas = 0;
         int fallidas = 0;
+        List<OperacionInfo> operacionesFallidas = new ArrayList<>();
+        int puntosGanados = 0;
 
         for (OperacionInfo operacion : carrito) {
             String resultado = OperacionController.guardarOperacion(
@@ -483,35 +488,26 @@ public class PnlNuevaOperacion extends JPanel {
 
             if (resultado.startsWith("Exito")) {
                 exitosas++;
+                puntosGanados += OperacionController.calcularPuntosGanados(operacion.getMonto() - operacion.getDescuento());
             } else {
                 fallidas++;
+                operacionesFallidas.add(operacion);
             }
         }
 
         // Mostrar resultado
         String mensaje = "Operacion completada:\n" +
                          "Exitosas: " + exitosas + "\n" +
-                         "Fallidas: " + fallidas;
+                         "Fallidas: " + fallidas + "\n" +
+                         "Puntos ganados: " + puntosGanados;
 
         if (fallidas == 0) {
             JOptionPane.showMessageDialog(this, mensaje, "Exito", JOptionPane.INFORMATION_MESSAGE);
             limpiarCarrito();
         } else {
             JOptionPane.showMessageDialog(this, mensaje, "Aviso", JOptionPane.WARNING_MESSAGE);
-            // Limpiar solo los exitosos del carrito
-            carrito.removeIf(op -> {
-                String resultado = OperacionController.guardarOperacion(
-                    op.getIdCliente(),
-                    op.getIdVideojuego(),
-                    op.getIdUsuario(),
-                    op.getTipo(),
-                    op.getMonto(),
-                    op.getDescuento(),
-                    op.getFechaOperacion(),
-                    op.getFechaDevolucion()
-                );
-                return resultado.startsWith("Exito");
-            });
+            carrito.clear();
+            carrito.addAll(operacionesFallidas);
             actualizarTicket();
         }
     }

@@ -15,6 +15,7 @@ public class ClienteInfo {
     private boolean frecuente;
     private String telefono;
     private String fechaNacimiento;
+    private int puntos;
 
     // Constructor vacío (para DAO)
     public ClienteInfo() {
@@ -84,6 +85,10 @@ public class ClienteInfo {
         return fechaNacimiento;
     }
 
+    public int getPuntos() {
+        return puntos;
+    }
+
     // SETTERS (nuevos, no rompen nada)
     
     public void setId(String id) {
@@ -124,5 +129,9 @@ public class ClienteInfo {
 
     public void setFechaNacimiento(String fechaNacimiento) {
         this.fechaNacimiento = fechaNacimiento;
+    }
+
+    public void setPuntos(int puntos) {
+        this.puntos = puntos;
     }
 }

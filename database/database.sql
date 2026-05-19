@@ -31,6 +31,7 @@ CREATE TABLE `clientes` (
   `fecha_nacimiento` date DEFAULT NULL,
   `telefono` varchar(10) DEFAULT NULL,
   `lvl_fidelidad` int DEFAULT '0',
+  `puntos` int DEFAULT '0',
   PRIMARY KEY (`id_cliente`),
   UNIQUE KEY `correo_electronico` (`correo_electronico`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -42,7 +43,7 @@ CREATE TABLE `clientes` (
 
 LOCK TABLES `clientes` WRITE;
 /*!40000 ALTER TABLE `clientes` DISABLE KEYS */;
-INSERT INTO `clientes` VALUES (2,'Jesus Iran','Ruiz','Medellin','soimediocre@hotmail.com','2026-05-09','1122334455',0),(3,'Darnell sueño','Aguilar','Ramirez','wasa@sueñomail.com','2001-09-11','1234567890',0),(4,'leonardazo','pichard','colon','LeonardoChickcrAzy@hotmail.com','2001-09-11','6122333612',0);
+INSERT INTO `clientes` VALUES (2,'Jesus Iran','Ruiz','Medellin','soimediocre@hotmail.com','2026-05-09','1122334455',0,0),(3,'Darnell sueño','Aguilar','Ramirez','wasa@sueñomail.com','2001-09-11','1234567890',0,0),(4,'leonardazo','pichard','colon','LeonardoChickcrAzy@hotmail.com','2001-09-11','6122333612',0,0);
 /*!40000 ALTER TABLE `clientes` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -70,7 +71,7 @@ CREATE TABLE `operaciones` (
   CONSTRAINT `operaciones_ibfk_1` FOREIGN KEY (`id_cliente`) REFERENCES `clientes` (`id_cliente`),
   CONSTRAINT `operaciones_ibfk_2` FOREIGN KEY (`id_videojuego`) REFERENCES `videojuegos` (`id_videojuego`),
   CONSTRAINT `operaciones_ibfk_3` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -79,6 +80,7 @@ CREATE TABLE `operaciones` (
 
 LOCK TABLES `operaciones` WRITE;
 /*!40000 ALTER TABLE `operaciones` DISABLE KEYS */;
+INSERT INTO `operaciones` VALUES (1,3,3,2,'COMPRA',111.00,0.00,'2026-05-18',NULL),(2,3,3,2,'COMPRA',111.00,0.00,'2026-05-18',NULL);
 /*!40000 ALTER TABLE `operaciones` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -135,7 +137,7 @@ CREATE TABLE `videojuegos` (
   `puntos` int DEFAULT '0',
   `activo` tinyint(1) DEFAULT '1',
   PRIMARY KEY (`id_videojuego`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -144,7 +146,7 @@ CREATE TABLE `videojuegos` (
 
 LOCK TABLES `videojuegos` WRITE;
 /*!40000 ALTER TABLE `videojuegos` DISABLE KEYS */;
-INSERT INTO `videojuegos` VALUES (1,'Halo 3 ODST','XBOX','FPS','M',2009,117.00,343.00,67,'caratulaGame3.png',77,1),(2,'The Evil Within','Xbox','Terror','E',2014,123.00,321.00,14,'caratulaGame5.png',10,1);
+INSERT INTO `videojuegos` VALUES (1,'Halo 3 ODST','XBOX','FPS','M',2009,117.00,343.00,67,'caratulaGame3.png',77,1),(2,'The Evil Within','Xbox','Terror','E',2014,123.00,321.00,14,'caratulaGame5.png',10,1),(3,'fsdffsfsf','ffsffs','fsfsfs','E',2000,111.00,111.00,9,NULL,11,0);
 /*!40000 ALTER TABLE `videojuegos` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -157,4 +159,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-05-18 16:10:50
+-- Dump completed on 2026-05-18 22:12:38

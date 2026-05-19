@@ -19,7 +19,6 @@ public class DlgAgregarVideojuego extends JDialog {
     private JTextField txtRenta;
     private JTextField txtVenta;
     private JTextField txtStock;
-    private JTextField txtPuntos;
     private JTextField txtImagen;
 
     public DlgAgregarVideojuego(Ventana parent, Runnable onConfirm) {
@@ -79,7 +78,6 @@ public class DlgAgregarVideojuego extends JDialog {
         txtRenta = crearCampo(mainPanel, "Precio renta", colX, col3Y, 120);
         txtVenta = crearCampo(mainPanel, "Precio venta", colX + 140, col3Y, 120);
         txtStock = crearCampo(mainPanel, "Stock", colX + 280, col3Y, 90);
-        txtPuntos = crearCampo(mainPanel, "Puntos", colX, col4Y, 120);
         txtImagen = crearCampo(mainPanel, "Imagen/path", colX, col5Y, 300);
 
         JButton btnConfirmar = new JButton("Confirmar");
@@ -151,7 +149,6 @@ public class DlgAgregarVideojuego extends JDialog {
             double renta = parseDecimal(txtRenta.getText());
             double venta = parseDecimal(txtVenta.getText());
             int stock = parseEnteroRequerido(txtStock.getText());
-            int puntos = parseEnteroOpcional(txtPuntos.getText());
 
             return new VideojuegoInfo(
                 id,
@@ -162,12 +159,11 @@ public class DlgAgregarVideojuego extends JDialog {
                 anio,
                 renta,
                 venta,
-                puntos,
                 stock,
                 txtImagen.getText().trim()
             );
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Stock, precios, puntos y anio deben tener formato numerico valido.", "Datos invalidos", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Stock, precios y anio deben tener formato numerico valido.", "Datos invalidos", JOptionPane.WARNING_MESSAGE);
             return null;
         }
     }

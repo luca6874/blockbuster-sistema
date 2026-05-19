@@ -33,7 +33,6 @@ public class PnlVideojuegos extends JPanel {
     private JLabel lblDetalleModo;
     private JLabel lblDetalleRenta;
     private JLabel lblDetalleCompra;
-    private JLabel lblDetallePuntos;
     private JLabel lblDetalleStock;
     private JLabel lblDetalleImagen;
     private List<VideojuegoInfo> datosVideojuegos = new ArrayList<>();
@@ -209,10 +208,7 @@ public class PnlVideojuegos extends JPanel {
         lblDetalleCompra = createDetailLabel(170, 265, 150, 18, Font.PLAIN, 11);
         panel.add(lblDetalleCompra);
 
-        lblDetallePuntos = createDetailLabel(16, 285, 150, 18, Font.PLAIN, 11);
-        panel.add(lblDetallePuntos);
-
-        lblDetalleStock = createDetailLabel(170, 285, 150, 18, Font.PLAIN, 11);
+        lblDetalleStock = createDetailLabel(16, 285, 150, 18, Font.PLAIN, 11);
         panel.add(lblDetalleStock);
 
         JButton btnDescargar = createActionButton("Descargar info", new Color(230, 230, 230));
@@ -255,7 +251,7 @@ public class PnlVideojuegos extends JPanel {
     }
 
     private void initTablaVideojuegos() {
-        String[] columnas = {"Titulo", "Genero", "Clasificacion", "Renta", "Compra", "Puntos"};
+        String[] columnas = {"Titulo", "Genero", "Clasificacion", "Renta", "Compra"};
 
         datosVideojuegos = VideojuegoController.traerVideojuegosDeBD();
         if (lblTituloTabla != null) {
@@ -281,7 +277,6 @@ public class PnlVideojuegos extends JPanel {
         tablaVideojuegos.getColumnModel().getColumn(2).setPreferredWidth(90);
         tablaVideojuegos.getColumnModel().getColumn(3).setPreferredWidth(70);
         tablaVideojuegos.getColumnModel().getColumn(4).setPreferredWidth(70);
-        tablaVideojuegos.getColumnModel().getColumn(5).setPreferredWidth(50);
 
         tablaVideojuegos.addMouseListener(new MouseAdapter() {
             @Override
@@ -311,14 +306,13 @@ public class PnlVideojuegos extends JPanel {
     public void refrescarTabla() {
         datosVideojuegos = VideojuegoController.traerVideojuegosDeBD();
         DefaultTableModel modelo = (DefaultTableModel) tablaVideojuegos.getModel();
-        modelo.setDataVector(convertirVideojuegosAArray(), new String[]{"Titulo", "Genero", "Clasificacion", "Renta", "Compra", "Puntos"});
+        modelo.setDataVector(convertirVideojuegosAArray(), new String[]{"Titulo", "Genero", "Clasificacion", "Renta", "Compra"});
         tablaVideojuegos.getColumnModel().getColumn(0).setPreferredWidth(180);
         tablaVideojuegos.getColumnModel().getColumn(0).setCellRenderer(new TituloTableRenderer());
         tablaVideojuegos.getColumnModel().getColumn(1).setPreferredWidth(100);
         tablaVideojuegos.getColumnModel().getColumn(2).setPreferredWidth(90);
         tablaVideojuegos.getColumnModel().getColumn(3).setPreferredWidth(70);
         tablaVideojuegos.getColumnModel().getColumn(4).setPreferredWidth(70);
-        tablaVideojuegos.getColumnModel().getColumn(5).setPreferredWidth(50);
 
         if (lblTituloTabla != null) {
             lblTituloTabla.setText("Listado de videojuegos (" + datosVideojuegos.size() + ")");
@@ -335,7 +329,7 @@ public class PnlVideojuegos extends JPanel {
     }
 
     private Object[][] convertirVideojuegosAArray() {
-        Object[][] datos = new Object[datosVideojuegos.size()][6];
+        Object[][] datos = new Object[datosVideojuegos.size()][5];
         for (int i = 0; i < datosVideojuegos.size(); i++) {
             VideojuegoInfo videojuego = datosVideojuegos.get(i);
             datos[i][0] = videojuego.getTitulo();
@@ -343,7 +337,6 @@ public class PnlVideojuegos extends JPanel {
             datos[i][2] = videojuego.getClasificacion();
             datos[i][3] = formatoMoneda(videojuego.getPrecioRenta());
             datos[i][4] = formatoMoneda(videojuego.getPrecioCompra());
-            datos[i][5] = String.valueOf(videojuego.getPuntos());
         }
         return datos;
     }
@@ -361,7 +354,6 @@ public class PnlVideojuegos extends JPanel {
         lblDetalleModo.setText("<html>Modo: " + obtenerModo(videojuego) + "</html>");
         lblDetalleRenta.setText("Renta: " + formatoMoneda(videojuego.getPrecioRenta()));
         lblDetalleCompra.setText("Venta: " + formatoMoneda(videojuego.getPrecioCompra()));
-        lblDetallePuntos.setText("Puntos: " + videojuego.getPuntos());
         lblDetalleStock.setText("Stock: " + videojuego.getStock());
         cargarImagenDetalle(videojuego.getImagenUrl());
     }
@@ -401,7 +393,6 @@ public class PnlVideojuegos extends JPanel {
             videojuego.getClasificacion(),
             formatoMoneda(videojuego.getPrecioRenta()),
             formatoMoneda(videojuego.getPrecioCompra()),
-            String.valueOf(videojuego.getPuntos()),
             videojuego.getImagenUrl() != null ? videojuego.getImagenUrl() : "",
             videojuego.getPlataforma(),
             videojuego.getAnioLanzamiento() > 0 ? String.valueOf(videojuego.getAnioLanzamiento()) : "",
@@ -443,7 +434,6 @@ public class PnlVideojuegos extends JPanel {
         lblDetalleModo.setText("");
         lblDetalleRenta.setText("");
         lblDetalleCompra.setText("");
-        lblDetallePuntos.setText("");
         lblDetalleStock.setText("");
         lblDetalleImagen.setIcon(null);
         lblDetalleImagen.setText("");

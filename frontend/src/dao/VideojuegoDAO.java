@@ -18,7 +18,7 @@ public class VideojuegoDAO {
             conn = ConexionBD.conectar();
 
             String sql = "SELECT id_videojuego, nombre, plataforma, genero, clasificacion, " +
-                         "anio_lanzamiento, precio_renta, precio_compra, stock, imagen, puntos " +
+                         "anio_lanzamiento, precio_renta, precio_compra, stock, imagen " +
                          "FROM videojuegos " +
                          "WHERE activo = TRUE " +
                          "ORDER BY nombre ASC";
@@ -51,7 +51,7 @@ public class VideojuegoDAO {
 
             int idNumerico = extraerIdNumerico(id);
             String sql = "SELECT id_videojuego, nombre, plataforma, genero, clasificacion, " +
-                         "anio_lanzamiento, precio_renta, precio_compra, stock, imagen, puntos " +
+                         "anio_lanzamiento, precio_renta, precio_compra, stock, imagen " +
                          "FROM videojuegos " +
                          "WHERE id_videojuego = ? AND activo = TRUE";
 
@@ -82,8 +82,8 @@ public class VideojuegoDAO {
             conn = ConexionBD.conectar();
 
             String sql = "INSERT INTO videojuegos (nombre, plataforma, genero, clasificacion, " +
-                         "anio_lanzamiento, precio_renta, precio_compra, stock, imagen, puntos) " +
-                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                         "anio_lanzamiento, precio_renta, precio_compra, stock, imagen) " +
+                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, videojuego.getTitulo());
@@ -95,7 +95,6 @@ public class VideojuegoDAO {
             ps.setDouble(7, videojuego.getPrecioCompra());
             ps.setInt(8, videojuego.getStock());
             ps.setString(9, emptyToNull(videojuego.getImagenUrl()));
-            ps.setInt(10, videojuego.getPuntos());
 
             int filasAfectadas = ps.executeUpdate();
             ps.close();
@@ -119,7 +118,7 @@ public class VideojuegoDAO {
             String sql = "UPDATE videojuegos " +
                          "SET nombre = ?, plataforma = ?, genero = ?, clasificacion = ?, " +
                          "    anio_lanzamiento = ?, precio_renta = ?, precio_compra = ?, " +
-                         "    stock = ?, imagen = ?, puntos = ? " +
+                         "    stock = ?, imagen = ? " +
                          "WHERE id_videojuego = ?";
 
             PreparedStatement ps = conn.prepareStatement(sql);
@@ -132,8 +131,7 @@ public class VideojuegoDAO {
             ps.setDouble(7, videojuego.getPrecioCompra());
             ps.setInt(8, videojuego.getStock());
             ps.setString(9, emptyToNull(videojuego.getImagenUrl()));
-            ps.setInt(10, videojuego.getPuntos());
-            ps.setInt(11, idNumerico);
+            ps.setInt(10, idNumerico);
 
             int filasAfectadas = ps.executeUpdate();
             ps.close();
@@ -183,7 +181,6 @@ public class VideojuegoDAO {
             rs.getInt("anio_lanzamiento"),
             rs.getDouble("precio_renta"),
             rs.getDouble("precio_compra"),
-            rs.getInt("puntos"),
             rs.getInt("stock"),
             rs.getString("imagen")
         );

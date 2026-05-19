@@ -61,7 +61,7 @@ public class OperacionDAO {
             String sql = "SELECT o.id_operacion, " +
                          "CONCAT(c.nombre, ' ', c.primer_apellido, COALESCE(CONCAT(' ', c.segundo_apellido), '')) AS cliente, " +
                          "c.correo_electronico, " +
-                         "v.nombre AS videojuego, v.plataforma, v.imagen, v.puntos, " +
+                         "v.nombre AS videojuego, v.plataforma, v.imagen, " +
                          "u.username AS usuario, " +
                          "o.tipo, o.monto, o.descuento, o.fecha_operacion, o.fecha_devolucion " +
                          "FROM operaciones o " +
@@ -78,6 +78,7 @@ public class OperacionDAO {
                 Date fechaDevolucion = rs.getDate("fecha_devolucion");
                 double monto = rs.getDouble("monto");
                 double descuento = rs.getDouble("descuento");
+                double total = calcularTotalOperacion(monto, descuento);
 
                 operaciones.add(new String[]{
                     rs.getString("cliente"),
@@ -86,7 +87,7 @@ public class OperacionDAO {
                     String.format("$%.2f", monto),
                     descuento > 0 ? String.format("$%.2f", descuento) : "N/A",
                     fechaOperacion != null ? fechaOperacion.toLocalDate().toString() : "N/A",
-                    String.valueOf(rs.getInt("puntos")),
+                    String.valueOf(calcularPuntosGanados(total)),
                     String.format("%05d", rs.getInt("id_operacion")),
                     fechaDevolucion != null ? fechaDevolucion.toLocalDate().toString() : "N/A",
                     "RENTA".equalsIgnoreCase(rs.getString("tipo")) ? "Activa" : "Completada",
@@ -248,6 +249,23 @@ public class OperacionDAO {
                 return false;
             }
 
+            // Paso 4: Sumar puntos automaticos al cliente por el total neto de la operacion.
+            int puntosGanados = calcularPuntosGanados(calcularTotalOperacion(operacion.getMonto(), operacion.getDescuento()));
+            String sqlPuntos = "UPDATE clientes SET puntos = COALESCE(puntos, 0) + ? WHERE id_cliente = ?";
+
+            PreparedStatement psPuntos = conn.prepareStatement(sqlPuntos);
+            psPuntos.setInt(1, puntosGanados);
+            psPuntos.setInt(2, operacion.getIdCliente());
+
+            int clientesActualizados = psPuntos.executeUpdate();
+            psPuntos.close();
+
+            if (clientesActualizados == 0) {
+                System.err.println("Error: La operacion no se completo porque no se actualizaron los puntos del cliente");
+                conn.rollback();
+                return false;
+            }
+
             conn.commit();
             return true;
 
@@ -379,6 +397,14 @@ public class OperacionDAO {
         ps.close();
 
         return stock;
+    }
+
+    public static int calcularPuntosGanados(double totalOperacion) {
+        return (int) (Math.max(0.0, totalOperacion) / 10);
+    }
+
+    private static double calcularTotalOperacion(double monto, double descuento) {
+        return Math.max(0.0, monto - descuento);
     }
 
     /**

@@ -22,7 +22,6 @@ public class DlgEdicionVideojuego extends JDialog {
     private JTextField txtRenta;
     private JTextField txtVenta;
     private JTextField txtStock;
-    private JTextField txtPuntos;
     private JTextField txtImagen;
 
     public DlgEdicionVideojuego(Ventana parent, VideojuegoInfo videojuego, Runnable onConfirm) {
@@ -82,7 +81,6 @@ public class DlgEdicionVideojuego extends JDialog {
         txtRenta = crearCampo(mainPanel, "Precio renta", colX, col3Y, 120);
         txtVenta = crearCampo(mainPanel, "Precio venta", colX + 140, col3Y, 120);
         txtStock = crearCampo(mainPanel, "Stock", colX + 280, col3Y, 90);
-        txtPuntos = crearCampo(mainPanel, "Puntos", colX, col4Y, 120);
         txtImagen = crearCampo(mainPanel, "Imagen/path", colX, col5Y, 300);
 
         cargarDatos(videojuego);
@@ -142,7 +140,6 @@ public class DlgEdicionVideojuego extends JDialog {
         txtRenta.setText(String.valueOf(videojuego.getPrecioRenta()));
         txtVenta.setText(String.valueOf(videojuego.getPrecioCompra()));
         txtStock.setText(String.valueOf(videojuego.getStock()));
-        txtPuntos.setText(String.valueOf(videojuego.getPuntos()));
         txtImagen.setText(videojuego.getImagenUrl() != null ? videojuego.getImagenUrl() : "");
         cargarImagen(videojuego.getImagenUrl());
     }
@@ -174,7 +171,6 @@ public class DlgEdicionVideojuego extends JDialog {
             double renta = parseDecimal(txtRenta.getText());
             double venta = parseDecimal(txtVenta.getText());
             int stock = parseEnteroRequerido(txtStock.getText());
-            int puntos = parseEnteroOpcional(txtPuntos.getText());
 
             return new VideojuegoInfo(
                 videojuegoOriginal.getId(),
@@ -185,12 +181,11 @@ public class DlgEdicionVideojuego extends JDialog {
                 anio,
                 renta,
                 venta,
-                puntos,
                 stock,
                 txtImagen.getText().trim()
             );
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Stock, precios, puntos y anio deben tener formato numerico valido.", "Datos invalidos", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Stock, precios y anio deben tener formato numerico valido.", "Datos invalidos", JOptionPane.WARNING_MESSAGE);
             return null;
         }
     }

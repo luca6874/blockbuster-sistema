@@ -17,7 +17,6 @@ public class DlgNuevaOperacion extends JDialog {
     private JComboBox<String> comboTipo;
     private JTextField txtMonto;
     private JTextField txtDescuento;
-    private JTextField txtPuntos;
     private JTextField txtFechaRenta;
     private JTextField txtFechaVencimiento;
     private VideojuegoInfo videojuegoSeleccionado;
@@ -129,24 +128,13 @@ public class DlgNuevaOperacion extends JDialog {
         txtDescuento.setBorder(new LineBorder(new Color(200, 200, 200), 1));
         mainPanel.add(txtDescuento);
 
-        // Puntos
-        JLabel lblPuntos = new JLabel("Puntos");
-        lblPuntos.setBounds(colX, col5Y, 100, 20);
-        lblPuntos.setFont(new Font("Arial", Font.BOLD, 11));
-        mainPanel.add(lblPuntos);
-        txtPuntos = new JTextField();
-        txtPuntos.setBounds(colX, col5Y + 20, 250, 30);
-        txtPuntos.setFont(new Font("Arial", Font.PLAIN, 12));
-        txtPuntos.setBorder(new LineBorder(new Color(200, 200, 200), 1));
-        mainPanel.add(txtPuntos);
-
         // Fecha Renta
         JLabel lblFechaRenta = new JLabel("Fecha Renta (DD/MM/YYYY)");
-        lblFechaRenta.setBounds(colX + 280, col5Y, 250, 20);
+        lblFechaRenta.setBounds(colX, col5Y, 250, 20);
         lblFechaRenta.setFont(new Font("Arial", Font.BOLD, 11));
         mainPanel.add(lblFechaRenta);
         txtFechaRenta = new JTextField();
-        txtFechaRenta.setBounds(colX + 280, col5Y + 20, 250, 30);
+        txtFechaRenta.setBounds(colX, col5Y + 20, 250, 30);
         txtFechaRenta.setFont(new Font("Arial", Font.PLAIN, 12));
         txtFechaRenta.setBorder(new LineBorder(new Color(200, 200, 200), 1));
         mainPanel.add(txtFechaRenta);

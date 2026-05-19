@@ -15,11 +15,10 @@ public class DlgEdicionOperacion extends JDialog {
     private static final int IDX_TIPO = 2;
     private static final int IDX_MONTO = 3;
     private static final int IDX_DESCUENTO = 4;
-    private static final int IDX_PUNTOS = 5;
-    private static final int IDX_ID = 6;
-    private static final int IDX_FECHA_RENTA = 7;
-    private static final int IDX_FECHA_VENCIMIENTO = 8;
-    private static final int IDX_ESTADO = 9;
+    private static final int IDX_ID = 5;
+    private static final int IDX_FECHA_RENTA = 6;
+    private static final int IDX_FECHA_VENCIMIENTO = 7;
+    private static final int IDX_ESTADO = 8;
 
     private JComboBox<String> comboCliente;
     private JComboBox<String> comboVideojuego;
@@ -27,7 +26,6 @@ public class DlgEdicionOperacion extends JDialog {
     private JComboBox<String> comboEstado;
     private JTextField txtMonto;
     private JTextField txtDescuento;
-    private JTextField txtPuntos;
     private JTextField txtFechaRenta;
     private JTextField txtFechaVencimiento;
     private final String[] datosOperacion;
@@ -134,37 +132,25 @@ public class DlgEdicionOperacion extends JDialog {
         txtDescuento.setText(datosOperacion[IDX_DESCUENTO]);
         mainPanel.add(txtDescuento);
 
-        JLabel lblPuntos = new JLabel("Puntos");
-        lblPuntos.setBounds(colX, col5Y, 100, 20);
-        lblPuntos.setFont(new Font("Arial", Font.BOLD, 11));
-        mainPanel.add(lblPuntos);
-
-        txtPuntos = new JTextField();
-        txtPuntos.setBounds(colX, col5Y + 20, 550, 30);
-        txtPuntos.setFont(new Font("Arial", Font.PLAIN, 12));
-        txtPuntos.setBorder(new LineBorder(new Color(200, 200, 200), 1));
-        txtPuntos.setText(datosOperacion[IDX_PUNTOS]);
-        mainPanel.add(txtPuntos);
-
         JLabel lblFechaRenta = new JLabel("Fecha Renta (DD/MM/YYYY)");
-        lblFechaRenta.setBounds(colX, col6Y, 250, 20);
+        lblFechaRenta.setBounds(colX, col5Y, 250, 20);
         lblFechaRenta.setFont(new Font("Arial", Font.BOLD, 11));
         mainPanel.add(lblFechaRenta);
 
         txtFechaRenta = new JTextField();
-        txtFechaRenta.setBounds(colX, col6Y + 20, 250, 30);
+        txtFechaRenta.setBounds(colX, col5Y + 20, 250, 30);
         txtFechaRenta.setFont(new Font("Arial", Font.PLAIN, 12));
         txtFechaRenta.setBorder(new LineBorder(new Color(200, 200, 200), 1));
         txtFechaRenta.setText(datosOperacion[IDX_FECHA_RENTA]);
         mainPanel.add(txtFechaRenta);
 
         JLabel lblFechaVencimiento = new JLabel("Fecha Vencimiento (DD/MM/YYYY)");
-        lblFechaVencimiento.setBounds(colX + 280, col6Y, 250, 20);
+        lblFechaVencimiento.setBounds(colX + 280, col5Y, 250, 20);
         lblFechaVencimiento.setFont(new Font("Arial", Font.BOLD, 11));
         mainPanel.add(lblFechaVencimiento);
 
         txtFechaVencimiento = new JTextField();
-        txtFechaVencimiento.setBounds(colX + 280, col6Y + 20, 250, 30);
+        txtFechaVencimiento.setBounds(colX + 280, col5Y + 20, 250, 30);
         txtFechaVencimiento.setFont(new Font("Arial", Font.PLAIN, 12));
         txtFechaVencimiento.setBorder(new LineBorder(new Color(200, 200, 200), 1));
         txtFechaVencimiento.setText(datosOperacion[IDX_FECHA_VENCIMIENTO]);
@@ -212,7 +198,6 @@ public class DlgEdicionOperacion extends JDialog {
         datosOperacion[IDX_TIPO] = (String) comboTipo.getSelectedItem();
         datosOperacion[IDX_MONTO] = txtMonto.getText();
         datosOperacion[IDX_DESCUENTO] = txtDescuento.getText();
-        datosOperacion[IDX_PUNTOS] = txtPuntos.getText();
         datosOperacion[IDX_FECHA_RENTA] = txtFechaRenta.getText();
         datosOperacion[IDX_FECHA_VENCIMIENTO] = txtFechaVencimiento.getText();
         datosOperacion[IDX_ESTADO] = (String) comboEstado.getSelectedItem();

@@ -9,7 +9,6 @@ public class VideojuegoInfo {
     private final int anioLanzamiento;
     private final double precioRenta;
     private final double precioCompra;
-    private final int puntos;
     private final int stock;
     private final String imagenUrl;
 
@@ -21,11 +20,10 @@ public class VideojuegoInfo {
         String clasificacion,
         double precioRenta,
         double precioCompra,
-        int puntos,
         int stock,
         String imagenUrl
     ) {
-        this(id, titulo, plataforma, genero, clasificacion, 0, precioRenta, precioCompra, puntos, stock, imagenUrl);
+        this(id, titulo, plataforma, genero, clasificacion, 0, precioRenta, precioCompra, stock, imagenUrl);
     }
 
     public VideojuegoInfo(
@@ -37,7 +35,6 @@ public class VideojuegoInfo {
         int anioLanzamiento,
         double precioRenta,
         double precioCompra,
-        int puntos,
         int stock,
         String imagenUrl
     ) {
@@ -49,7 +46,6 @@ public class VideojuegoInfo {
         this.anioLanzamiento = anioLanzamiento;
         this.precioRenta = precioRenta;
         this.precioCompra = precioCompra;
-        this.puntos = puntos;
         this.stock = stock;
         this.imagenUrl = imagenUrl;
     }
@@ -84,10 +80,6 @@ public class VideojuegoInfo {
 
     public double getPrecioCompra() {
         return precioCompra;
-    }
-
-    public int getPuntos() {
-        return puntos;
     }
 
     public int getStock() {

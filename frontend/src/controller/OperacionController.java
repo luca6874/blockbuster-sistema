@@ -19,6 +19,10 @@ public class OperacionController {
         return OperacionDAO.obtenerTodas();
     }
 
+    public static int calcularPuntosGanados(double totalOperacion) {
+        return OperacionDAO.calcularPuntosGanados(totalOperacion);
+    }
+
     /**
      * Guarda una nueva operación en la base de datos.
      *
@@ -26,6 +30,7 @@ public class OperacionController {
      * 1. Valida que el videojuego tenga stock disponible
      * 2. Inserta la operación en BD
      * 3. Actualiza el stock del videojuego
+     * 4. Suma puntos automaticos al cliente
      *
      * @param idCliente ID del cliente
      * @param idVideojuego ID del videojuego
@@ -84,7 +89,8 @@ public class OperacionController {
         boolean resultado = OperacionDAO.insertar(operacion);
 
         if (resultado) {
-            return "Exito: Operacion registrada correctamente. Stock actualizado.";
+            int puntosGanados = calcularPuntosGanados(monto - descuento);
+            return "Exito: Operacion registrada correctamente. Stock actualizado. Puntos ganados: " + puntosGanados + ".";
         } else {
             return "Error: No se pudo registrar la operacion.";
         }
