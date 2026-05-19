@@ -2,6 +2,7 @@ package frontend.src.view;
 
 import frontend.src.controller.Ventana;
 import frontend.src.controller.ClienteController;
+import frontend.src.dao.OperacionDAO;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -440,6 +441,7 @@ public class PnlResumenCliente extends JPanel {
     
     /**
      * Actualiza las estadísticas de juegos rentados, comprados, descuentos usados y puntos acumulados.
+     * Obtiene datos dinámicos del cliente seleccionado desde la base de datos.
      */
     private void actualizarEstadisticas() {
         if (clienteActual == null) {
@@ -451,12 +453,56 @@ public class PnlResumenCliente extends JPanel {
             return;
         }
         
-        // Actualizar puntos acumulados desde el cliente
-        if (lblDescFrecuencia != null) {
-            int puntos = clienteActual.getPuntos();
-            lblDescFrecuencia.setText(String.valueOf(puntos));
+        try {
+            // Obtener ID numérico real del cliente (ej: 3 de "CLI-003")
+            int clienteIdNumerico = clienteActual.getIdNumerico();
+            if (clienteIdNumerico <= 0) {
+                resetearEstadisticas();
+                return;
+            }
+            
+            // Actualizar juegos rentados desde operaciones
+            if (lblJuegosRentados != null) {
+                int rentados = OperacionDAO.contarJuegosRentados(clienteIdNumerico);
+                lblJuegosRentados.setText(String.valueOf(rentados));
+            }
+            
+            // Actualizar juegos comprados desde operaciones
+            if (lblJuegosComprados != null) {
+                int comprados = OperacionDAO.contarJuegosComprados(clienteIdNumerico);
+                lblJuegosComprados.setText(String.valueOf(comprados));
+            }
+            
+            // Actualizar puntos acumulados desde el cliente
+            if (lblDescFrecuencia != null) {
+                int puntos = clienteActual.getPuntos();
+                lblDescFrecuencia.setText(String.valueOf(puntos));
+            }
+            
+            // Nota: lblDescuentosUsados puede ser actualizado si existe un método en DAO para contar descuentos
+            // Por ahora se mantiene como está (puede ser mejorado en futuras versiones)
+            if (lblDescuentosUsados != null) {
+                // Mantener valor actual o implementar lógica de descuentos si es necesario
+                if (lblDescuentosUsados.getText().equals("")) {
+                    lblDescuentosUsados.setText("0");
+                }
+            }
+            
+        } catch (Exception e) {
+            System.err.println("Error al actualizar estadísticas: " + e.getMessage());
+            e.printStackTrace();
+            resetearEstadisticas();
         }
-        
+    }
+    
+    /**
+     * Reinicia las estadísticas a valores por defecto.
+     */
+    private void resetearEstadisticas() {
+        if (lblJuegosRentados != null) lblJuegosRentados.setText("0");
+        if (lblJuegosComprados != null) lblJuegosComprados.setText("0");
+        if (lblDescuentosUsados != null) lblDescuentosUsados.setText("0");
+        if (lblDescFrecuencia != null) lblDescFrecuencia.setText("0");
     }
 
     /**

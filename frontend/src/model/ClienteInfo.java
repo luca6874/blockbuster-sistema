@@ -38,6 +38,27 @@ public class ClienteInfo {
         return id;
     }
 
+    /**
+     * Obtiene el ID numérico del cliente desde el formato visual "CLI-XXX".
+     * Ejemplo: "CLI-003" retorna 3
+     * 
+     * @return ID numérico, o -1 si no se puede parsear
+     */
+    public int getIdNumerico() {
+        try {
+            if (id != null && id.contains("-")) {
+                // Formato: "CLI-003" -> extrae "003" -> retorna 3
+                return Integer.parseInt(id.split("-")[1]);
+            } else if (id != null) {
+                // Si no tiene guión, intenta parsear directamente
+                return Integer.parseInt(id);
+            }
+        } catch (Exception e) {
+            System.err.println("Error al parsear ID numerico: " + e.getMessage());
+        }
+        return -1;
+    }
+
     public String getNombre() {
         StringBuilder nombreCompleto = new StringBuilder(nombre != null ? nombre : "");
         if (primerApellido != null && !primerApellido.trim().isEmpty()) {

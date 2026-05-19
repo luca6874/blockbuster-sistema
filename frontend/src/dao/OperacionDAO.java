@@ -16,6 +16,9 @@ import java.util.List;
  * Maneja todas las operaciones de BD relacionadas con operaciones.
  * Incluye validación de stock y actualización de stock.
  * Usa PreparedStatement para seguridad.
+ * 
+ * 
+ * @param coso parametro de entrada y @return es el resultado esperado. <-- documentacion y ajá
  */
 public class OperacionDAO {
 
@@ -354,6 +357,82 @@ public class OperacionDAO {
             System.err.println("Error en eliminar operación: " + e.getMessage());
             e.printStackTrace();
             return false;
+        } finally {
+            ConexionBD.cerrar(conn);
+        }
+    }
+
+    /**
+     * Cuenta la cantidad de videojuegos rentados por un cliente.
+     * 
+     * @param idClienteNumerico ID numérico del cliente (ej: 3)
+     * @return Cantidad de juegos rentados, o 0 si no hay operaciones
+     */
+    public static int contarJuegosRentados(int idClienteNumerico) {
+        Connection conn = null;
+
+        try {
+            conn = ConexionBD.conectar();
+
+            String sql = "SELECT COUNT(*) as total FROM operaciones " +
+                         "WHERE id_cliente = ? AND UPPER(tipo) = 'RENTA'";
+
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1, idClienteNumerico);
+            ResultSet rs = ps.executeQuery();
+
+            int total = 0;
+            if (rs.next()) {
+                total = rs.getInt("total");
+            }
+
+            rs.close();
+            ps.close();
+
+            return total;
+
+        } catch (Exception e) {
+            System.err.println("Error en contarJuegosRentados: " + e.getMessage());
+            e.printStackTrace();
+            return 0;
+        } finally {
+            ConexionBD.cerrar(conn);
+        }
+    }
+
+    /**
+     * Cuenta la cantidad de videojuegos comprados por un cliente.
+     * 
+     * @param idClienteNumerico ID numérico del cliente (ej: 3)
+     * @return Cantidad de juegos comprados, o 0 si no hay operaciones
+     */
+    public static int contarJuegosComprados(int idClienteNumerico) {
+        Connection conn = null;
+
+        try {
+            conn = ConexionBD.conectar();
+
+            String sql = "SELECT COUNT(*) as total FROM operaciones " +
+                         "WHERE id_cliente = ? AND UPPER(tipo) = 'COMPRA'";
+
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1, idClienteNumerico);
+            ResultSet rs = ps.executeQuery();
+
+            int total = 0;
+            if (rs.next()) {
+                total = rs.getInt("total");
+            }
+
+            rs.close();
+            ps.close();
+
+            return total;
+
+        } catch (Exception e) {
+            System.err.println("Error en contarJuegosComprados: " + e.getMessage());
+            e.printStackTrace();
+            return 0;
         } finally {
             ConexionBD.cerrar(conn);
         }
