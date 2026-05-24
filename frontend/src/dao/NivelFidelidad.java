@@ -6,17 +6,11 @@ package frontend.src.dao;
  * Define las reglas de cálculo automático de niveles según puntos acumulados.
  * Todas las referencias a nombres de nivel deben pasar por aquí.
  * 
- * Niveles internos (Java): 1-4
+ * Niveles (1-4):
  * - 1: Bronce (0-499 puntos)
  * - 2: Plata (500-1499 puntos)
  * - 3: Oro (1500-2999 puntos)
  * - 4: Diamante (3000+ puntos)
- * 
- * Niveles BD (compatibilidad): 0-2
- * - 0: Bronce
- * - 1: Plata
- * - 2: Oro
- * (La BD no tiene Diamante todavía)
  */
 public class NivelFidelidad {
     
@@ -111,91 +105,6 @@ public class NivelFidelidad {
                 return new int[]{64, 224, 208};    // Diamante (turquesa)
             default:
                 return new int[]{205, 127, 50};    // Default: Bronce
-        }
-    }
-
-    // ============= MÉTODOS DE COMPATIBILIDAD CON BD (0-2) =============
-
-    /**
-     * Convierte nivel BD (0-2) a nivel interno (1-4).
-     * IMPORTANTE: Usa nombre del nivel para la conversión, no el número directo.
-     * 
-     * @param lvlBD nivel de BD (0-2)
-     * @return nivel interno (1-4)
-     */
-    public static int convertirDesdeBD(int lvlBD) {
-        String nombre = convertirNivelBDaNombre(lvlBD);
-        return convertirNombreANivel(nombre);
-    }
-
-    /**
-     * Convierte nivel interno (1-4) a nivel BD (0-2).
-     * 
-     * @param nivelInterno nivel interno (1-4)
-     * @return nivel BD (0-2), o 0 si es Diamante (no existe en BD aún)
-     */
-    public static int convertirABD(int nivelInterno) {
-        String nombre = obtenerNombreNivel(nivelInterno);
-        return convertirNombreANivelBD(nombre);
-    }
-
-    /**
-     * Convierte nivel BD (número) a nombre.
-     */
-    private static String convertirNivelBDaNombre(int lvlBD) {
-        switch (lvlBD) {
-            case 0:
-                return "Bronce";
-            case 1:
-                return "Plata";
-            case 2:
-                return "Oro";
-            default:
-                return "Bronce";
-        }
-    }
-
-    /**
-     * Convierte nombre a nivel BD.
-     */
-    private static int convertirNombreANivelBD(String nombre) {
-        if (nombre == null) {
-            return 0;
-        }
-        
-        switch (nombre) {
-            case "Bronce":
-                return 0;
-            case "Plata":
-                return 1;
-            case "Oro":
-                return 2;
-            case "Diamante":
-                return 2; // Diamante mapea a Oro por compatibilidad
-            default:
-                return 0;
-        }
-    }
-
-    /**
-     * Convierte nombre a nivel interno.
-     */
-    private static int convertirNombreANivel(String nombre) {
-        if (nombre == null) {
-            return NIVEL_BRONCE;
-        }
-        
-        switch (nombre) {
-            case "Bronce":
-                return NIVEL_BRONCE;
-            case "Plata":
-                return NIVEL_PLATA;
-            case "Oro":
-                return NIVEL_ORO;
-            case "Diamante":
-                return NIVEL_DIAMANTE;
-            default:
-                return NIVEL_BRONCE;
         }
     }
 }

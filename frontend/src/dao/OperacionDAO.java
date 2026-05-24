@@ -277,12 +277,11 @@ public class OperacionDAO {
             
             if (rsSelectPuntos.next()) {
                 int puntosActuales = rsSelectPuntos.getInt("puntos");
-                int nuevoNivelInterno = NivelFidelidad.calcularNivelFidelidad(puntosActuales);
-                int nuevoNivelBD = NivelFidelidad.convertirABD(nuevoNivelInterno);
+                int nuevoNivel = NivelFidelidad.calcularNivelFidelidad(puntosActuales);
                 
                 String sqlUpdateNivel = "UPDATE clientes SET lvl_fidelidad = ? WHERE id_cliente = ?";
                 PreparedStatement psUpdateNivel = conn.prepareStatement(sqlUpdateNivel);
-                psUpdateNivel.setInt(1, nuevoNivelBD);
+                psUpdateNivel.setInt(1, nuevoNivel);
                 psUpdateNivel.setInt(2, operacion.getIdCliente());
                 
                 int nivelActualizado = psUpdateNivel.executeUpdate();
@@ -294,7 +293,7 @@ public class OperacionDAO {
                 }
                 
                 System.out.println("Nivel de fidelidad recalculado: " + puntosActuales + " puntos -> Nivel " + 
-                                 NivelFidelidad.obtenerNombreNivel(nuevoNivelInterno));
+                                 NivelFidelidad.obtenerNombreNivel(nuevoNivel));
             }
             
             rsSelectPuntos.close();
