@@ -248,7 +248,7 @@ public class DlgEdicionCliente extends JDialog {
         clienteActualizado.setEmail(email);
         clienteActualizado.setTelefono(telefono);
         clienteActualizado.setFechaNacimiento(fechaNacimiento);
-        clienteActualizado.setNivel("Bronce");
+        // Nota: NO establecemos nivel aquí - se calcula automáticamente por puntos en OperacionDAO
 
         boolean exito = ClienteController.actualizarCliente(clienteActualizado);
 

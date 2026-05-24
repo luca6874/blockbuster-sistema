@@ -95,7 +95,8 @@ public class ClienteDAO {
         try {
             conn = ConexionBD.conectar();
 
-            int lvlFidelidad = obtenerLvlFidelidad(cliente.getNivel());
+            // Convertir nivel a formato BD (0-2)
+            int lvlFidelidadBD = NivelFidelidad.convertirABD(NivelFidelidad.NIVEL_BRONCE);
 
             String sql = "INSERT INTO clientes (nombre, primer_apellido, segundo_apellido, " +
                          "correo_electronico, fecha_nacimiento, telefono, lvl_fidelidad) " +
@@ -108,7 +109,7 @@ public class ClienteDAO {
             ps.setString(4, cliente.getEmail());
             setFechaNacimiento(ps, 5, cliente.getFechaNacimiento());
             ps.setString(6, emptyToNull(cliente.getTelefono()));
-            ps.setInt(7, lvlFidelidad);
+            ps.setInt(7, lvlFidelidadBD);
 
             int filasAfectadas = ps.executeUpdate();
             ps.close();
@@ -131,7 +132,10 @@ public class ClienteDAO {
             conn = ConexionBD.conectar();
 
             int idNumerico = Integer.parseInt(cliente.getId().replace("CLI-", ""));
-            int lvlFidelidad = obtenerLvlFidelidad(cliente.getNivel());
+            // Convertir nivel a formato BD (0-2) - obtener del objeto si tiene lvlFidelidad
+            int nivelInterno = cliente.getLvlFidelidad() > 0 ? cliente.getLvlFidelidad() : 
+                               NivelFidelidad.convertirDesdeBD(0);
+            int lvlFidelidadBD = NivelFidelidad.convertirABD(nivelInterno);
 
             String sql = "UPDATE clientes " +
                          "SET nombre = ?, primer_apellido = ?, segundo_apellido = ?, correo_electronico = ?, " +
@@ -145,7 +149,7 @@ public class ClienteDAO {
             ps.setString(4, cliente.getEmail());
             setFechaNacimiento(ps, 5, cliente.getFechaNacimiento());
             ps.setString(6, emptyToNull(cliente.getTelefono()));
-            ps.setInt(7, lvlFidelidad);
+            ps.setInt(7, lvlFidelidadBD);
             ps.setInt(8, idNumerico);
 
             int filasAfectadas = ps.executeUpdate();
@@ -199,8 +203,14 @@ public class ClienteDAO {
         cliente.setSegundoApellido(rs.getString("segundo_apellido"));
         cliente.setEmail(rs.getString("correo_electronico"));
         cliente.setEstatus("Activo");
-        cliente.setNivel(obtenerNivelFidelidad(rs.getInt("lvl_fidelidad")));
-        cliente.setFrecuente(rs.getInt("lvl_fidelidad") > 0);
+        
+        // Obtener lvl_fidelidad de BD y convertirlo a nivel interno
+        int lvlBD = rs.getInt("lvl_fidelidad");
+        int nivelInterno = NivelFidelidad.convertirDesdeBD(lvlBD);
+        cliente.setLvlFidelidad(nivelInterno);
+        cliente.setNivel(NivelFidelidad.obtenerNombreNivel(nivelInterno));
+        
+        cliente.setFrecuente(lvlBD > 0);
         cliente.setPuntos(rs.getInt("puntos"));
         cliente.setTelefono(rs.getString("telefono"));
 
@@ -210,27 +220,7 @@ public class ClienteDAO {
         return cliente;
     }
 
-    private static String obtenerNivelFidelidad(int lvl) {
-        switch (lvl) {
-            case 0: return "Bronce";
-            case 1: return "Plata";
-            case 2: return "Oro";
-            default: return "Bronce";
-        }
-    }
 
-    private static int obtenerLvlFidelidad(String nivel) {
-        if (nivel == null) {
-            return 0;
-        }
-
-        switch (nivel) {
-            case "Bronce": return 0;
-            case "Plata": return 1;
-            case "Oro": return 2;
-            default: return 0;
-        }
-    }
 
     private static String emptyToNull(String valor) {
         return valor == null || valor.trim().isEmpty() ? null : valor.trim();

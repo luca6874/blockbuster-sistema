@@ -16,6 +16,7 @@ public class ClienteInfo {
     private String telefono;
     private String fechaNacimiento;
     private int puntos;
+    private int lvlFidelidad;  // Nivel de fidelidad (1-4)
 
     // Constructor vacío (para DAO)
     public ClienteInfo() {
@@ -110,6 +111,10 @@ public class ClienteInfo {
         return puntos;
     }
 
+    public int getLvlFidelidad() {
+        return lvlFidelidad;
+    }
+
     // SETTERS (nuevos, no rompen nada)
     
     public void setId(String id) {
@@ -154,5 +159,9 @@ public class ClienteInfo {
 
     public void setPuntos(int puntos) {
         this.puntos = puntos;
+    }
+
+    public void setLvlFidelidad(int lvlFidelidad) {
+        this.lvlFidelidad = lvlFidelidad;
     }
 }

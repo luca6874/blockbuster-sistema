@@ -269,6 +269,37 @@ public class OperacionDAO {
                 return false;
             }
 
+            // Paso 5: Recalcular lvl_fidelidad automaticamente segun los nuevos puntos
+            String sqlRecalcularNivel = "SELECT puntos FROM clientes WHERE id_cliente = ?";
+            PreparedStatement psSelectPuntos = conn.prepareStatement(sqlRecalcularNivel);
+            psSelectPuntos.setInt(1, operacion.getIdCliente());
+            ResultSet rsSelectPuntos = psSelectPuntos.executeQuery();
+            
+            if (rsSelectPuntos.next()) {
+                int puntosActuales = rsSelectPuntos.getInt("puntos");
+                int nuevoNivelInterno = NivelFidelidad.calcularNivelFidelidad(puntosActuales);
+                int nuevoNivelBD = NivelFidelidad.convertirABD(nuevoNivelInterno);
+                
+                String sqlUpdateNivel = "UPDATE clientes SET lvl_fidelidad = ? WHERE id_cliente = ?";
+                PreparedStatement psUpdateNivel = conn.prepareStatement(sqlUpdateNivel);
+                psUpdateNivel.setInt(1, nuevoNivelBD);
+                psUpdateNivel.setInt(2, operacion.getIdCliente());
+                
+                int nivelActualizado = psUpdateNivel.executeUpdate();
+                psUpdateNivel.close();
+                
+                if (nivelActualizado == 0) {
+                    System.err.println("Advertencia: No se pudo actualizar el nivel de fidelidad");
+                    // No hacemos rollback aqui, solo advertencia
+                }
+                
+                System.out.println("Nivel de fidelidad recalculado: " + puntosActuales + " puntos -> Nivel " + 
+                                 NivelFidelidad.obtenerNombreNivel(nuevoNivelInterno));
+            }
+            
+            rsSelectPuntos.close();
+            psSelectPuntos.close();
+
             conn.commit();
             return true;
 

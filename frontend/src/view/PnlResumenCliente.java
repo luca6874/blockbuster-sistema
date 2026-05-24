@@ -538,11 +538,19 @@ public class PnlResumenCliente extends JPanel {
             }
         }
         
-        // Actualizar badge de frecuencia
+        // Actualizar badge de frecuencia / nivel de fidelidad
         if (badgeFrecuente != null) {
             if (clienteActual.isFrecuente()) {
+                // Mostrar el nombre del nivel de fidelidad dinámicamente
+                String nombreNivel = frontend.src.dao.NivelFidelidad.obtenerNombreNivel(clienteActual.getLvlFidelidad());
                 badgeFrecuente.setVisible(true);
-                badgeFrecuente.setText("Cliente frecuente");
+                badgeFrecuente.setText("Nivel: " + nombreNivel);
+                
+                // Cambiar color según el nivel
+                int[] colorNivel = frontend.src.dao.NivelFidelidad.obtenerColorNivel(clienteActual.getLvlFidelidad());
+                Color bgColor = new Color(colorNivel[0], colorNivel[1], colorNivel[2]);
+                badgeFrecuente.setBackground(bgColor);
+                badgeFrecuente.setForeground(Color.WHITE);
             } else {
                 badgeFrecuente.setVisible(false);
             }

@@ -516,7 +516,7 @@ public class PnlGestionClientes extends JPanel {
             } else {
                 JOptionPane.showMessageDialog(
                     this,
-                   "Este cliente no puede eliminarse porque tiene operaciones registradas.",
+                  "Este cliente no puede eliminarse porque tiene operaciones registradas.",
                     "Error",
                     JOptionPane.ERROR_MESSAGE
                 );
