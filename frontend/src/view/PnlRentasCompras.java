@@ -41,6 +41,7 @@ public class PnlRentasCompras extends JPanel {
     private JTable tablaOperaciones;
     private JTextField txtBuscarCliente;
     private JTextField txtBuscarVideojuego;
+    private JComboBox<String> comboPlataforma;
     private JComboBox<String> comboTipo;
     private JLabel lblTituloTabla;
     private JLabel lblDetalleID;
@@ -60,8 +61,9 @@ public class PnlRentasCompras extends JPanel {
     private JLabel lblDetalleTotal;
     private JLabel lblDetallePuntos;
     private JButton btnDescargar;
-    private List<String[]> datosOperaciones;
-    private int filaSeleccionada = 0;
+    private List<String[]> datosOperaciones = new ArrayList<>();
+    private List<String[]> datosOperacionesFiltradas = new ArrayList<>();
+    private int filaSeleccionada = -1;
 
     public PnlRentasCompras(ViewDashboard parent) {
         this.parent = parent;
@@ -110,6 +112,8 @@ public class PnlRentasCompras extends JPanel {
         txtBuscarCliente.setBorder(new LineBorder(new Color(200, 200, 200), 1, true));
         txtBuscarCliente.setBackground(Color.WHITE);
         txtBuscarCliente.setFont(new Font("Arial", Font.PLAIN, 12));
+        txtBuscarCliente.setForeground(new Color(150, 150, 150));
+        configurarPlaceholder(txtBuscarCliente, "Buscar por cliente...");
         panel.add(txtBuscarCliente);
 
         txtBuscarVideojuego = new JTextField("Buscar por videojuego...");
@@ -117,6 +121,8 @@ public class PnlRentasCompras extends JPanel {
         txtBuscarVideojuego.setBorder(new LineBorder(new Color(200, 200, 200), 1, true));
         txtBuscarVideojuego.setBackground(Color.WHITE);
         txtBuscarVideojuego.setFont(new Font("Arial", Font.PLAIN, 12));
+        txtBuscarVideojuego.setForeground(new Color(150, 150, 150));
+        configurarPlaceholder(txtBuscarVideojuego, "Buscar por videojuego...");
         panel.add(txtBuscarVideojuego);
 
         JLabel lblPlataforma = new JLabel("Plataforma:");
@@ -124,8 +130,8 @@ public class PnlRentasCompras extends JPanel {
         lblPlataforma.setFont(new Font("Arial", Font.PLAIN, 12));
         panel.add(lblPlataforma);
 
-        String[] plataformas = {"Todos","Xbox 360", "SWITCH", "PS4", "Xbox ONE", "SWITCH 2", "PS5"};
-        JComboBox<String> comboPlataforma = new JComboBox<>(plataformas);
+        String[] plataformas = {"Todos", "Xbox", "PlayStation", "Switch", "Xbox 360", "Xbox ONE", "SWITCH", "SWITCH 2", "PS4", "PS5"};
+        comboPlataforma = new JComboBox<>(plataformas);
         comboPlataforma.setBounds(425, 10, 110, 30);
         comboPlataforma.setBackground(Color.WHITE);
         panel.add(comboPlataforma);
@@ -135,7 +141,7 @@ public class PnlRentasCompras extends JPanel {
         chkOperacion.setOpaque(false);
         panel.add(chkOperacion);
 
-        String[] opcionesOperacion = {"Ambos", "Renta", "Venta"};
+        String[] opcionesOperacion = {"Ambos", "Renta", "Compra"};
         comboTipo = new JComboBox<>(opcionesOperacion);
         comboTipo.setBounds(575, 10, 90, 30);
         comboTipo.setBorder(new LineBorder(new Color(200, 200, 200), 1));
@@ -152,6 +158,11 @@ public class PnlRentasCompras extends JPanel {
         btnNuevaOperacion.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnNuevaOperacion.addActionListener(e -> parent.mostrarNuevaOperacion());
         panel.add(btnNuevaOperacion);
+
+        registrarFiltradoTexto(txtBuscarCliente);
+        registrarFiltradoTexto(txtBuscarVideojuego);
+        comboPlataforma.addActionListener(e -> filtrarOperaciones());
+        comboTipo.addActionListener(e -> filtrarOperaciones());
 
         return panel;
     }
@@ -397,6 +408,7 @@ public class PnlRentasCompras extends JPanel {
     private void initTablaOperaciones() {
         String[] columnas = {"Cliente", "Videojuego", "Tipo", "Monto", "Descuento", "Fecha"};
         datosOperaciones = new ArrayList<>(OperacionController.obtenerTodas());
+        datosOperacionesFiltradas = new ArrayList<>(datosOperaciones);
 
         DefaultTableModel modelo = new DefaultTableModel(crearFilasTabla(), columnas) {
             @Override
@@ -440,18 +452,20 @@ public class PnlRentasCompras extends JPanel {
             }
         });
 
-        if (!datosOperaciones.isEmpty()) {
+        if (!datosOperacionesFiltradas.isEmpty() && tablaOperaciones.getRowCount() > 0) {
+            filaSeleccionada = 0;
             tablaOperaciones.setRowSelectionInterval(0, 0);
             mostrarDetalle(0);
         } else {
+            filaSeleccionada = -1;
             limpiarDetalle();
         }
     }
 
     private String[][] crearFilasTabla() {
-        String[][] filas = new String[datosOperaciones.size()][6];
-        for (int i = 0; i < datosOperaciones.size(); i++) {
-            String[] datos = datosOperaciones.get(i);
+        String[][] filas = new String[datosOperacionesFiltradas.size()][6];
+        for (int i = 0; i < datosOperacionesFiltradas.size(); i++) {
+            String[] datos = datosOperacionesFiltradas.get(i);
             filas[i][0] = datos[IDX_CLIENTE];
             filas[i][1] = datos[IDX_VIDEOJUEGO];
             filas[i][2] = datos[IDX_TIPO];
@@ -467,12 +481,13 @@ public class PnlRentasCompras extends JPanel {
             return;
         }
 
-        if (fila < 0 || fila >= datosOperaciones.size()) {
+        if (fila < 0 || fila >= datosOperacionesFiltradas.size()) {
             limpiarDetalle();
             return;
         }
 
-        String[] datos = datosOperaciones.get(fila);
+        filaSeleccionada = fila;
+        String[] datos = datosOperacionesFiltradas.get(fila);
         String cliente = datos[IDX_CLIENTE];
         String videojuego = datos[IDX_VIDEOJUEGO];
         String[] juegoInfo = resolverFichaJuego(datos);
@@ -578,33 +593,201 @@ public class PnlRentasCompras extends JPanel {
             && btnDescargar != null;
     }
 
-    private void eliminarOperacionSeleccionada() {
-        if (filaSeleccionada < 0 || filaSeleccionada >= datosOperaciones.size()) {
+    private void filtrarOperaciones() {
+        String textoCliente = obtenerTextoBusqueda(txtBuscarCliente, "Buscar por cliente...");
+        String textoVideojuego = obtenerTextoBusqueda(txtBuscarVideojuego, "Buscar por videojuego...");
+        String plataformaSeleccionada = obtenerValorCombo(comboPlataforma);
+        String tipoSeleccionado = obtenerValorCombo(comboTipo);
+        String idSeleccionado = filaSeleccionada >= 0 && filaSeleccionada < datosOperacionesFiltradas.size()
+            ? valorIndice(datosOperacionesFiltradas.get(filaSeleccionada), IDX_ID)
+            : "";
+
+        datosOperacionesFiltradas = new ArrayList<>();
+
+        for (String[] operacion : datosOperaciones) {
+            boolean coincideCliente = textoCliente.isEmpty()
+                || normalizar(valorIndice(operacion, IDX_CLIENTE)).contains(textoCliente);
+            boolean coincideVideojuego = textoVideojuego.isEmpty()
+                || normalizar(valorIndice(operacion, IDX_VIDEOJUEGO)).contains(textoVideojuego);
+            boolean coincidePlataforma = coincidePlataforma(valorIndice(operacion, IDX_PLATAFORMA), plataformaSeleccionada);
+            boolean coincideTipo = coincideTipo(valorIndice(operacion, IDX_TIPO), tipoSeleccionado);
+
+            if (coincideCliente && coincideVideojuego && coincidePlataforma && coincideTipo) {
+                datosOperacionesFiltradas.add(operacion);
+            }
+        }
+
+        if (tablaOperaciones == null) {
             return;
         }
 
-        datosOperaciones.remove(filaSeleccionada);
         DefaultTableModel modelo = (DefaultTableModel) tablaOperaciones.getModel();
-        modelo.removeRow(filaSeleccionada);
+        modelo.setDataVector(crearFilasTabla(), new String[]{"Cliente", "Videojuego", "Tipo", "Monto", "Descuento", "Fecha"});
+        configurarColumnasTabla();
         actualizarTituloTabla();
 
-        if (datosOperaciones.isEmpty()) {
+        if (datosOperacionesFiltradas.isEmpty()) {
             filaSeleccionada = -1;
             limpiarDetalle();
             return;
         }
 
-        if (filaSeleccionada >= datosOperaciones.size()) {
-            filaSeleccionada = datosOperaciones.size() - 1;
+        int nuevaFila = buscarFilaPorId(idSeleccionado);
+        if (nuevaFila < 0) {
+            nuevaFila = Math.min(Math.max(filaSeleccionada, 0), datosOperacionesFiltradas.size() - 1);
         }
 
-        tablaOperaciones.setRowSelectionInterval(filaSeleccionada, filaSeleccionada);
-        mostrarDetalle(filaSeleccionada);
+        mostrarDetalle(nuevaFila);
+        if (tablaOperaciones.getRowCount() > 0 && nuevaFila < tablaOperaciones.getRowCount()) {
+            tablaOperaciones.setRowSelectionInterval(nuevaFila, nuevaFila);
+        }
+    }
+
+    private void configurarColumnasTabla() {
+        tablaOperaciones.getColumnModel().getColumn(0).setPreferredWidth(150);
+        tablaOperaciones.getColumnModel().getColumn(1).setPreferredWidth(185);
+        tablaOperaciones.getColumnModel().getColumn(2).setPreferredWidth(70);
+        tablaOperaciones.getColumnModel().getColumn(3).setPreferredWidth(80);
+        tablaOperaciones.getColumnModel().getColumn(4).setPreferredWidth(70);
+        tablaOperaciones.getColumnModel().getColumn(5).setPreferredWidth(85);
+    }
+
+    private int buscarFilaPorId(String idOperacion) {
+        if (idOperacion == null || idOperacion.trim().isEmpty()) {
+            return -1;
+        }
+
+        for (int i = 0; i < datosOperacionesFiltradas.size(); i++) {
+            if (idOperacion.equals(valorIndice(datosOperacionesFiltradas.get(i), IDX_ID))) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private void configurarPlaceholder(JTextField campo, String placeholder) {
+        campo.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
+            public void focusGained(java.awt.event.FocusEvent e) {
+                if (placeholder.equals(campo.getText())) {
+                    campo.setText("");
+                    campo.setForeground(Color.BLACK);
+                }
+            }
+
+            @Override
+            public void focusLost(java.awt.event.FocusEvent e) {
+                if (campo.getText().trim().isEmpty()) {
+                    campo.setText(placeholder);
+                    campo.setForeground(new Color(150, 150, 150));
+                }
+            }
+        });
+    }
+
+    private void registrarFiltradoTexto(JTextField campo) {
+        campo.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            @Override
+            public void insertUpdate(javax.swing.event.DocumentEvent e) {
+                filtrarOperaciones();
+            }
+
+            @Override
+            public void removeUpdate(javax.swing.event.DocumentEvent e) {
+                filtrarOperaciones();
+            }
+
+            @Override
+            public void changedUpdate(javax.swing.event.DocumentEvent e) {
+                filtrarOperaciones();
+            }
+        });
+    }
+
+    private String obtenerTextoBusqueda(JTextField campo, String placeholder) {
+        String texto = campo == null ? "" : campo.getText();
+        if (texto == null || placeholder.equals(texto)) {
+            return "";
+        }
+        return normalizar(texto);
+    }
+
+    private String obtenerValorCombo(JComboBox<String> combo) {
+        Object seleccionado = combo == null ? null : combo.getSelectedItem();
+        return seleccionado == null ? "" : seleccionado.toString().trim();
+    }
+
+    private boolean coincideTipo(String tipoOperacion, String tipoSeleccionado) {
+        String filtro = tipoSeleccionado == null ? "" : tipoSeleccionado.trim();
+        if (filtro.isEmpty() || "Ambos".equalsIgnoreCase(filtro)) {
+            return true;
+        }
+
+        String tipo = tipoOperacion == null ? "" : tipoOperacion.trim();
+        if ("Compra".equalsIgnoreCase(filtro) || "Venta".equalsIgnoreCase(filtro)) {
+            return "COMPRA".equalsIgnoreCase(tipo) || "VENTA".equalsIgnoreCase(tipo);
+        }
+        return tipo.equalsIgnoreCase(filtro);
+    }
+
+    private boolean coincidePlataforma(String plataformaOperacion, String plataformaSeleccionada) {
+        String filtro = plataformaSeleccionada == null ? "" : plataformaSeleccionada.trim();
+        if (filtro.isEmpty() || "Todos".equalsIgnoreCase(filtro)) {
+            return true;
+        }
+
+        String plataforma = plataformaOperacion == null ? "" : plataformaOperacion.trim();
+        if (plataforma.isEmpty()) {
+            return false;
+        }
+
+        String plataformaNormalizada = normalizar(plataforma);
+        String filtroNormalizado = normalizar(filtro);
+
+        if (plataformaNormalizada.equals(filtroNormalizado)) {
+            return true;
+        }
+        if ("xbox".equals(filtroNormalizado)) {
+            return plataformaNormalizada.contains("xbox");
+        }
+        if ("playstation".equals(filtroNormalizado)) {
+            return plataformaNormalizada.contains("playstation") || plataformaNormalizada.matches("ps\\s*\\d+");
+        }
+        if ("switch".equals(filtroNormalizado)) {
+            return plataformaNormalizada.contains("switch");
+        }
+
+        return false;
+    }
+
+    private String normalizar(String texto) {
+        if (texto == null) {
+            return "";
+        }
+        return texto.trim().toLowerCase(Locale.ROOT);
+    }
+
+    private String valorIndice(String[] datos, int indice) {
+        if (datos == null || indice < 0 || indice >= datos.length || datos[indice] == null) {
+            return "";
+        }
+        return datos[indice].trim();
+    }
+
+    private void eliminarOperacionSeleccionada() {
+        if (filaSeleccionada < 0 || filaSeleccionada >= datosOperacionesFiltradas.size()) {
+            return;
+        }
+
+        String idOperacion = valorIndice(datosOperacionesFiltradas.get(filaSeleccionada), IDX_ID);
+        datosOperaciones.removeIf(datos -> valorIndice(datos, IDX_ID).equals(idOperacion));
+        filtrarOperaciones();
+
     }
 
     private void actualizarTituloTabla() {
         if (lblTituloTabla != null) {
-            int total = datosOperaciones == null ? 0 : datosOperaciones.size();
+            int total = datosOperacionesFiltradas == null ? 0 : datosOperacionesFiltradas.size();
             lblTituloTabla.setText("Listado de Rentas y Compras (" + total + ")");
         }
     }
