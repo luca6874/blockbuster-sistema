@@ -115,7 +115,7 @@ public class PnlVideojuegos extends JPanel {
         lblPlataforma.setFont(new Font("Arial", Font.BOLD, 12));
         panel.add(lblPlataforma);
 
-        comboPlataforma = new JComboBox<>(new String[]{"Todos", "Xbox 360", "SWITCH", "PS4", "Xbox ONE", "SWITCH 2", "PS5"});
+        comboPlataforma = new JComboBox<>(new String[]{"Todos", "Xbox", "PlayStation", "Switch", "Xbox 360", "Xbox ONE", "SWITCH", "SWITCH 2", "PS4", "PS5"});
         comboPlataforma.setBounds(450, 10, 120, 30);
         comboPlataforma.setBorder(new LineBorder(new Color(200, 200, 200), 1));
         comboPlataforma.setBackground(Color.WHITE);
@@ -489,9 +489,9 @@ public class PnlVideojuegos extends JPanel {
      */
     private void filtrarVideojuegos() {
         // Obtener criterios de filtrado
-        String textoBusqueda = txtBuscar.getText().trim().toLowerCase();
-        String plataformaSeleccionada = (String) comboPlataforma.getSelectedItem();
-        String estadoSeleccionado = (String) comboEstado.getSelectedItem();
+        String textoBusqueda = obtenerTextoBusqueda();
+        String plataformaSeleccionada = obtenerValorCombo(comboPlataforma);
+        String estadoSeleccionado = obtenerValorCombo(comboEstado);
         
         // Crear lista de videojuegos filtrados
         datosVideosjuegosFiltrados = new ArrayList<>();
@@ -500,8 +500,8 @@ public class PnlVideojuegos extends JPanel {
             // Filtro 1: Búsqueda textual (nombre, género, año)
             boolean coincideBusqueda = true;
             if (!textoBusqueda.isEmpty()) {
-                String titulo = videojuego.getTitulo().toLowerCase();
-                String genero = (videojuego.getGenero() != null ? videojuego.getGenero().toLowerCase() : "");
+                String titulo = videojuego.getTitulo() != null ? videojuego.getTitulo().trim().toLowerCase() : "";
+                String genero = videojuego.getGenero() != null ? videojuego.getGenero().trim().toLowerCase() : "";
                 String anio = String.valueOf(videojuego.getAnioLanzamiento());
                 
                 coincideBusqueda = titulo.contains(textoBusqueda) || 
@@ -510,19 +510,15 @@ public class PnlVideojuegos extends JPanel {
             }
             
             // Filtro 2: Plataforma
-            boolean coincidePlataforma = true;
-            if (!"Todos".equals(plataformaSeleccionada)) {
-                String plataformaVideojuego = videojuego.getPlataforma() != null ? videojuego.getPlataforma() : "";
-                coincidePlataforma = plataformaVideojuego.equalsIgnoreCase(plataformaSeleccionada);
-            }
+            boolean coincidePlataforma = coincidePlataforma(videojuego.getPlataforma(), plataformaSeleccionada);
             
             // Filtro 3: Estado (disponible/agotado)
             boolean coincideEstado = true;
-            if (!"Ambos".equals(estadoSeleccionado)) {
+            if (!"Ambos".equalsIgnoreCase(estadoSeleccionado)) {
                 boolean estaDisponible = videojuego.getStock() > 0;
-                if ("Disponible".equals(estadoSeleccionado)) {
+                if ("Disponible".equalsIgnoreCase(estadoSeleccionado)) {
                     coincideEstado = estaDisponible;
-                } else if ("Agotado".equals(estadoSeleccionado)) {
+                } else if ("Agotado".equalsIgnoreCase(estadoSeleccionado)) {
                     coincideEstado = !estaDisponible;
                 }
             }
@@ -562,6 +558,49 @@ public class PnlVideojuegos extends JPanel {
                 tablaVideojuegos.setRowSelectionInterval(nuevaFila, nuevaFila);
             }
         }
+    }
+
+    private String obtenerTextoBusqueda() {
+        String texto = txtBuscar.getText();
+        if (texto == null || "Buscar por nombre, genero, anio...".equals(texto)) {
+            return "";
+        }
+        return texto.trim().toLowerCase();
+    }
+
+    private String obtenerValorCombo(JComboBox<String> combo) {
+        Object seleccionado = combo.getSelectedItem();
+        return seleccionado == null ? "" : seleccionado.toString().trim();
+    }
+
+    private boolean coincidePlataforma(String plataformaVideojuego, String plataformaSeleccionada) {
+        String filtro = plataformaSeleccionada == null ? "" : plataformaSeleccionada.trim();
+        if (filtro.isEmpty() || "Todos".equalsIgnoreCase(filtro)) {
+            return true;
+        }
+
+        String plataforma = plataformaVideojuego == null ? "" : plataformaVideojuego.trim();
+        if (plataforma.isEmpty()) {
+            return false;
+        }
+
+        String plataformaNormalizada = plataforma.toLowerCase();
+        String filtroNormalizado = filtro.toLowerCase();
+
+        if (plataformaNormalizada.equals(filtroNormalizado)) {
+            return true;
+        }
+        if ("xbox".equals(filtroNormalizado)) {
+            return plataformaNormalizada.contains("xbox");
+        }
+        if ("playstation".equals(filtroNormalizado)) {
+            return plataformaNormalizada.contains("playstation") || plataformaNormalizada.matches("ps\\s*\\d+");
+        }
+        if ("switch".equals(filtroNormalizado)) {
+            return plataformaNormalizada.contains("switch");
+        }
+
+        return false;
     }
 
     private class TituloTableRenderer extends JPanel implements TableCellRenderer {
