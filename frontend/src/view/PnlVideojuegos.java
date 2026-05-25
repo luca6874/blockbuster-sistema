@@ -24,6 +24,7 @@ public class PnlVideojuegos extends JPanel {
     private JTable tablaVideojuegos;
     private JTextField txtBuscar;
     private JComboBox<String> comboPlataforma;
+    private JComboBox<String> comboEstado;
     private JLabel lblTituloTabla;
     private JLabel lblDetalleTitulo;
     private JLabel lblDetallePlataforma;
@@ -36,6 +37,7 @@ public class PnlVideojuegos extends JPanel {
     private JLabel lblDetalleStock;
     private JLabel lblDetalleImagen;
     private List<VideojuegoInfo> datosVideojuegos = new ArrayList<>();
+    private List<VideojuegoInfo> datosVideosjuegosFiltrados = new ArrayList<>();
     private int filaSeleccionada = -1;
 
     public PnlVideojuegos(ViewDashboard parent) {
@@ -85,6 +87,27 @@ public class PnlVideojuegos extends JPanel {
         txtBuscar.setBorder(new LineBorder(new Color(200, 200, 200), 1, true));
         txtBuscar.setBackground(Color.WHITE);
         txtBuscar.setFont(new Font("Arial", Font.PLAIN, 12));
+        txtBuscar.setForeground(new Color(150, 150, 150)); // Gris para placeholder
+        
+        // Listener para placeholder
+        txtBuscar.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
+            public void focusGained(java.awt.event.FocusEvent e) {
+                if (txtBuscar.getText().equals("Buscar por nombre, genero, anio...")) {
+                    txtBuscar.setText("");
+                    txtBuscar.setForeground(Color.BLACK);
+                }
+            }
+
+            @Override
+            public void focusLost(java.awt.event.FocusEvent e) {
+                if (txtBuscar.getText().isEmpty()) {
+                    txtBuscar.setText("Buscar por nombre, genero, anio...");
+                    txtBuscar.setForeground(new Color(150, 150, 150));
+                }
+            }
+        });
+        
         panel.add(txtBuscar);
 
         JLabel lblPlataforma = new JLabel("Plataforma:");
@@ -104,7 +127,7 @@ public class PnlVideojuegos extends JPanel {
         chkFiltro.setBackground(Ventana.CARD_WHITE);
         panel.add(chkFiltro);
 
-        JComboBox<String> comboEstado = new JComboBox<>(new String[]{"Ambos", "Disponible", "Agotado"});
+        comboEstado = new JComboBox<>(new String[]{"Ambos", "Disponible", "Agotado"});
         comboEstado.setBounds(610, 10, 120, 30);
         comboEstado.setBorder(new LineBorder(new Color(200, 200, 200), 1));
         comboEstado.setBackground(Color.WHITE);
@@ -123,6 +146,17 @@ public class PnlVideojuegos extends JPanel {
             new DlgAgregarVideojuego(parent.getHost(), this::refrescarTabla).setVisible(true);
         });
         panel.add(btnAgregar);
+
+        // Agregar listeners para filtrado dinámico
+        txtBuscar.addKeyListener(new java.awt.event.KeyAdapter() {
+            @Override
+            public void keyReleased(java.awt.event.KeyEvent e) {
+                filtrarVideojuegos();
+            }
+        });
+
+        comboPlataforma.addActionListener(e -> filtrarVideojuegos());
+        comboEstado.addActionListener(e -> filtrarVideojuegos());
 
         return panel;
     }
@@ -254,6 +288,9 @@ public class PnlVideojuegos extends JPanel {
         String[] columnas = {"Titulo", "Genero", "Clasificacion", "Renta", "Compra"};
 
         datosVideojuegos = VideojuegoController.traerVideojuegosDeBD();
+        // Inicializar lista filtrada con todos los datos al inicio
+        datosVideosjuegosFiltrados = new ArrayList<>(datosVideojuegos);
+        
         if (lblTituloTabla != null) {
             lblTituloTabla.setText("Listado de videojuegos (" + datosVideojuegos.size() + ")");
         }
@@ -295,43 +332,29 @@ public class PnlVideojuegos extends JPanel {
         header.setPreferredSize(new Dimension(0, 40));
         header.setReorderingAllowed(false);
 
-        if (datosVideojuegos.isEmpty()) {
+        if (datosVideosjuegosFiltrados.isEmpty()) {
             limpiarDetalle();
         } else {
             mostrarDetalle(0);
-            tablaVideojuegos.setRowSelectionInterval(0, 0);
+            // Validar que la tabla tiene filas antes de seleccionar
+            if (tablaVideojuegos.getRowCount() > 0) {
+                tablaVideojuegos.setRowSelectionInterval(0, 0);
+            }
         }
     }
 
     public void refrescarTabla() {
         datosVideojuegos = VideojuegoController.traerVideojuegosDeBD();
-        DefaultTableModel modelo = (DefaultTableModel) tablaVideojuegos.getModel();
-        modelo.setDataVector(convertirVideojuegosAArray(), new String[]{"Titulo", "Genero", "Clasificacion", "Renta", "Compra"});
-        tablaVideojuegos.getColumnModel().getColumn(0).setPreferredWidth(180);
-        tablaVideojuegos.getColumnModel().getColumn(0).setCellRenderer(new TituloTableRenderer());
-        tablaVideojuegos.getColumnModel().getColumn(1).setPreferredWidth(100);
-        tablaVideojuegos.getColumnModel().getColumn(2).setPreferredWidth(90);
-        tablaVideojuegos.getColumnModel().getColumn(3).setPreferredWidth(70);
-        tablaVideojuegos.getColumnModel().getColumn(4).setPreferredWidth(70);
-
-        if (lblTituloTabla != null) {
-            lblTituloTabla.setText("Listado de videojuegos (" + datosVideojuegos.size() + ")");
-        }
-
-        if (datosVideojuegos.isEmpty()) {
-            filaSeleccionada = -1;
-            limpiarDetalle();
-        } else {
-            int nuevaFila = Math.min(Math.max(filaSeleccionada, 0), datosVideojuegos.size() - 1);
-            mostrarDetalle(nuevaFila);
-            tablaVideojuegos.setRowSelectionInterval(nuevaFila, nuevaFila);
-        }
+        filaSeleccionada = -1;
+        
+        // Aplicar filtros después de cargar datos
+        filtrarVideojuegos();
     }
 
     private Object[][] convertirVideojuegosAArray() {
-        Object[][] datos = new Object[datosVideojuegos.size()][5];
-        for (int i = 0; i < datosVideojuegos.size(); i++) {
-            VideojuegoInfo videojuego = datosVideojuegos.get(i);
+        Object[][] datos = new Object[datosVideosjuegosFiltrados.size()][5];
+        for (int i = 0; i < datosVideosjuegosFiltrados.size(); i++) {
+            VideojuegoInfo videojuego = datosVideosjuegosFiltrados.get(i);
             datos[i][0] = videojuego.getTitulo();
             datos[i][1] = videojuego.getGenero();
             datos[i][2] = videojuego.getClasificacion();
@@ -342,9 +365,9 @@ public class PnlVideojuegos extends JPanel {
     }
 
     private void mostrarDetalle(int row) {
-        if (row < 0 || row >= datosVideojuegos.size()) return;
+        if (row < 0 || row >= datosVideosjuegosFiltrados.size()) return;
         filaSeleccionada = row;
-        VideojuegoInfo videojuego = datosVideojuegos.get(row);
+        VideojuegoInfo videojuego = datosVideosjuegosFiltrados.get(row);
 
         lblDetalleTitulo.setText("<html><b>" + videojuego.getTitulo() + "</b></html>");
         lblDetallePlataforma.setText("<html>" + valor(videojuego.getPlataforma()) + "</html>");
@@ -359,21 +382,21 @@ public class PnlVideojuegos extends JPanel {
     }
 
     private void abrirEditarSeleccionado() {
-        if (filaSeleccionada < 0 || filaSeleccionada >= datosVideojuegos.size()) {
+        if (filaSeleccionada < 0 || filaSeleccionada >= datosVideosjuegosFiltrados.size()) {
             return;
         }
 
-        VideojuegoInfo videojuego = datosVideojuegos.get(filaSeleccionada);
+        VideojuegoInfo videojuego = datosVideosjuegosFiltrados.get(filaSeleccionada);
         parent.getHost().setOscurecer(true);
         new DlgEdicionVideojuego(parent.getHost(), videojuego, this::refrescarTabla).setVisible(true);
     }
 
     private void confirmarEliminarSeleccionado() {
-        if (filaSeleccionada < 0 || filaSeleccionada >= datosVideojuegos.size()) {
+        if (filaSeleccionada < 0 || filaSeleccionada >= datosVideosjuegosFiltrados.size()) {
             return;
         }
 
-        VideojuegoInfo videojuego = datosVideojuegos.get(filaSeleccionada);
+        VideojuegoInfo videojuego = datosVideosjuegosFiltrados.get(filaSeleccionada);
         parent.getHost().setOscurecer(true);
         new DlgConfirmarEliminacionVideojuego(parent.getHost(), convertirVideojuegoADetalle(videojuego), () -> {
             boolean eliminado = VideojuegoController.eliminarVideojuego(videojuego.getId());
@@ -456,6 +479,91 @@ public class PnlVideojuegos extends JPanel {
         return "-";
     }
 
+    /**
+     * Filtra los videojuegos según los criterios activos:
+     * - Búsqueda textual (nombre, género, año)
+     * - Plataforma
+     * - Estado (disponible/agotado)
+     * 
+     * Actualiza la tabla dinámicamente con los resultados filtrados.
+     */
+    private void filtrarVideojuegos() {
+        // Obtener criterios de filtrado
+        String textoBusqueda = txtBuscar.getText().trim().toLowerCase();
+        String plataformaSeleccionada = (String) comboPlataforma.getSelectedItem();
+        String estadoSeleccionado = (String) comboEstado.getSelectedItem();
+        
+        // Crear lista de videojuegos filtrados
+        datosVideosjuegosFiltrados = new ArrayList<>();
+        
+        for (VideojuegoInfo videojuego : datosVideojuegos) {
+            // Filtro 1: Búsqueda textual (nombre, género, año)
+            boolean coincideBusqueda = true;
+            if (!textoBusqueda.isEmpty()) {
+                String titulo = videojuego.getTitulo().toLowerCase();
+                String genero = (videojuego.getGenero() != null ? videojuego.getGenero().toLowerCase() : "");
+                String anio = String.valueOf(videojuego.getAnioLanzamiento());
+                
+                coincideBusqueda = titulo.contains(textoBusqueda) || 
+                                  genero.contains(textoBusqueda) || 
+                                  anio.contains(textoBusqueda);
+            }
+            
+            // Filtro 2: Plataforma
+            boolean coincidePlataforma = true;
+            if (!"Todos".equals(plataformaSeleccionada)) {
+                String plataformaVideojuego = videojuego.getPlataforma() != null ? videojuego.getPlataforma() : "";
+                coincidePlataforma = plataformaVideojuego.equalsIgnoreCase(plataformaSeleccionada);
+            }
+            
+            // Filtro 3: Estado (disponible/agotado)
+            boolean coincideEstado = true;
+            if (!"Ambos".equals(estadoSeleccionado)) {
+                boolean estaDisponible = videojuego.getStock() > 0;
+                if ("Disponible".equals(estadoSeleccionado)) {
+                    coincideEstado = estaDisponible;
+                } else if ("Agotado".equals(estadoSeleccionado)) {
+                    coincideEstado = !estaDisponible;
+                }
+            }
+            
+            // Aplicar todos los filtros
+            if (coincideBusqueda && coincidePlataforma && coincideEstado) {
+                datosVideosjuegosFiltrados.add(videojuego);
+            }
+        }
+        
+        // Actualizar tabla con datos filtrados
+        DefaultTableModel modelo = (DefaultTableModel) tablaVideojuegos.getModel();
+        modelo.setDataVector(convertirVideojuegosAArray(), new String[]{"Titulo", "Genero", "Clasificacion", "Renta", "Compra"});
+        
+        // Restaurar renderizadores y anchos de columna
+        tablaVideojuegos.getColumnModel().getColumn(0).setPreferredWidth(180);
+        tablaVideojuegos.getColumnModel().getColumn(0).setCellRenderer(new TituloTableRenderer());
+        tablaVideojuegos.getColumnModel().getColumn(1).setPreferredWidth(100);
+        tablaVideojuegos.getColumnModel().getColumn(2).setPreferredWidth(90);
+        tablaVideojuegos.getColumnModel().getColumn(3).setPreferredWidth(70);
+        tablaVideojuegos.getColumnModel().getColumn(4).setPreferredWidth(70);
+        
+        // Actualizar título con cantidad de resultados
+        if (lblTituloTabla != null) {
+            lblTituloTabla.setText("Listado de videojuegos (" + datosVideosjuegosFiltrados.size() + ")");
+        }
+        
+        // Actualizar detalle del videojuego seleccionado
+        if (datosVideosjuegosFiltrados.isEmpty()) {
+            filaSeleccionada = -1;
+            limpiarDetalle();
+        } else {
+            int nuevaFila = Math.min(Math.max(filaSeleccionada, 0), datosVideosjuegosFiltrados.size() - 1);
+            mostrarDetalle(nuevaFila);
+            // Validar que la tabla tiene filas antes de seleccionar
+            if (tablaVideojuegos.getRowCount() > 0 && nuevaFila < tablaVideojuegos.getRowCount()) {
+                tablaVideojuegos.setRowSelectionInterval(nuevaFila, nuevaFila);
+            }
+        }
+    }
+
     private class TituloTableRenderer extends JPanel implements TableCellRenderer {
         private JLabel lblImagen;
         private JLabel lblTitulo;
@@ -488,8 +596,8 @@ public class PnlVideojuegos extends JPanel {
             lblTitulo.setText("");
             lblAnio.setText("");
 
-            if (row >= 0 && row < datosVideojuegos.size()) {
-                VideojuegoInfo videojuego = datosVideojuegos.get(row);
+            if (row >= 0 && row < datosVideosjuegosFiltrados.size()) {
+                VideojuegoInfo videojuego = datosVideosjuegosFiltrados.get(row);
                 lblTitulo.setText(videojuego.getTitulo());
                 lblAnio.setText(videojuego.getAnioLanzamiento() > 0 ? "(" + videojuego.getAnioLanzamiento() + ")" : "");
 
