@@ -2,16 +2,19 @@ package frontend.src.view;
 
 import frontend.src.controller.OperacionController;
 import frontend.src.controller.Ventana;
+import frontend.src.model.OperacionTicketInfo;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
@@ -293,6 +296,7 @@ public class PnlRentasCompras extends JPanel {
         btnDescargar.setIcon(loadScaledIcon("/frontend/src/images/download.png", 16, 16));
         btnDescargar.setIconTextGap(8);
         btnDescargar.setMargin(new Insets(0, 10, 0, 0));
+        btnDescargar.addActionListener(e -> descargarTicketPDF());
         panel.add(btnDescargar);
 
         limpiarDetalle();
@@ -783,6 +787,76 @@ public class PnlRentasCompras extends JPanel {
         datosOperaciones.removeIf(datos -> valorIndice(datos, IDX_ID).equals(idOperacion));
         filtrarOperaciones();
 
+    }
+
+    private void descargarTicketPDF() {
+        int fila = tablaOperaciones != null ? tablaOperaciones.getSelectedRow() : filaSeleccionada;
+        if (fila >= 0) {
+            filaSeleccionada = fila;
+        }
+
+        if (filaSeleccionada < 0 || filaSeleccionada >= datosOperacionesFiltradas.size()) {
+            JOptionPane.showMessageDialog(this, "Selecciona una operacion para generar el PDF.", "Sin operacion seleccionada", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        String[] operacion = datosOperacionesFiltradas.get(filaSeleccionada);
+        OperacionTicketInfo ticket = crearTicketSeleccionado(operacion);
+
+        JFileChooser chooser = new JFileChooser();
+        chooser.setDialogTitle("Guardar ticket PDF");
+        chooser.setFileFilter(new FileNameExtensionFilter("Archivo PDF (*.pdf)", "pdf"));
+        chooser.setSelectedFile(new File("ticket_operacion_" + idOperacionParaArchivo(ticket.getIdOperacion()) + ".pdf"));
+
+        int opcion = chooser.showSaveDialog(this);
+        if (opcion != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+
+        File destino = asegurarExtensionPdf(chooser.getSelectedFile());
+        try {
+            OperacionController.generarTicketPDF(ticket, destino);
+            JOptionPane.showMessageDialog(this, "Ticket PDF generado correctamente:\n" + destino.getAbsolutePath(), "PDF generado", JOptionPane.INFORMATION_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "No se pudo generar el PDF:\n" + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private OperacionTicketInfo crearTicketSeleccionado(String[] operacion) {
+        return new OperacionTicketInfo(
+                valorIndice(operacion, IDX_ID),
+                valorIndice(operacion, IDX_TIPO),
+                valorIndice(operacion, IDX_CLIENTE),
+                valorIndice(operacion, IDX_VIDEOJUEGO),
+                valorIndice(operacion, IDX_PLATAFORMA),
+                valorIndice(operacion, IDX_FECHA_OPERACION),
+                valorIndice(operacion, IDX_FECHA_VENCIMIENTO),
+                valorIndice(operacion, IDX_MONTO),
+                valorIndice(operacion, IDX_DESCUENTO),
+                valorIndice(operacion, IDX_ESTADO)
+        );
+    }
+
+    private File asegurarExtensionPdf(File archivo) {
+        if (archivo == null || archivo.getName().toLowerCase(Locale.ROOT).endsWith(".pdf")) {
+            return archivo;
+        }
+        return new File(archivo.getParentFile(), archivo.getName() + ".pdf");
+    }
+
+    private String idOperacionParaArchivo(String idOperacion) {
+        if (idOperacion == null || idOperacion.trim().isEmpty()) {
+            return "sin_id";
+        }
+        String digitos = idOperacion.replaceAll("[^0-9]", "");
+        if (digitos.isEmpty()) {
+            return idOperacion.replaceAll("[^A-Za-z0-9_-]", "_");
+        }
+        try {
+            return String.valueOf(Integer.parseInt(digitos));
+        } catch (NumberFormatException e) {
+            return digitos;
+        }
     }
 
     private void actualizarTituloTabla() {

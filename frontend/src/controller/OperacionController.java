@@ -4,7 +4,10 @@ import frontend.src.dao.ClienteDAO;
 import frontend.src.dao.OperacionDAO;
 import frontend.src.dao.VideojuegoDAO;
 import frontend.src.model.OperacionInfo;
+import frontend.src.model.OperacionTicketInfo;
 import frontend.src.model.VideojuegoInfo;
+import frontend.src.service.TicketPDFGenerator;
+import java.io.File;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -32,6 +35,10 @@ public class OperacionController {
             System.err.println("Error al convertir ID de operacion: " + e.getMessage());
             return false;
         }
+    }
+
+    public static void generarTicketPDF(OperacionTicketInfo ticket, File destino) throws Exception {
+        new TicketPDFGenerator().generar(ticket, destino);
     }
 
     public static int calcularPuntosGanados(double totalOperacion) {
