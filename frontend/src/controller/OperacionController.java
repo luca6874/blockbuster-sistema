@@ -20,6 +20,20 @@ public class OperacionController {
         return OperacionDAO.obtenerTodas();
     }
 
+    public static List<String[]> obtenerHistorialRentas() {
+        return OperacionDAO.obtenerHistorialRentas();
+    }
+
+    public static boolean marcarRentaComoDevuelta(String idOperacion) {
+        try {
+            int idNumerico = Integer.parseInt(idOperacion.replace("OP-", "").replace("-", "").trim());
+            return OperacionDAO.marcarRentaComoDevuelta(idNumerico);
+        } catch (Exception e) {
+            System.err.println("Error al convertir ID de operacion: " + e.getMessage());
+            return false;
+        }
+    }
+
     public static int calcularPuntosGanados(double totalOperacion) {
         return OperacionDAO.calcularPuntosGanados(totalOperacion);
     }

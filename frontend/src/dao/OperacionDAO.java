@@ -66,7 +66,7 @@ public class OperacionDAO {
                          "c.correo_electronico, " +
                          "v.nombre AS videojuego, v.plataforma, v.imagen, " +
                          "u.username AS usuario, " +
-                         "o.tipo, o.monto, o.descuento, o.fecha_operacion, o.fecha_devolucion " +
+                         "o.tipo, o.monto, o.descuento, o.fecha_operacion, o.fecha_devolucion, o.devuelto " +
                          "FROM operaciones o " +
                          "INNER JOIN clientes c ON o.id_cliente = c.id_cliente " +
                          "INNER JOIN videojuegos v ON o.id_videojuego = v.id_videojuego " +
@@ -93,7 +93,7 @@ public class OperacionDAO {
                     String.valueOf(calcularPuntosGanados(total)),
                     String.format("%05d", rs.getInt("id_operacion")),
                     fechaDevolucion != null ? fechaDevolucion.toLocalDate().toString() : "N/A",
-                    "RENTA".equalsIgnoreCase(rs.getString("tipo")) ? "Activa" : "Completada",
+                    calcularEstadoOperacion(rs.getString("tipo"), rs.getBoolean("devuelto"), fechaDevolucion),
                     rs.getString("correo_electronico") != null ? rs.getString("correo_electronico") : "",
                     rs.getString("plataforma") != null ? rs.getString("plataforma") : "Catalogo general",
                     rs.getString("imagen") != null ? rs.getString("imagen") : "",
@@ -112,6 +112,56 @@ public class OperacionDAO {
         }
 
         return operaciones;
+    }
+
+    public static List<String[]> obtenerHistorialRentas() {
+        List<String[]> rentas = new ArrayList<>();
+        Connection conn = null;
+
+        try {
+            conn = ConexionBD.conectar();
+
+            String sql = "SELECT o.id_operacion, o.id_cliente, " +
+                         "CONCAT(c.nombre, ' ', c.primer_apellido, COALESCE(CONCAT(' ', c.segundo_apellido), '')) AS cliente, " +
+                         "v.nombre AS videojuego, v.plataforma, v.imagen, " +
+                         "o.fecha_operacion, o.fecha_devolucion, o.devuelto " +
+                         "FROM operaciones o " +
+                         "INNER JOIN clientes c ON o.id_cliente = c.id_cliente " +
+                         "INNER JOIN videojuegos v ON o.id_videojuego = v.id_videojuego " +
+                         "WHERE UPPER(o.tipo) = 'RENTA' " +
+                         "ORDER BY o.fecha_operacion DESC, o.id_operacion DESC";
+
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Date fechaOperacion = rs.getDate("fecha_operacion");
+                Date fechaDevolucion = rs.getDate("fecha_devolucion");
+                String estado = calcularEstadoRenta(rs.getBoolean("devuelto"), fechaDevolucion);
+
+                rentas.add(new String[]{
+                    String.format("%05d", rs.getInt("id_operacion")),
+                    rs.getString("cliente"),
+                    rs.getString("videojuego"),
+                    fechaOperacion != null ? fechaOperacion.toLocalDate().toString() : "N/A",
+                    fechaDevolucion != null ? fechaDevolucion.toLocalDate().toString() : "N/A",
+                    estado,
+                    "CLI-" + String.format("%03d", rs.getInt("id_cliente")),
+                    rs.getString("plataforma") != null ? rs.getString("plataforma") : "",
+                    rs.getString("imagen") != null ? rs.getString("imagen") : ""
+                });
+            }
+
+            rs.close();
+            ps.close();
+        } catch (Exception e) {
+            System.err.println("Error en obtenerHistorialRentas: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            ConexionBD.cerrar(conn);
+        }
+
+        return rentas;
     }
 
     public static OperacionInfo obtenerPorId(int id) {
@@ -392,6 +442,78 @@ public class OperacionDAO {
         }
     }
 
+    public static boolean marcarRentaComoDevuelta(int idOperacion) {
+        Connection conn = null;
+
+        try {
+            conn = ConexionBD.conectar();
+            conn.setAutoCommit(false);
+
+            String sqlSelect = "SELECT id_videojuego FROM operaciones " +
+                               "WHERE id_operacion = ? AND UPPER(tipo) = 'RENTA' AND devuelto = 0 " +
+                               "FOR UPDATE";
+            PreparedStatement psSelect = conn.prepareStatement(sqlSelect);
+            psSelect.setInt(1, idOperacion);
+            ResultSet rs = psSelect.executeQuery();
+
+            if (!rs.next()) {
+                rs.close();
+                psSelect.close();
+                conn.rollback();
+                return false;
+            }
+
+            int idVideojuego = rs.getInt("id_videojuego");
+            rs.close();
+            psSelect.close();
+
+            String sqlUpdateOperacion = "UPDATE operaciones SET devuelto = 1 WHERE id_operacion = ?";
+            PreparedStatement psUpdateOperacion = conn.prepareStatement(sqlUpdateOperacion);
+            psUpdateOperacion.setInt(1, idOperacion);
+            int operacionesActualizadas = psUpdateOperacion.executeUpdate();
+            psUpdateOperacion.close();
+
+            if (operacionesActualizadas == 0) {
+                conn.rollback();
+                return false;
+            }
+
+            String sqlUpdateStock = "UPDATE videojuegos SET stock = stock + 1 WHERE id_videojuego = ?";
+            PreparedStatement psUpdateStock = conn.prepareStatement(sqlUpdateStock);
+            psUpdateStock.setInt(1, idVideojuego);
+            int videojuegosActualizados = psUpdateStock.executeUpdate();
+            psUpdateStock.close();
+
+            if (videojuegosActualizados == 0) {
+                conn.rollback();
+                return false;
+            }
+
+            conn.commit();
+            return true;
+        } catch (Exception e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (Exception rollbackError) {
+                    System.err.println("Error al revertir devolucion: " + rollbackError.getMessage());
+                }
+            }
+            System.err.println("Error en marcarRentaComoDevuelta: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                } catch (Exception autoCommitError) {
+                    System.err.println("Error al restaurar autocommit: " + autoCommitError.getMessage());
+                }
+            }
+            ConexionBD.cerrar(conn);
+        }
+    }
+
     /**
      * Cuenta la cantidad de videojuegos rentados por un cliente.
      * 
@@ -514,6 +636,23 @@ public class OperacionDAO {
 
     private static double calcularTotalOperacion(double monto, double descuento) {
         return Math.max(0.0, monto - descuento);
+    }
+
+    private static String calcularEstadoOperacion(String tipo, boolean devuelto, Date fechaDevolucion) {
+        if (!"RENTA".equalsIgnoreCase(tipo)) {
+            return "Completada";
+        }
+        return calcularEstadoRenta(devuelto, fechaDevolucion);
+    }
+
+    private static String calcularEstadoRenta(boolean devuelto, Date fechaDevolucion) {
+        if (devuelto) {
+            return "Devuelto";
+        }
+        if (fechaDevolucion != null && fechaDevolucion.toLocalDate().isBefore(LocalDate.now())) {
+            return "Retrasado";
+        }
+        return "Pendiente";
     }
 
     /**

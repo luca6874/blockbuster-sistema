@@ -2,6 +2,7 @@ package frontend.src.view;
 
 import frontend.src.controller.Ventana;
 import frontend.src.controller.ClienteController;
+import frontend.src.controller.OperacionController;
 import frontend.src.model.ClienteInfo;
 
 import javax.swing.*;
@@ -24,7 +25,18 @@ import java.util.Locale;
  */
 public class PnlGestionClientes extends JPanel {
     private static final String[] COLUMNAS_CLIENTES = {"ID", "Nombre completo", "Email", "Estatus", "Nivel", "Acciones"};
+    private static final String[] COLUMNAS_HISTORIAL = {"Cliente", "Juego", "Fecha renta", "Fecha dev. (est)", "Estatus", "Accion", "ID cliente"};
     private static final String PLACEHOLDER_BUSQUEDA_CLIENTE = "Buscar por nombre o email...";
+    private static final String PLACEHOLDER_BUSQUEDA_HISTORIAL = "Buscar por ID, nombre o fecha...";
+    private static final int IDX_HIST_ID = 0;
+    private static final int IDX_HIST_CLIENTE = 1;
+    private static final int IDX_HIST_JUEGO = 2;
+    private static final int IDX_HIST_FECHA_RENTA = 3;
+    private static final int IDX_HIST_FECHA_DEVOLUCION = 4;
+    private static final int IDX_HIST_ESTATUS = 5;
+    private static final int IDX_HIST_CLIENTE_ID = 6;
+    private static final int IDX_HIST_PLATAFORMA = 7;
+    private static final int IDX_HIST_IMAGEN = 8;
 
     private final ViewDashboard parent;
     private JTable tablaClientes;
@@ -43,6 +55,8 @@ public class PnlGestionClientes extends JPanel {
     private PnlTotalJuego pnlTotalJuego;
     private PnlResumenCliente pnlResumenCliente;
     private List<ClienteInfo> clientesActuales;  // Almacena clientes para filtrado
+    private List<String[]> rentasHistorial = new ArrayList<>();
+    private List<String[]> rentasHistorialFiltradas = new ArrayList<>();
     private boolean actualizandoComboClientes;
 
     public PnlGestionClientes(ViewDashboard parent) {
@@ -567,10 +581,30 @@ public class PnlGestionClientes extends JPanel {
     panel.setBackground(Color.WHITE);
     panel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0)); 
     
-    txtBuscarHistorial = new JTextField("Buscar por ID, nombre o fecha...");
+    txtBuscarHistorial = new JTextField(PLACEHOLDER_BUSQUEDA_HISTORIAL);
     txtBuscarHistorial.setBounds(0, 10, 250, 30);
     txtBuscarHistorial.setBorder(new LineBorder(new Color(200, 200, 200), 1, true));
     txtBuscarHistorial.setFont(new Font("Arial", Font.PLAIN, 12));
+    txtBuscarHistorial.addFocusListener(new FocusAdapter() {
+        @Override
+        public void focusGained(FocusEvent e) {
+            if (PLACEHOLDER_BUSQUEDA_HISTORIAL.equals(txtBuscarHistorial.getText())) {
+                txtBuscarHistorial.setText("");
+            }
+        }
+
+        @Override
+        public void focusLost(FocusEvent e) {
+            if (txtBuscarHistorial.getText().trim().isEmpty()) {
+                txtBuscarHistorial.setText(PLACEHOLDER_BUSQUEDA_HISTORIAL);
+            }
+        }
+    });
+    txtBuscarHistorial.getDocument().addDocumentListener(new DocumentListener() {
+        @Override public void insertUpdate(DocumentEvent e) { aplicarFiltrosHistorial(); }
+        @Override public void removeUpdate(DocumentEvent e) { aplicarFiltrosHistorial(); }
+        @Override public void changedUpdate(DocumentEvent e) { aplicarFiltrosHistorial(); }
+    });
     panel.add(txtBuscarHistorial);
     
     JLabel lblEstatusHist = new JLabel("Estatus:");
@@ -578,15 +612,16 @@ public class PnlGestionClientes extends JPanel {
     lblEstatusHist.setFont(new Font("Arial", Font.PLAIN, 12));
     panel.add(lblEstatusHist);
     
-    comboEstatusHistorial = new JComboBox<>(new String[]{"Todos", "Devuelto", "Pendiente", "Vencido"});
+    comboEstatusHistorial = new JComboBox<>(new String[]{"Todos", "Devuelto", "Pendiente", "Retrasado", "Vencido"});
     comboEstatusHistorial.setBounds(330, 10, 110, 30);
     comboEstatusHistorial.setBackground(Color.WHITE);
+    comboEstatusHistorial.addActionListener(e -> aplicarFiltrosHistorial());
     panel.add(comboEstatusHistorial);
     
     initTablaHistorial();
     
     JScrollPane scroll = new JScrollPane(tablaHistorial);
-    scroll.setBounds(0, 50, 600, 280);
+    scroll.setBounds(0, 50, 610, 280);
     scroll.setBorder(new LineBorder(new Color(200, 200, 200), 1));
     scroll.getViewport().setBackground(Color.WHITE);
     panel.add(scroll);
@@ -622,17 +657,28 @@ public class PnlGestionClientes extends JPanel {
     private JPanel createListaJuegosVisuales() {
         JPanel panel = new JPanel(new GridLayout(0, 1, 5, 5));
         panel.setBackground(Color.WHITE);
-        
-        // Datos de ejemplo de juegos
-        String[][] juegos = {
-            {"BIOSHOCK INFINITE (XBOX 360)", "caratulaGame1.png", "2024-01-15", "Devuelto", "USR-001"},
-            {"Halo 3 ODST(XBOX 360)", "caratulagame2.png", "2024-01-20", "Pendiente", "USR-002"},
-            {"Assassin's Creed IV: Black Flag(PS4)", "caratulaGame3.png", "2024-01-18", "Devuelto", "USR-003"},
-            {"The Last of Us Remastered(PS4)", "caratulaGame4.png", "2024-01-22", "Pendiente", "USR-004"}
-        };
-        
-        for (String[] juego : juegos) {
-            JPanel itemJuego = createItemJuegoVisual(juego[0], juego[1], juego[2], juego[3], juego[4]);
+
+        List<String[]> rentas = rentasHistorial != null ? rentasHistorial : OperacionController.obtenerHistorialRentas();
+        if (rentas == null || rentas.isEmpty()) {
+            JLabel lblVacio = new JLabel("Sin rentas registradas", SwingConstants.CENTER);
+            lblVacio.setFont(new Font("Arial", Font.PLAIN, 12));
+            lblVacio.setForeground(Color.GRAY);
+            panel.add(lblVacio);
+            return panel;
+        }
+
+        int limite = Math.min(rentas.size(), 8);
+        for (int i = 0; i < limite; i++) {
+            String[] renta = rentas.get(i);
+            String plataforma = valorHistorial(renta, IDX_HIST_PLATAFORMA);
+            String titulo = valorHistorial(renta, IDX_HIST_JUEGO) + (plataforma.trim().isEmpty() ? "" : " (" + plataforma + ")");
+            JPanel itemJuego = createItemJuegoVisual(
+                    titulo,
+                    valorHistorial(renta, IDX_HIST_IMAGEN),
+                    valorHistorial(renta, IDX_HIST_FECHA_DEVOLUCION),
+                    valorHistorial(renta, IDX_HIST_ESTATUS),
+                    valorHistorial(renta, IDX_HIST_CLIENTE_ID)
+            );
             panel.add(itemJuego);
         }
         
@@ -799,16 +845,9 @@ public class PnlGestionClientes extends JPanel {
     }
     
     private void initTablaHistorial() {
-        String[] columnas = {"Juego", "Fecha renta", "Fecha dev. (est)", "Estatus", "ID usuario"};
+        cargarHistorialRentasDesdeBD();
         
-        Object[][] datos = {
-            {"BIOSHOCK INFINITE", "2024-01-10", "2024-01-17", "Devuelto", "CLI-001"},
-            {"Halo 3 ODST", "2024-01-15", "2024-01-22", "Pendiente", "CLI-002"},
-            {"Assassin's Creed IV", "2024-01-08", "2024-01-15", "Devuelto", "CLI-003"},
-            {"The Last of Us", "2024-01-20", "2024-01-27", "Pendiente", "CLI-004"}
-        };
-        
-        DefaultTableModel modelo = new DefaultTableModel(datos, columnas) {
+        DefaultTableModel modelo = new DefaultTableModel(convertirRentasAArray(rentasHistorial), COLUMNAS_HISTORIAL) {
             @Override public boolean isCellEditable(int r, int c) { return false; }
         };
         
@@ -819,12 +858,22 @@ public class PnlGestionClientes extends JPanel {
         tablaHistorial.setShowVerticalLines(false);
         tablaHistorial.setGridColor(new Color(235, 235, 235));
         tablaHistorial.setFont(new Font("Arial", Font.PLAIN, 11));
+        tablaHistorial.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int row = tablaHistorial.rowAtPoint(e.getPoint());
+                int col = tablaHistorial.columnAtPoint(e.getPoint());
+                if (row >= 0 && col == 5) {
+                    marcarRentaSeleccionadaComoDevuelta(row);
+                }
+            }
+        });
         
         // Renderizador para la columna de estatus
-        tablaHistorial.getColumnModel().getColumn(3).setCellRenderer(new TableCellRenderer() {
+        tablaHistorial.getColumnModel().getColumn(4).setCellRenderer(new TableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                JLabel label = new JLabel(value.toString());
+                JLabel label = new JLabel(value != null ? value.toString() : "");
                 label.setOpaque(true);
                 label.setHorizontalAlignment(SwingConstants.CENTER);
                 label.setFont(new Font("Arial", Font.BOLD, 10));
@@ -845,6 +894,24 @@ public class PnlGestionClientes extends JPanel {
                 return label;
             }
         });
+
+        tablaHistorial.getColumnModel().getColumn(5).setCellRenderer(new TableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                JButton boton = new JButton(value != null ? value.toString() : "");
+                boton.setFont(new Font("Arial", Font.BOLD, 10));
+                boton.setFocusPainted(false);
+                boton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                boton.setBorder(new LineBorder(new Color(170, 170, 170), 1, true));
+                boolean habilitado = value != null && !value.toString().trim().isEmpty();
+                boton.setEnabled(habilitado);
+                boton.setBackground(habilitado ? Color.WHITE : new Color(245, 245, 245));
+                boton.setForeground(habilitado ? Ventana.ACCENT_RED : Color.GRAY);
+                return boton;
+            }
+        });
+
+        configurarColumnasHistorial();
         
         // Estilo del encabezado
         JTableHeader header = tablaHistorial.getTableHeader();
@@ -853,6 +920,175 @@ public class PnlGestionClientes extends JPanel {
         header.setFont(new Font("Arial", Font.BOLD, 11));
         header.setPreferredSize(new Dimension(0, 30));
         header.setReorderingAllowed(false);
+    }
+
+    private void cargarHistorialRentasDesdeBD() {
+        rentasHistorial = OperacionController.obtenerHistorialRentas();
+        if (rentasHistorial == null) {
+            rentasHistorial = new ArrayList<>();
+        }
+        rentasHistorialFiltradas = new ArrayList<>(rentasHistorial);
+    }
+
+    private void configurarColumnasHistorial() {
+        tablaHistorial.getColumnModel().getColumn(0).setPreferredWidth(115);
+        tablaHistorial.getColumnModel().getColumn(1).setPreferredWidth(135);
+        tablaHistorial.getColumnModel().getColumn(2).setPreferredWidth(78);
+        tablaHistorial.getColumnModel().getColumn(3).setPreferredWidth(88);
+        tablaHistorial.getColumnModel().getColumn(4).setPreferredWidth(75);
+        tablaHistorial.getColumnModel().getColumn(5).setPreferredWidth(82);
+        tablaHistorial.getColumnModel().getColumn(6).setPreferredWidth(72);
+    }
+
+    private Object[][] convertirRentasAArray(List<String[]> rentas) {
+        if (rentas == null || rentas.isEmpty()) {
+            return new Object[0][COLUMNAS_HISTORIAL.length];
+        }
+
+        Object[][] datos = new Object[rentas.size()][COLUMNAS_HISTORIAL.length];
+        for (int i = 0; i < rentas.size(); i++) {
+            String[] renta = rentas.get(i);
+            String estatus = valorHistorial(renta, IDX_HIST_ESTATUS);
+            datos[i][0] = valorHistorial(renta, IDX_HIST_CLIENTE);
+            datos[i][1] = valorHistorial(renta, IDX_HIST_JUEGO);
+            datos[i][2] = valorHistorial(renta, IDX_HIST_FECHA_RENTA);
+            datos[i][3] = valorHistorial(renta, IDX_HIST_FECHA_DEVOLUCION);
+            datos[i][4] = estatus;
+            datos[i][5] = "Devuelto".equalsIgnoreCase(estatus) ? "" : "Marcar dev.";
+            datos[i][6] = valorHistorial(renta, IDX_HIST_CLIENTE_ID);
+        }
+        return datos;
+    }
+
+    private void aplicarFiltrosHistorial() {
+        if (tablaHistorial == null || rentasHistorial == null) return;
+
+        String busqueda = obtenerTextoBusquedaHistorial();
+        String estatusSeleccionado = comboEstatusHistorial != null ? String.valueOf(comboEstatusHistorial.getSelectedItem()) : "Todos";
+        if ("Vencido".equalsIgnoreCase(estatusSeleccionado)) {
+            estatusSeleccionado = "Retrasado";
+        }
+
+        rentasHistorialFiltradas = new ArrayList<>();
+        for (String[] renta : rentasHistorial) {
+            String estatus = valorHistorial(renta, IDX_HIST_ESTATUS);
+            boolean coincideBusqueda = busqueda.isEmpty()
+                    || contiene(valorHistorial(renta, IDX_HIST_CLIENTE_ID), busqueda)
+                    || contiene(valorHistorial(renta, IDX_HIST_CLIENTE), busqueda)
+                    || contiene(valorHistorial(renta, IDX_HIST_JUEGO), busqueda)
+                    || contiene(valorHistorial(renta, IDX_HIST_FECHA_RENTA), busqueda)
+                    || contiene(valorHistorial(renta, IDX_HIST_FECHA_DEVOLUCION), busqueda);
+            boolean coincideEstatus = "Todos".equalsIgnoreCase(estatusSeleccionado)
+                    || estatusSeleccionado.equalsIgnoreCase(estatus);
+
+            if (coincideBusqueda && coincideEstatus) {
+                rentasHistorialFiltradas.add(renta);
+            }
+        }
+
+        actualizarTablaHistorial();
+    }
+
+    private void actualizarTablaHistorial() {
+        DefaultTableModel modelo = (DefaultTableModel) tablaHistorial.getModel();
+        modelo.setDataVector(convertirRentasAArray(rentasHistorialFiltradas), COLUMNAS_HISTORIAL);
+        if (tablaHistorial.getColumnModel().getColumnCount() > 6) {
+            tablaHistorial.getColumnModel().getColumn(4).setCellRenderer(crearRenderizadorEstatusHistorial());
+            tablaHistorial.getColumnModel().getColumn(5).setCellRenderer(crearRenderizadorAccionHistorial());
+            configurarColumnasHistorial();
+        }
+    }
+
+    private void refrescarHistorialRentas() {
+        cargarHistorialRentasDesdeBD();
+        aplicarFiltrosHistorial();
+    }
+
+    private void marcarRentaSeleccionadaComoDevuelta(int fila) {
+        if (fila < 0 || fila >= rentasHistorialFiltradas.size()) return;
+
+        String[] renta = rentasHistorialFiltradas.get(fila);
+        if ("Devuelto".equalsIgnoreCase(valorHistorial(renta, IDX_HIST_ESTATUS))) {
+            return;
+        }
+
+        int opcion = JOptionPane.showConfirmDialog(
+                this,
+                "Marcar esta renta como devuelta y aumentar el stock del videojuego?",
+                "Confirmar devolucion",
+                JOptionPane.YES_NO_OPTION
+        );
+        if (opcion != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        boolean actualizado = OperacionController.marcarRentaComoDevuelta(valorHistorial(renta, IDX_HIST_ID));
+        if (actualizado) {
+            refrescarHistorialRentas();
+            JOptionPane.showMessageDialog(this, "Renta marcada como devuelta.", "Exito", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, "No se pudo marcar la renta como devuelta.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private String obtenerTextoBusquedaHistorial() {
+        if (txtBuscarHistorial == null) return "";
+        String texto = txtBuscarHistorial.getText();
+        if (texto == null || PLACEHOLDER_BUSQUEDA_HISTORIAL.equals(texto)) {
+            return "";
+        }
+        return texto.trim().toLowerCase(Locale.ROOT);
+    }
+
+    private String valorHistorial(String[] datos, int indice) {
+        if (datos == null || indice < 0 || indice >= datos.length || datos[indice] == null) {
+            return "";
+        }
+        return datos[indice];
+    }
+
+    private TableCellRenderer crearRenderizadorEstatusHistorial() {
+        return new TableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                JLabel label = new JLabel(value != null ? value.toString() : "");
+                label.setOpaque(true);
+                label.setHorizontalAlignment(SwingConstants.CENTER);
+                label.setFont(new Font("Arial", Font.BOLD, 10));
+
+                if ("Devuelto".equals(value)) {
+                    label.setBackground(new Color(46, 204, 113));
+                    label.setForeground(Color.WHITE);
+                } else if ("Pendiente".equals(value)) {
+                    label.setBackground(Ventana.ACCENT_RED);
+                    label.setForeground(Color.WHITE);
+                } else {
+                    label.setBackground(Color.ORANGE);
+                    label.setForeground(Color.WHITE);
+                }
+
+                label.setBorder(BorderFactory.createEmptyBorder(2, 5, 2, 5));
+                return label;
+            }
+        };
+    }
+
+    private TableCellRenderer crearRenderizadorAccionHistorial() {
+        return new TableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                JButton boton = new JButton(value != null ? value.toString() : "");
+                boton.setFont(new Font("Arial", Font.BOLD, 10));
+                boton.setFocusPainted(false);
+                boton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                boton.setBorder(new LineBorder(new Color(170, 170, 170), 1, true));
+                boolean habilitado = value != null && !value.toString().trim().isEmpty();
+                boton.setEnabled(habilitado);
+                boton.setBackground(habilitado ? Color.WHITE : new Color(245, 245, 245));
+                boton.setForeground(habilitado ? Ventana.ACCENT_RED : Color.GRAY);
+                return boton;
+            }
+        };
     }
 
     /**
