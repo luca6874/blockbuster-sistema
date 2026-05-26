@@ -331,7 +331,12 @@ public class PnlNuevaOperacion extends JPanel {
 
         // Obtener fecha de devolución (si es renta)
         LocalDate fechaDevolucion = null;
-        if (tipo.equals("RENTA") && !txtFecha.getText().trim().isEmpty()) {
+        if (tipo.equals("RENTA")) {
+            // Para RENTA, la fecha de devolución es obligatoria
+            if (txtFecha.getText().trim().isEmpty()) {
+                JOptionPane.showMessageDialog(this, "La fecha de devolución es obligatoria para rentas.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
             try {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
                 fechaDevolucion = LocalDate.parse(txtFecha.getText().trim(), formatter);
@@ -339,6 +344,17 @@ public class PnlNuevaOperacion extends JPanel {
                 JOptionPane.showMessageDialog(this, "Formato de fecha inválido. Use dd/MM/yyyy.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
+            
+            // Validar que la fecha de devolución sea mayor a la fecha de renta (hoy)
+            LocalDate hoy = LocalDate.now();
+            if (!fechaDevolucion.isAfter(hoy)) {
+                JOptionPane.showMessageDialog(this, "La fecha de devolución debe ser posterior a la fecha de renta.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        } else if (!txtFecha.getText().trim().isEmpty()) {
+            // Para COMPRA, el campo de fecha no debe estar lleno
+            JOptionPane.showMessageDialog(this, "La fecha de devolución solo se aplica a rentas.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
         }
 
         // Extraer IDs (el ClienteDAO los devuelve como "CLI-001", necesitamos el número)

@@ -29,9 +29,10 @@ public class OperacionController {
      *
      * Pasos:
      * 1. Valida que el videojuego tenga stock disponible
-     * 2. Inserta la operación en BD
-     * 3. Actualiza el stock del videojuego
-     * 4. Suma puntos automaticos al cliente
+     * 2. Valida las fechas según el tipo de operación
+     * 3. Inserta la operación en BD
+     * 4. Actualiza el stock del videojuego
+     * 5. Suma puntos automaticos al cliente
      *
      * @param idCliente ID del cliente
      * @param idVideojuego ID del videojuego
@@ -72,6 +73,24 @@ public class OperacionController {
         // Validación 4: Verificar que monto sea válido
         if (monto <= 0) {
             return "Error: El monto debe ser mayor a 0.";
+        }
+
+        // Validación 5: Validaciones de fecha para RENTA
+        if (tipo.equals("RENTA")) {
+            // La fecha de devolución es obligatoria para rentas
+            if (fechaDevolucion == null) {
+                return "Error: La fecha de devolución es obligatoria para rentas.";
+            }
+            
+            // La fecha de devolución debe ser posterior a la fecha de operación
+            if (!fechaDevolucion.isAfter(fechaOperacion)) {
+                return "Error: La fecha de devolución debe ser posterior a la fecha de renta.";
+            }
+        } else if (tipo.equals("COMPRA")) {
+            // Para compras, la fecha de devolución debe ser null
+            if (fechaDevolucion != null) {
+                return "Error: Las compras no deben tener fecha de devolución.";
+            }
         }
 
         // Crear objeto operación
