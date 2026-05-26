@@ -9,6 +9,7 @@ import frontend.src.model.VideojuegoInfo;
 import frontend.src.service.TicketPDFGenerator;
 import java.io.File;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -47,6 +48,22 @@ public class OperacionController {
 
     public static int calcularPuntosGanados(double totalOperacion) {
         return OperacionDAO.calcularPuntosGanados(totalOperacion);
+    }
+
+    public static List<String> obtenerOpcionesDescuento(int lvlFidelidad) {
+        int maximo = calcularDescuentoMaximo(lvlFidelidad);
+        List<String> opciones = new ArrayList<>();
+        for (int porcentaje = 0; porcentaje <= maximo; porcentaje += 5) {
+            opciones.add(porcentaje + "%");
+        }
+        return opciones;
+    }
+
+    private static int calcularDescuentoMaximo(int lvlFidelidad) {
+        if (lvlFidelidad <= 1) {
+            return 0;
+        }
+        return Math.min(15, (lvlFidelidad - 1) * 5);
     }
 
     /**

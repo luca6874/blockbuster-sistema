@@ -36,7 +36,7 @@ public class PnlNuevaOperacion extends JPanel {
     private ClienteInfo clienteSeleccionado;
     private VideojuegoInfo videojuegoSeleccionado;
     private JComboBox<String> comboTipo;
-    private JTextField txtDescuento;
+    private JComboBox<String> comboDescuento;
     private JTextField txtFecha;
     private List<OperacionInfo> carrito = new ArrayList<>();
     private JButton btnConfirmar;
@@ -135,23 +135,11 @@ public class PnlNuevaOperacion extends JPanel {
         JLabel lblDescuento = createSectionLabel("Descuento", 290, 198, 90);
         panel.add(lblDescuento);
 
-        JCheckBox chkDescuento = new JCheckBox("Aplicar descuento");
-        chkDescuento.setBounds(290, 223, 140, 18);
-        chkDescuento.setBackground(Color.WHITE);
-        chkDescuento.setFocusPainted(false);
-        chkDescuento.setFont(new Font("Arial", Font.PLAIN, 10));
-        panel.add(chkDescuento);
-
-        this.txtDescuento = createTextField();
-        this.txtDescuento.setBounds(290, 244, 80, 24);
-        this.txtDescuento.setEnabled(false);
-        panel.add(this.txtDescuento);
-        chkDescuento.addActionListener(e -> {
-            txtDescuento.setEnabled(chkDescuento.isSelected());
-            if (!chkDescuento.isSelected()) {
-                txtDescuento.setText("");
-            }
-        });
+        this.comboDescuento = createComboBox(new String[]{"0%"});
+        this.comboDescuento.setBounds(290, 223, 120, 24);
+        this.comboDescuento.setEnabled(false);
+        this.comboDescuento.setToolTipText("Selecciona un cliente para cargar descuentos disponibles.");
+        panel.add(this.comboDescuento);
 
         JLabel lblFecha = createSectionLabel("Fecha de devolucion", 16, 266, 160);
         panel.add(lblFecha);
@@ -265,6 +253,7 @@ public class PnlNuevaOperacion extends JPanel {
             clienteSeleccionado = seleccionado;
             btnSeleccionarCliente.setText(seleccionado.getNombre());
             btnSeleccionarCliente.setForeground(Color.BLACK);
+            cargarDescuentosPorCliente();
             actualizarTicket();
         }
     }
@@ -313,16 +302,7 @@ public class PnlNuevaOperacion extends JPanel {
         // Calcular monto basado en el tipo y precio del videojuego
         double monto = tipo.equals("RENTA") ? videojuegoSeleccionado.getPrecioRenta() : videojuegoSeleccionado.getPrecioCompra();
 
-        // Obtener descuento (si está vacío, es 0)
-        double descuento = 0;
-        if (!txtDescuento.getText().trim().isEmpty()) {
-            try {
-                descuento = Double.parseDouble(txtDescuento.getText().trim());
-            } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(this, "El descuento debe ser un número válido.", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-        }
+        double descuento = calcularDescuentoSeleccionado(monto);
 
         if (descuento < 0 || descuento > monto) {
             JOptionPane.showMessageDialog(this, "El descuento no puede ser negativo ni mayor al monto.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -398,7 +378,7 @@ public class PnlNuevaOperacion extends JPanel {
         btnSeleccionarVideojuego.setText("Seleccionar videojuego");
         btnSeleccionarVideojuego.setForeground(new Color(110, 110, 110));
         comboTipo.setSelectedIndex(0);
-        txtDescuento.setText("");
+        cargarDescuentosPorCliente();
         txtFecha.setText("");
     }
 
@@ -407,8 +387,41 @@ public class PnlNuevaOperacion extends JPanel {
         btnSeleccionarVideojuego.setText("Seleccionar videojuego");
         btnSeleccionarVideojuego.setForeground(new Color(110, 110, 110));
         comboTipo.setSelectedIndex(0);
-        txtDescuento.setText("");
+        if (comboDescuento != null) {
+            comboDescuento.setSelectedIndex(0);
+        }
         txtFecha.setText("");
+    }
+
+    private void cargarDescuentosPorCliente() {
+        if (comboDescuento == null) {
+            return;
+        }
+
+        comboDescuento.removeAllItems();
+        int nivel = clienteSeleccionado != null ? clienteSeleccionado.getLvlFidelidad() : 0;
+        for (String opcion : OperacionController.obtenerOpcionesDescuento(nivel)) {
+            comboDescuento.addItem(opcion);
+        }
+        comboDescuento.setSelectedIndex(0);
+        comboDescuento.setEnabled(clienteSeleccionado != null);
+    }
+
+    private double calcularDescuentoSeleccionado(double monto) {
+        return monto * obtenerPorcentajeDescuentoSeleccionado() / 100.0;
+    }
+
+    private int obtenerPorcentajeDescuentoSeleccionado() {
+        if (comboDescuento == null || comboDescuento.getSelectedItem() == null) {
+            return 0;
+        }
+
+        String valor = comboDescuento.getSelectedItem().toString().replace("%", "").trim();
+        try {
+            return Integer.parseInt(valor);
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
 
     private void actualizarTicket() {

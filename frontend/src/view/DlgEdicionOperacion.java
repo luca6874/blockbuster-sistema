@@ -25,7 +25,7 @@ public class DlgEdicionOperacion extends JDialog {
     private JComboBox<String> comboTipo;
     private JComboBox<String> comboEstado;
     private JTextField txtMonto;
-    private JTextField txtDescuento;
+    private JComboBox<String> comboDescuento;
     private JTextField txtFechaRenta;
     private JTextField txtFechaVencimiento;
     private final String[] datosOperacion;
@@ -125,12 +125,12 @@ public class DlgEdicionOperacion extends JDialog {
         lblDescuento.setFont(new Font("Arial", Font.BOLD, 11));
         mainPanel.add(lblDescuento);
 
-        txtDescuento = new JTextField();
-        txtDescuento.setBounds(colX + 280, col4Y + 20, 250, 30);
-        txtDescuento.setFont(new Font("Arial", Font.PLAIN, 12));
-        txtDescuento.setBorder(new LineBorder(new Color(200, 200, 200), 1));
-        txtDescuento.setText(datosOperacion[IDX_DESCUENTO]);
-        mainPanel.add(txtDescuento);
+        comboDescuento = new JComboBox<>(new String[]{"0%", "5%", "10%", "15%"});
+        comboDescuento.setBounds(colX + 280, col4Y + 20, 250, 30);
+        comboDescuento.setFont(new Font("Arial", Font.PLAIN, 12));
+        comboDescuento.setBorder(new LineBorder(new Color(200, 200, 200), 1));
+        comboDescuento.setSelectedItem(normalizarDescuento(datosOperacion[IDX_DESCUENTO]));
+        mainPanel.add(comboDescuento);
 
         JLabel lblFechaRenta = new JLabel("Fecha Renta (DD/MM/YYYY)");
         lblFechaRenta.setBounds(colX, col5Y, 250, 20);
@@ -197,7 +197,7 @@ public class DlgEdicionOperacion extends JDialog {
         datosOperacion[IDX_VIDEOJUEGO] = (String) comboVideojuego.getSelectedItem();
         datosOperacion[IDX_TIPO] = (String) comboTipo.getSelectedItem();
         datosOperacion[IDX_MONTO] = txtMonto.getText();
-        datosOperacion[IDX_DESCUENTO] = txtDescuento.getText();
+        datosOperacion[IDX_DESCUENTO] = (String) comboDescuento.getSelectedItem();
         datosOperacion[IDX_FECHA_RENTA] = txtFechaRenta.getText();
         datosOperacion[IDX_FECHA_VENCIMIENTO] = txtFechaVencimiento.getText();
         datosOperacion[IDX_ESTADO] = (String) comboEstado.getSelectedItem();
@@ -205,5 +205,20 @@ public class DlgEdicionOperacion extends JDialog {
         this.setVisible(false);
         parent.setOscurecer(false);
         parent.mostrarAvisoExitoso(this);
+    }
+
+    private String normalizarDescuento(String descuento) {
+        if (descuento == null || descuento.trim().isEmpty() || "N/A".equalsIgnoreCase(descuento.trim())) {
+            return "0%";
+        }
+        String limpio = descuento.replace("$", "").replace("%", "").trim();
+        try {
+            double valor = Double.parseDouble(limpio);
+            int porcentaje = (int) Math.round(valor / 5.0) * 5;
+            porcentaje = Math.max(0, Math.min(15, porcentaje));
+            return porcentaje + "%";
+        } catch (NumberFormatException e) {
+            return "0%";
+        }
     }
 }

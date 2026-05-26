@@ -16,7 +16,7 @@ public class DlgNuevaOperacion extends JDialog {
     private JButton btnSeleccionarVideojuego;
     private JComboBox<String> comboTipo;
     private JTextField txtMonto;
-    private JTextField txtDescuento;
+    private JComboBox<String> comboDescuento;
     private JTextField txtFechaRenta;
     private JTextField txtFechaVencimiento;
     private VideojuegoInfo videojuegoSeleccionado;
@@ -122,11 +122,11 @@ public class DlgNuevaOperacion extends JDialog {
         lblDescuento.setBounds(colX + 280, col4Y, 250, 20);
         lblDescuento.setFont(new Font("Arial", Font.BOLD, 11));
         mainPanel.add(lblDescuento);
-        txtDescuento = new JTextField();
-        txtDescuento.setBounds(colX + 280, col4Y + 20, 250, 30);
-        txtDescuento.setFont(new Font("Arial", Font.PLAIN, 12));
-        txtDescuento.setBorder(new LineBorder(new Color(200, 200, 200), 1));
-        mainPanel.add(txtDescuento);
+        comboDescuento = new JComboBox<>(new String[]{"0%", "5%", "10%", "15%"});
+        comboDescuento.setBounds(colX + 280, col4Y + 20, 250, 30);
+        comboDescuento.setFont(new Font("Arial", Font.PLAIN, 12));
+        comboDescuento.setBorder(new LineBorder(new Color(200, 200, 200), 1));
+        mainPanel.add(comboDescuento);
 
         // Fecha Renta
         JLabel lblFechaRenta = new JLabel("Fecha Renta (DD/MM/YYYY)");
