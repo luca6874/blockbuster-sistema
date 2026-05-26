@@ -27,6 +27,10 @@ public class OperacionController {
         return OperacionDAO.obtenerHistorialRentas();
     }
 
+    public static List<String[]> obtenerHistorialCompras() {
+        return OperacionDAO.obtenerHistorialCompras();
+    }
+
     public static boolean marcarRentaComoDevuelta(String idOperacion) {
         try {
             int idNumerico = Integer.parseInt(idOperacion.replace("OP-", "").replace("-", "").trim());

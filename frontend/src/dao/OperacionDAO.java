@@ -164,6 +164,49 @@ public class OperacionDAO {
         return rentas;
     }
 
+    public static List<String[]> obtenerHistorialCompras() {
+        List<String[]> compras = new ArrayList<>();
+        Connection conn = null;
+
+        try {
+            conn = ConexionBD.conectar();
+
+            String sql = "SELECT " +
+                         "v.nombre AS videojuego, " +
+                         "CONCAT(c.nombre, ' ', c.primer_apellido, COALESCE(CONCAT(' ', c.segundo_apellido), '')) AS cliente, " +
+                         "o.fecha_operacion, v.stock, o.monto " +
+                         "FROM operaciones o " +
+                         "INNER JOIN clientes c ON o.id_cliente = c.id_cliente " +
+                         "INNER JOIN videojuegos v ON o.id_videojuego = v.id_videojuego " +
+                         "WHERE UPPER(o.tipo) = 'COMPRA' " +
+                         "ORDER BY o.fecha_operacion DESC, o.id_operacion DESC";
+
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Date fechaOperacion = rs.getDate("fecha_operacion");
+                compras.add(new String[]{
+                    rs.getString("videojuego") != null ? rs.getString("videojuego") : "",
+                    rs.getString("cliente") != null ? rs.getString("cliente") : "",
+                    fechaOperacion != null ? fechaOperacion.toLocalDate().toString() : "N/A",
+                    String.valueOf(rs.getInt("stock")),
+                    String.format("$%.2f", rs.getDouble("monto"))
+                });
+            }
+
+            rs.close();
+            ps.close();
+        } catch (Exception e) {
+            System.err.println("Error en obtenerHistorialCompras: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            ConexionBD.cerrar(conn);
+        }
+
+        return compras;
+    }
+
     public static OperacionInfo obtenerPorId(int id) {
         OperacionInfo operacion = null;
         Connection conn = null;
