@@ -18,7 +18,7 @@ public class VideojuegoDAO {
             conn = ConexionBD.conectar();
 
             String sql = "SELECT id_videojuego, nombre, plataforma, genero, clasificacion, " +
-                         "anio_lanzamiento, precio_renta, precio_compra, stock, imagen " +
+                         "anio_lanzamiento, precio_renta, precio_compra, stock, imagen, puntos, activo " +
                          "FROM videojuegos " +
                          "WHERE activo = TRUE " +
                          "ORDER BY nombre ASC";
@@ -51,7 +51,7 @@ public class VideojuegoDAO {
 
             int idNumerico = extraerIdNumerico(id);
             String sql = "SELECT id_videojuego, nombre, plataforma, genero, clasificacion, " +
-                         "anio_lanzamiento, precio_renta, precio_compra, stock, imagen " +
+                         "anio_lanzamiento, precio_renta, precio_compra, stock, imagen, puntos, activo " +
                          "FROM videojuegos " +
                          "WHERE id_videojuego = ? AND activo = TRUE";
 
@@ -182,7 +182,9 @@ public class VideojuegoDAO {
             rs.getDouble("precio_renta"),
             rs.getDouble("precio_compra"),
             rs.getInt("stock"),
-            rs.getString("imagen")
+            rs.getString("imagen"),
+            rs.getInt("puntos"),
+            rs.getBoolean("activo")
         );
     }
 

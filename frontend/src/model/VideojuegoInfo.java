@@ -11,6 +11,8 @@ public class VideojuegoInfo {
     private final double precioCompra;
     private final int stock;
     private final String imagenUrl;
+    private final int puntos;
+    private final boolean activo;
 
     public VideojuegoInfo(
         String id,
@@ -38,6 +40,23 @@ public class VideojuegoInfo {
         int stock,
         String imagenUrl
     ) {
+        this(id, titulo, plataforma, genero, clasificacion, anioLanzamiento, precioRenta, precioCompra, stock, imagenUrl, 0, true);
+    }
+
+    public VideojuegoInfo(
+        String id,
+        String titulo,
+        String plataforma,
+        String genero,
+        String clasificacion,
+        int anioLanzamiento,
+        double precioRenta,
+        double precioCompra,
+        int stock,
+        String imagenUrl,
+        int puntos,
+        boolean activo
+    ) {
         this.id = id;
         this.titulo = titulo;
         this.plataforma = plataforma;
@@ -48,6 +67,8 @@ public class VideojuegoInfo {
         this.precioCompra = precioCompra;
         this.stock = stock;
         this.imagenUrl = imagenUrl;
+        this.puntos = puntos;
+        this.activo = activo;
     }
 
     public String getId() {
@@ -88,5 +109,13 @@ public class VideojuegoInfo {
 
     public String getImagenUrl() {
         return imagenUrl;
+    }
+
+    public int getPuntos() {
+        return puntos;
+    }
+
+    public boolean isActivo() {
+        return activo;
     }
 }

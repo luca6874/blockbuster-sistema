@@ -3,10 +3,12 @@ package frontend.src.view;
 import frontend.src.controller.Ventana;
 import frontend.src.controller.VideojuegoController;
 import frontend.src.model.VideojuegoInfo;
+import frontend.src.service.FichaTecnicaPDFGenerator;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -245,11 +247,12 @@ public class PnlVideojuegos extends JPanel {
         lblDetalleStock = createDetailLabel(16, 285, 150, 18, Font.PLAIN, 11);
         panel.add(lblDetalleStock);
 
-        JButton btnDescargar = createActionButton("Descargar info", new Color(230, 230, 230));
+        JButton btnDescargar = createActionButton("Descargar ficha técnica", new Color(230, 230, 230));
         btnDescargar.setBounds(16, 315, 308, 28);
         btnDescargar.setForeground(Color.BLACK);
         btnDescargar.setBorder(new LineBorder(new Color(120, 120, 120), 1, true));
         btnDescargar.setBackground(new Color(230, 230, 230));
+        btnDescargar.addActionListener(e -> descargarFichaTecnicaSeleccionada());
         panel.add(btnDescargar);
 
         JButton btnEditar = createActionButton("Editar juego", new Color(46, 204, 113));
@@ -389,6 +392,42 @@ public class PnlVideojuegos extends JPanel {
         VideojuegoInfo videojuego = datosVideosjuegosFiltrados.get(filaSeleccionada);
         parent.getHost().setOscurecer(true);
         new DlgEdicionVideojuego(parent.getHost(), videojuego, this::refrescarTabla).setVisible(true);
+    }
+
+    private void descargarFichaTecnicaSeleccionada() {
+        VideojuegoInfo videojuego = obtenerVideojuegoSeleccionado();
+        if (videojuego == null) {
+            JOptionPane.showMessageDialog(this, "Selecciona un videojuego para descargar su ficha técnica.", "Sin selección", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        JFileChooser chooser = new JFileChooser();
+        chooser.setDialogTitle("Guardar ficha técnica");
+        chooser.setSelectedFile(new File("ficha_tecnica_" + nombreArchivoSeguro(videojuego.getId()) + ".pdf"));
+
+        int resultado = chooser.showSaveDialog(this);
+        if (resultado != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+
+        try {
+            new FichaTecnicaPDFGenerator().generar(videojuego, chooser.getSelectedFile());
+            JOptionPane.showMessageDialog(this, "Ficha técnica generada correctamente.", "Descarga completa", JOptionPane.INFORMATION_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "No se pudo generar la ficha técnica. Verifica la ubicación e intenta nuevamente.", "Error al generar PDF", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private VideojuegoInfo obtenerVideojuegoSeleccionado() {
+        if (filaSeleccionada < 0 || filaSeleccionada >= datosVideosjuegosFiltrados.size()) {
+            return null;
+        }
+        return datosVideosjuegosFiltrados.get(filaSeleccionada);
+    }
+
+    private String nombreArchivoSeguro(String valor) {
+        String nombre = valor == null || valor.trim().isEmpty() ? "sin_id" : valor.trim();
+        return nombre.replaceAll("[^a-zA-Z0-9._-]", "_");
     }
 
     private void confirmarEliminarSeleccionado() {
