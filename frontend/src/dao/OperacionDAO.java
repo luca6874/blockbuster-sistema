@@ -207,6 +207,65 @@ public class OperacionDAO {
         return compras;
     }
 
+    /**
+     * Obtiene el historial de descuentos/promociones aplicadas.
+     * Solo incluye operaciones donde descuento > 0.
+     * 
+     * @return Lista de arrays con: Juego, Fecha de uso, Cliente, Código de descuento, % descontado
+     */
+    public static List<String[]> obtenerHistorialDescuentos() {
+        List<String[]> descuentos = new ArrayList<>();
+        Connection conn = null;
+
+        try {
+            conn = ConexionBD.conectar();
+
+            String sql = "SELECT o.id_operacion, " +
+                         "v.nombre AS videojuego, " +
+                         "o.fecha_operacion, " +
+                         "CONCAT(c.nombre, ' ', c.primer_apellido, COALESCE(CONCAT(' ', c.segundo_apellido), '')) AS cliente, " +
+                         "o.monto, o.descuento " +
+                         "FROM operaciones o " +
+                         "INNER JOIN clientes c ON o.id_cliente = c.id_cliente " +
+                         "INNER JOIN videojuegos v ON o.id_videojuego = v.id_videojuego " +
+                         "WHERE o.descuento > 0 " +
+                         "ORDER BY o.fecha_operacion DESC, o.id_operacion DESC";
+
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Date fechaOperacion = rs.getDate("fecha_operacion");
+                double monto = rs.getDouble("monto");
+                double descuento = rs.getDouble("descuento");
+                
+                // Calcular porcentaje de descuento
+                double porcentajeDescuento = 0;
+                if (monto > 0) {
+                    porcentajeDescuento = (descuento / monto) * 100;
+                }
+
+                descuentos.add(new String[]{
+                    rs.getString("videojuego") != null ? rs.getString("videojuego") : "",
+                    fechaOperacion != null ? fechaOperacion.toLocalDate().toString() : "N/A",
+                    rs.getString("cliente") != null ? rs.getString("cliente") : "",
+                    String.format("%05d", rs.getInt("id_operacion")),
+                    String.format("%.0f%%", porcentajeDescuento)
+                });
+            }
+
+            rs.close();
+            ps.close();
+        } catch (Exception e) {
+            System.err.println("Error en obtenerHistorialDescuentos: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            ConexionBD.cerrar(conn);
+        }
+
+        return descuentos;
+    }
+
     public static OperacionInfo obtenerPorId(int id) {
         OperacionInfo operacion = null;
         Connection conn = null;

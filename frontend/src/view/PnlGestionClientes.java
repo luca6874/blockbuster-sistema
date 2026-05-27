@@ -27,9 +27,11 @@ public class PnlGestionClientes extends JPanel {
     private static final String[] COLUMNAS_CLIENTES = {"ID", "Nombre completo", "Email", "Estatus", "Nivel", "Acciones"};
     private static final String[] COLUMNAS_HISTORIAL = {"Cliente", "Juego", "Fecha renta", "Fecha dev. (est)", "Estatus", "Accion", "ID cliente"};
     private static final String[] COLUMNAS_COMPRAS = {"Juego", "Cliente", "Fecha de compra", "Inventario actual", "Precio"};
+    private static final String[] COLUMNAS_DESCUENTOS = {"Juego", "Fecha de uso", "Cliente", "Código de descuento", "% descontado"};
     private static final String PLACEHOLDER_BUSQUEDA_CLIENTE = "Buscar por nombre o email...";
     private static final String PLACEHOLDER_BUSQUEDA_HISTORIAL = "Buscar por ID, nombre o fecha...";
     private static final String PLACEHOLDER_BUSQUEDA_COMPRAS = "Buscar por juego, cliente o fecha...";
+    private static final String PLACEHOLDER_BUSQUEDA_DESCUENTOS = "Buscar por juego, cliente o código...";
     private static final int IDX_HIST_ID = 0;
     private static final int IDX_HIST_CLIENTE = 1;
     private static final int IDX_HIST_JUEGO = 2;
@@ -39,15 +41,22 @@ public class PnlGestionClientes extends JPanel {
     private static final int IDX_HIST_CLIENTE_ID = 6;
     private static final int IDX_HIST_PLATAFORMA = 7;
     private static final int IDX_HIST_IMAGEN = 8;
+    private static final int IDX_DESC_JUEGO = 0;
+    private static final int IDX_DESC_FECHA = 1;
+    private static final int IDX_DESC_CLIENTE = 2;
+    private static final int IDX_DESC_CODIGO = 3;
+    private static final int IDX_DESC_PORCENTAJE = 4;
 
     private final ViewDashboard parent;
     private JTable tablaClientes;
     private JTable tablaHistorial;
     private JTable tablaCompras;
+    private JTable tablaDescuentos;
     private JTabbedPane tabbedPane;
     private JTextField txtBuscarCliente;
     private JTextField txtBuscarHistorial;
     private JTextField txtBuscarCompras;
+    private JTextField txtBuscarDescuentos;
     private JComboBox<String> comboEstatusCliente;
     private JComboBox<String> comboEstatusHistorial;
     private JComboBox<String> comboIDClientes;  // Nuevo: combo de IDs de clientes
@@ -64,6 +73,8 @@ public class PnlGestionClientes extends JPanel {
     private List<String[]> comprasHistorial = new ArrayList<>();
     private List<String[]> comprasHistorialFiltradas = new ArrayList<>();
     private boolean actualizandoComboClientes;
+    private List<String[]> descuentosHistorial = new ArrayList<>();
+    private List<String[]> descuentosHistorialFiltrados = new ArrayList<>();
 
     public PnlGestionClientes(ViewDashboard parent) {
         this.parent = parent;
@@ -572,9 +583,7 @@ public class PnlGestionClientes extends JPanel {
         tabbedPane.addTab("Historial de Rentas", panelRentas);
         JPanel panelCompras = createPanelContenidoCompras();
         tabbedPane.addTab("Historial de Compras", panelCompras);
-        JPanel panelDescuentos = new JPanel();
-        panelDescuentos.setBackground(Color.WHITE);
-        panelDescuentos.add(new JLabel("Contenido de Descuentos Aplicados"));
+        JPanel panelDescuentos = createPanelContenidoDescuentos();
         tabbedPane.addTab("Descuentos Aplicados", panelDescuentos);
         panel.add(tabbedPane);
         return panel;
@@ -667,6 +676,48 @@ public class PnlGestionClientes extends JPanel {
         initTablaCompras();
 
         JScrollPane scroll = new JScrollPane(tablaCompras);
+        scroll.setBounds(0, 50, 610, 280);
+        scroll.setBorder(new LineBorder(new Color(200, 200, 200), 1));
+        scroll.getViewport().setBackground(Color.WHITE);
+        panel.add(scroll);
+
+        return panel;
+    }
+    
+    private JPanel createPanelContenidoDescuentos() {
+        JPanel panel = new JPanel(null);
+        panel.setBackground(Color.WHITE);
+        panel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+
+        txtBuscarDescuentos = new JTextField(PLACEHOLDER_BUSQUEDA_DESCUENTOS);
+        txtBuscarDescuentos.setBounds(0, 10, 300, 30);
+        txtBuscarDescuentos.setBorder(new LineBorder(new Color(200, 200, 200), 1, true));
+        txtBuscarDescuentos.setFont(new Font("Arial", Font.PLAIN, 12));
+        txtBuscarDescuentos.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (PLACEHOLDER_BUSQUEDA_DESCUENTOS.equals(txtBuscarDescuentos.getText())) {
+                    txtBuscarDescuentos.setText("");
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (txtBuscarDescuentos.getText().trim().isEmpty()) {
+                    txtBuscarDescuentos.setText(PLACEHOLDER_BUSQUEDA_DESCUENTOS);
+                }
+            }
+        });
+        txtBuscarDescuentos.getDocument().addDocumentListener(new DocumentListener() {
+            @Override public void insertUpdate(DocumentEvent e) { aplicarFiltrosDescuentos(); }
+            @Override public void removeUpdate(DocumentEvent e) { aplicarFiltrosDescuentos(); }
+            @Override public void changedUpdate(DocumentEvent e) { aplicarFiltrosDescuentos(); }
+        });
+        panel.add(txtBuscarDescuentos);
+
+        initTablaDescuentos();
+
+        JScrollPane scroll = new JScrollPane(tablaDescuentos);
         scroll.setBounds(0, 50, 610, 280);
         scroll.setBorder(new LineBorder(new Color(200, 200, 200), 1));
         scroll.getViewport().setBackground(Color.WHITE);
@@ -992,6 +1043,30 @@ public class PnlGestionClientes extends JPanel {
         header.setReorderingAllowed(false);
     }
 
+    private void initTablaDescuentos() {
+        cargarHistorialDescuentosDesdeBD();
+
+        DefaultTableModel modelo = new DefaultTableModel(convertirDescuentosAArray(descuentosHistorial), COLUMNAS_DESCUENTOS) {
+            @Override public boolean isCellEditable(int r, int c) { return false; }
+        };
+
+        tablaDescuentos = new JTable(modelo);
+        tablaDescuentos.setRowHeight(30);
+        tablaDescuentos.setSelectionBackground(new Color(152, 33, 54, 40));
+        tablaDescuentos.setSelectionForeground(Color.BLACK);
+        tablaDescuentos.setShowVerticalLines(false);
+        tablaDescuentos.setGridColor(new Color(235, 235, 235));
+        tablaDescuentos.setFont(new Font("Arial", Font.PLAIN, 11));
+        configurarColumnasDescuentos();
+
+        JTableHeader header = tablaDescuentos.getTableHeader();
+        header.setBackground(Ventana.MAROON_BG);
+        header.setForeground(Color.WHITE);
+        header.setFont(new Font("Arial", Font.BOLD, 11));
+        header.setPreferredSize(new Dimension(0, 30));
+        header.setReorderingAllowed(false);
+    }
+
     private void cargarHistorialRentasDesdeBD() {
         rentasHistorial = OperacionController.obtenerHistorialRentas();
         if (rentasHistorial == null) {
@@ -1006,6 +1081,14 @@ public class PnlGestionClientes extends JPanel {
             comprasHistorial = new ArrayList<>();
         }
         comprasHistorialFiltradas = new ArrayList<>(comprasHistorial);
+    }
+
+    private void cargarHistorialDescuentosDesdeBD() {
+        descuentosHistorial = OperacionController.obtenerHistorialDescuentos();
+        if (descuentosHistorial == null) {
+            descuentosHistorial = new ArrayList<>();
+        }
+        descuentosHistorialFiltrados = new ArrayList<>(descuentosHistorial);
     }
 
     private void configurarColumnasHistorial() {
@@ -1024,6 +1107,14 @@ public class PnlGestionClientes extends JPanel {
         tablaCompras.getColumnModel().getColumn(2).setPreferredWidth(105);
         tablaCompras.getColumnModel().getColumn(3).setPreferredWidth(105);
         tablaCompras.getColumnModel().getColumn(4).setPreferredWidth(80);
+    }
+
+    private void configurarColumnasDescuentos() {
+        tablaDescuentos.getColumnModel().getColumn(0).setPreferredWidth(140);
+        tablaDescuentos.getColumnModel().getColumn(1).setPreferredWidth(100);
+        tablaDescuentos.getColumnModel().getColumn(2).setPreferredWidth(150);
+        tablaDescuentos.getColumnModel().getColumn(3).setPreferredWidth(120);
+        tablaDescuentos.getColumnModel().getColumn(4).setPreferredWidth(100);
     }
 
     private Object[][] convertirRentasAArray(List<String[]> rentas) {
@@ -1059,6 +1150,23 @@ public class PnlGestionClientes extends JPanel {
             datos[i][2] = valorHistorial(compra, 2);
             datos[i][3] = valorHistorial(compra, 3);
             datos[i][4] = valorHistorial(compra, 4);
+        }
+        return datos;
+    }
+
+    private Object[][] convertirDescuentosAArray(List<String[]> descuentos) {
+        if (descuentos == null || descuentos.isEmpty()) {
+            return new Object[0][COLUMNAS_DESCUENTOS.length];
+        }
+
+        Object[][] datos = new Object[descuentos.size()][COLUMNAS_DESCUENTOS.length];
+        for (int i = 0; i < descuentos.size(); i++) {
+            String[] descuento = descuentos.get(i);
+            datos[i][0] = valorHistorial(descuento, IDX_DESC_JUEGO);
+            datos[i][1] = valorHistorial(descuento, IDX_DESC_FECHA);
+            datos[i][2] = valorHistorial(descuento, IDX_DESC_CLIENTE);
+            datos[i][3] = valorHistorial(descuento, IDX_DESC_CODIGO);
+            datos[i][4] = valorHistorial(descuento, IDX_DESC_PORCENTAJE);
         }
         return datos;
     }
@@ -1113,6 +1221,26 @@ public class PnlGestionClientes extends JPanel {
         actualizarTablaCompras();
     }
 
+    private void aplicarFiltrosDescuentos() {
+        if (tablaDescuentos == null || descuentosHistorial == null) return;
+
+        String busqueda = obtenerTextoBusquedaDescuentos();
+        descuentosHistorialFiltrados = new ArrayList<>();
+        for (String[] descuento : descuentosHistorial) {
+            boolean coincideBusqueda = busqueda.isEmpty()
+                    || contiene(valorHistorial(descuento, IDX_DESC_JUEGO), busqueda)
+                    || contiene(valorHistorial(descuento, IDX_DESC_CLIENTE), busqueda)
+                    || contiene(valorHistorial(descuento, IDX_DESC_CODIGO), busqueda)
+                    || contiene(valorHistorial(descuento, IDX_DESC_FECHA), busqueda);
+
+            if (coincideBusqueda) {
+                descuentosHistorialFiltrados.add(descuento);
+            }
+        }
+
+        actualizarTablaDescuentos();
+    }
+
     private void actualizarTablaHistorial() {
         DefaultTableModel modelo = (DefaultTableModel) tablaHistorial.getModel();
         modelo.setDataVector(convertirRentasAArray(rentasHistorialFiltradas), COLUMNAS_HISTORIAL);
@@ -1128,6 +1256,14 @@ public class PnlGestionClientes extends JPanel {
         modelo.setDataVector(convertirComprasAArray(comprasHistorialFiltradas), COLUMNAS_COMPRAS);
         if (tablaCompras.getColumnModel().getColumnCount() > 4) {
             configurarColumnasCompras();
+        }
+    }
+
+    private void actualizarTablaDescuentos() {
+        DefaultTableModel modelo = (DefaultTableModel) tablaDescuentos.getModel();
+        modelo.setDataVector(convertirDescuentosAArray(descuentosHistorialFiltrados), COLUMNAS_DESCUENTOS);
+        if (tablaDescuentos.getColumnModel().getColumnCount() > 4) {
+            configurarColumnasDescuentos();
         }
     }
 
@@ -1176,6 +1312,15 @@ public class PnlGestionClientes extends JPanel {
         if (txtBuscarCompras == null) return "";
         String texto = txtBuscarCompras.getText();
         if (texto == null || PLACEHOLDER_BUSQUEDA_COMPRAS.equals(texto)) {
+            return "";
+        }
+        return texto.trim().toLowerCase(Locale.ROOT);
+    }
+
+    private String obtenerTextoBusquedaDescuentos() {
+        if (txtBuscarDescuentos == null) return "";
+        String texto = txtBuscarDescuentos.getText();
+        if (texto == null || PLACEHOLDER_BUSQUEDA_DESCUENTOS.equals(texto)) {
             return "";
         }
         return texto.trim().toLowerCase(Locale.ROOT);
