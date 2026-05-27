@@ -15,7 +15,7 @@ public class DlgAgregarVideojuego extends JDialog {
     private JComboBox<String> comboPlataforma;
     private JTextField txtAnio;
     private JComboBox<String> comboClasificacion;
-    private JTextField txtGenero;
+    private JComboBox<String> comboGenero;
     private JTextField txtRenta;
     private JTextField txtVenta;
     private JTextField txtStock;
@@ -74,7 +74,7 @@ public class DlgAgregarVideojuego extends JDialog {
         mainPanel.add(comboClasificacion);
 
         comboPlataforma = crearComboPlataforma(mainPanel, "Plataforma", colX, col2Y, 180);
-        txtGenero = crearCampo(mainPanel, "Genero", colX + 200, col2Y, 240);
+        comboGenero = crearComboGenero(mainPanel, "Genero", colX + 200, col2Y, 240);
         txtRenta = crearCampo(mainPanel, "Precio renta", colX, col3Y, 120);
         txtVenta = crearCampo(mainPanel, "Precio venta", colX + 140, col3Y, 120);
         txtStock = crearCampo(mainPanel, "Stock", colX + 280, col3Y, 90);
@@ -146,6 +146,21 @@ public class DlgAgregarVideojuego extends JDialog {
         return combo;
     }
 
+    private JComboBox<String> crearComboGenero(JPanel panel, String label, int x, int y, int w) {
+        JLabel lbl = new JLabel(label);
+        lbl.setBounds(x, y, w, 20);
+        lbl.setFont(new Font("Arial", Font.BOLD, 11));
+        panel.add(lbl);
+
+        JComboBox<String> combo = new JComboBox<>(VideojuegoController.GENEROS_VIDEOJUEGO);
+        combo.setBounds(x, y + 20, w, 30);
+        combo.setBackground(Color.WHITE);
+        combo.setFont(new Font("Arial", Font.PLAIN, 12));
+        combo.setBorder(new LineBorder(new Color(200, 200, 200), 1));
+        panel.add(combo);
+        return combo;
+    }
+
     private void guardarVideojuego() {
         VideojuegoInfo videojuego = construirVideojuego(null);
         if (videojuego == null) {
@@ -178,7 +193,7 @@ public class DlgAgregarVideojuego extends JDialog {
                 id,
                 titulo,
                 (String) comboPlataforma.getSelectedItem(),
-                txtGenero.getText().trim(),
+                obtenerGeneroSeleccionado(),
                 clasificacion,
                 anio,
                 renta,
@@ -202,5 +217,10 @@ public class DlgAgregarVideojuego extends JDialog {
 
     private double parseDecimal(String valor) {
         return valor == null || valor.trim().isEmpty() ? 0.0 : Double.parseDouble(valor.trim().replace("$", ""));
+    }
+
+    private String obtenerGeneroSeleccionado() {
+        Object seleccionado = comboGenero.getSelectedItem();
+        return seleccionado != null ? seleccionado.toString().trim() : "";
     }
 }

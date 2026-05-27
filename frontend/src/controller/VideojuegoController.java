@@ -7,6 +7,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class VideojuegoController {
+    public static final String[] GENEROS_VIDEOJUEGO = {
+        "Acción",
+        "Aventura",
+        "RPG",
+        "FPS",
+        "Terror",
+        "Deportes",
+        "Peleas",
+        "Estrategia",
+        "Simulación",
+        "Plataforma",
+        "Survival",
+        "Mundo Abierto",
+        "Carreras",
+        "Otro"
+    };
 
     public static List<VideojuegoInfo> traerVideojuegosDeBD() {
         try {
