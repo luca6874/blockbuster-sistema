@@ -51,6 +51,16 @@ public class ClienteController {
         }
     }
 
+    public static int sincronizarNivelesFidelidad() {
+        try {
+            return ClienteDAO.sincronizarNivelesFidelidad();
+        } catch (Exception e) {
+            System.err.println("Error al sincronizar niveles desde controller: " + e.getMessage());
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
     /**
      * Obtiene un cliente específico por ID.
      * 

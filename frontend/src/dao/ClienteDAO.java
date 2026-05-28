@@ -26,6 +26,7 @@ public class ClienteDAO {
         Connection conn = null;
 
         try {
+            sincronizarNivelesFidelidad();
             conn = ConexionBD.conectar();
 
             String sql = "SELECT id_cliente, nombre, primer_apellido, segundo_apellido, " +
@@ -59,6 +60,7 @@ public class ClienteDAO {
         Connection conn = null;
 
         try {
+            sincronizarNivelesFidelidad();
             conn = ConexionBD.conectar();
 
             int idNumerico = Integer.parseInt(id.replace("CLI-", ""));
@@ -87,6 +89,69 @@ public class ClienteDAO {
         }
 
         return cliente;
+    }
+
+    public static int sincronizarNivelesFidelidad() {
+        int actualizados = 0;
+        Connection conn = null;
+
+        try {
+            conn = ConexionBD.conectar();
+            conn.setAutoCommit(false);
+
+            String sqlSelect = "SELECT id_cliente, COALESCE(puntos, 0) AS puntos, " +
+                               "COALESCE(lvl_fidelidad, 0) AS lvl_fidelidad " +
+                               "FROM clientes";
+
+            PreparedStatement psSelect = conn.prepareStatement(sqlSelect);
+            ResultSet rs = psSelect.executeQuery();
+
+            String sqlUpdate = "UPDATE clientes SET lvl_fidelidad = ? WHERE id_cliente = ?";
+            PreparedStatement psUpdate = conn.prepareStatement(sqlUpdate);
+
+            while (rs.next()) {
+                int idCliente = rs.getInt("id_cliente");
+                int puntos = rs.getInt("puntos");
+                int nivelActual = rs.getInt("lvl_fidelidad");
+                int nivelCalculado = NivelFidelidad.calcularNivelFidelidad(puntos);
+
+                if (nivelActual != nivelCalculado) {
+                    psUpdate.setInt(1, nivelCalculado);
+                    psUpdate.setInt(2, idCliente);
+                    actualizados += psUpdate.executeUpdate();
+                }
+            }
+
+            rs.close();
+            psSelect.close();
+            psUpdate.close();
+            conn.commit();
+
+            if (actualizados > 0) {
+                System.out.println("Niveles de fidelidad sincronizados: " + actualizados);
+            }
+        } catch (Exception e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (Exception rollbackError) {
+                    System.err.println("Error al revertir sincronizacion de niveles: " + rollbackError.getMessage());
+                }
+            }
+            System.err.println("Error al sincronizar niveles de fidelidad: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                } catch (Exception autoCommitError) {
+                    System.err.println("Error al restaurar autocommit: " + autoCommitError.getMessage());
+                }
+            }
+            ConexionBD.cerrar(conn);
+        }
+
+        return actualizados;
     }
 
     public static boolean agregar(ClienteInfo cliente) {
