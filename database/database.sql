@@ -32,6 +32,7 @@ CREATE TABLE `clientes` (
   `telefono` varchar(10) DEFAULT NULL,
   `lvl_fidelidad` int DEFAULT '0',
   `puntos` int DEFAULT '0',
+  `foto` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id_cliente`),
   UNIQUE KEY `correo_electronico` (`correo_electronico`)
 ) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

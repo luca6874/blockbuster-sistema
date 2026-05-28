@@ -1,6 +1,7 @@
 package frontend.src.controller;
 
 import frontend.src.model.UsuarioInfo;
+import frontend.src.service.ImageManager;
 import frontend.src.view.*;
 import java.awt.*;
 import javax.swing.*;
@@ -341,9 +342,8 @@ public class Ventana extends JFrame {
         JPanel c = new JPanel(null); c.setBackground(CARD_WHITE); c.setBorder(BorderFactory.createLineBorder(ACCENT_RED, 2));
 
         try {
-            ImageIcon icon = new ImageIcon(getClass().getResource("/frontend/src/images/iconExitBig.png"));
-            Image img = icon.getImage().getScaledInstance(150, -1, Image.SCALE_SMOOTH); 
-            JLabel lblIco = new JLabel(new ImageIcon(img));
+            ImageIcon icon = ImageManager.cargarImagenPreview("iconExitBig.png", 150, 150);
+            JLabel lblIco = new JLabel(icon);
             lblIco.setBounds(150, 20, 150, 150); c.add(lblIco);
         } catch (Exception e) {}
 
@@ -370,8 +370,8 @@ public class Ventana extends JFrame {
         JPanel c = new JPanel(null); c.setBackground(CARD_WHITE); c.setBorder(BorderFactory.createLineBorder(ACCENT_RED, 2));
 
         try {
-            ImageIcon i = new ImageIcon(getClass().getResource("/frontend/src/images/iconExitBig.png"));
-            JLabel l = new JLabel(new ImageIcon(i.getImage().getScaledInstance(150, -1, Image.SCALE_SMOOTH)));
+            ImageIcon i = ImageManager.cargarImagenPreview("iconExitBig.png", 150, 150);
+            JLabel l = new JLabel(i);
             l.setBounds(150, 20, 150, 150); c.add(l);
         } catch (Exception e) {}
 

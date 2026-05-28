@@ -1,9 +1,9 @@
 package frontend.src.view;
 
 import frontend.src.controller.Ventana;
+import frontend.src.service.ImageManager;
 
 import java.awt.*;
-import java.net.URL;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 
@@ -31,13 +31,7 @@ public class DlgConfirmarEliminacionVideojuego extends JDialog {
         panel.add(lblImagen);
 
         if (datosVideojuego != null) {
-            try {
-                URL url = getClass().getResource("/frontend/src/images/" + datosVideojuego[5]);
-                if (url != null) {
-                    Image img = new ImageIcon(url).getImage().getScaledInstance(240, 280, Image.SCALE_SMOOTH);
-                    lblImagen.setIcon(new ImageIcon(img));
-                }
-            } catch (Exception ignored) {}
+            lblImagen.setIcon(ImageManager.cargarImagenPreview(datosVideojuego[5], 240, 280));
         }
 
         JPanel detalle = new JPanel(null);

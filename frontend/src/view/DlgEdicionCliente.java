@@ -3,8 +3,11 @@ package frontend.src.view;
 import frontend.src.controller.ClienteController;
 import frontend.src.controller.Ventana;
 import frontend.src.model.ClienteInfo;
+import frontend.src.service.ImageManager;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import java.awt.*;
+import java.io.File;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -26,6 +29,7 @@ public class DlgEdicionCliente extends JDialog {
     private JLabel lblId;
     private JLabel lblFoto;
     private String clienteId;
+    private String fotoActual;  
 
     public DlgEdicionCliente(Ventana host, String clienteId, String nombres, String primerApellido,
                              String email, String telefono, String fechaNacimiento, PnlGestionClientes panelGestion) {
@@ -90,7 +94,7 @@ public class DlgEdicionCliente extends JDialog {
         btnCambiar.setForeground(Color.WHITE);
         btnCambiar.setFont(new Font("Arial", Font.BOLD, 12));
         btnCambiar.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnCambiar.addActionListener(e -> JOptionPane.showMessageDialog(this, "Funcionalidad de cambiar foto proximamente"));
+        btnCambiar.addActionListener(e -> seleccionarFotoPerfil());
         content.add(btnCambiar);
 
         int xDerecha = 180;
@@ -139,7 +143,83 @@ public class DlgEdicionCliente extends JDialog {
         content.add(btnConfirmar);
 
         this.add(content);
+        cargarFotoActualDesdeBD();
+
     }
+
+    private void cargarFotoActualDesdeBD() {
+        ClienteInfo cliente = ClienteController.obtenerClientePorId(clienteId);
+        if (cliente == null) {
+            return;
+        }
+
+        fotoActual = cliente.getFoto();
+        mostrarFoto(fotoActual);
+    }
+
+    private void seleccionarFotoPerfil() {
+
+    JFileChooser fileChooser = new JFileChooser();
+
+    FileNameExtensionFilter filtro = new FileNameExtensionFilter(
+            "Imágenes", "png", "jpg", "jpeg");
+
+    fileChooser.setFileFilter(filtro);
+
+    int resultado = fileChooser.showOpenDialog(this);
+
+    if (resultado == JFileChooser.APPROVE_OPTION) {
+
+        File archivoSeleccionado = fileChooser.getSelectedFile();
+
+        try {
+
+            // Guardar imagen usando ImageManager
+            String nombreImagen = ImageManager.guardarImagen(
+                    archivoSeleccionado);
+
+            if (nombreImagen == null) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "No se pudo guardar la imagen seleccionada.",
+                        "Imagen invalida",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            // Guardar nombre de archivo
+            fotoActual = nombreImagen;
+
+            // Mostrar preview
+            mostrarFoto(nombreImagen);
+
+        } catch (Exception ex) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Error al cargar imagen:\n" + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+
+            ex.printStackTrace();
+        }
+    }
+}
+
+    private void mostrarFoto(String nombreImagen) {
+        ImageIcon icono = ImageManager.cargarImagenPreview(nombreImagen, 110, 110);
+        if (icono != null) {
+            lblFoto.setIcon(icono);
+            lblFoto.setText("");
+            return;
+        }
+
+        lblFoto.setIcon(null);
+        lblFoto.setText("U");
+    }
+
+    
+
 
     private void crearCampo(String label, int x, int y, int w, JPanel p, String valor, java.util.function.Consumer<JTextField> setter) {
         JLabel lbl = new JLabel(label);
@@ -248,6 +328,7 @@ public class DlgEdicionCliente extends JDialog {
         clienteActualizado.setEmail(email);
         clienteActualizado.setTelefono(telefono);
         clienteActualizado.setFechaNacimiento(fechaNacimiento);
+        clienteActualizado.setFoto(fotoActual);
         // Nota: NO establecemos nivel aquí - se calcula automáticamente por puntos en OperacionDAO
 
         boolean exito = ClienteController.actualizarCliente(clienteActualizado);

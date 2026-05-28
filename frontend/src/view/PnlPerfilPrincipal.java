@@ -1,6 +1,7 @@
 package frontend.src.view;
 
 import frontend.src.controller.Ventana;
+import frontend.src.service.ImageManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -56,8 +57,13 @@ public class PnlPerfilPrincipal extends JPanel {
 
     private JLabel parentIcon(ViewDashboard p, String r, int w, int h) {
         try {
-            ImageIcon i = new ImageIcon(getClass().getResource(r));
-            return new JLabel(new ImageIcon(i.getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH)));
+            return new JLabel(ImageManager.cargarImagenPreview(extraerNombreImagen(r), w, h));
         } catch(Exception e) { return new JLabel("!"); }
+    }
+
+    private String extraerNombreImagen(String path) {
+        if (path == null) return null;
+        int slash = path.lastIndexOf('/');
+        return slash >= 0 ? path.substring(slash + 1) : path;
     }
 }

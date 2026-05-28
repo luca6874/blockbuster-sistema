@@ -3,11 +3,11 @@ package frontend.src.view;
 import frontend.src.controller.Ventana;
 import frontend.src.controller.ClienteController;
 import frontend.src.dao.OperacionDAO;
+import frontend.src.service.ImageManager;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
-import java.net.URL;
 
 /**
  * Panel de Resumen del Cliente.
@@ -28,6 +28,7 @@ public class PnlResumenCliente extends JPanel {
     private JLabel lblDescFrecuencia;
     private JLabel badgeEstatus;
     private JLabel badgeFrecuente;
+    private JLabel lblAvatarIcon;
     
     // Datos del cliente actual
     private frontend.src.model.ClienteInfo clienteActual;
@@ -80,18 +81,11 @@ public class PnlResumenCliente extends JPanel {
         avatarCont.setOpaque(false);
         avatarCont.setBounds(15, 30, 50, 50);
 
-        JLabel icon = new JLabel();
-        icon.setHorizontalAlignment(SwingConstants.CENTER);
-        icon.setBounds(0, 0, 50, 50);
-        try {
-            URL url = getClass().getResource("/frontend/src/images/iconUserBig.png");
-            if (url != null) {
-                Image img = new ImageIcon(url).getImage().getScaledInstance(44, 44, Image.SCALE_SMOOTH);
-                icon.setIcon(new ImageIcon(img));
-            }
-        } catch (Exception ignored) {
-        }
-        avatarCont.add(icon);
+        lblAvatarIcon = new JLabel();
+        lblAvatarIcon.setHorizontalAlignment(SwingConstants.CENTER);
+        lblAvatarIcon.setBounds(0, 0, 50, 50);
+        actualizarAvatar(null);
+        avatarCont.add(lblAvatarIcon);
         this.add(avatarCont);
 
         lblNombre = new JLabel("Luis Spinetta");
@@ -222,14 +216,33 @@ public class PnlResumenCliente extends JPanel {
         icon.setHorizontalAlignment(SwingConstants.CENTER);
         icon.setBounds(x, y, 55, 18);
         try {
-            URL url = getClass().getResource(iconPath);
-            if (url != null) {
-                Image img = new ImageIcon(url).getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH);
-                icon.setIcon(new ImageIcon(img));
-            }
+            ImageIcon imageIcon = ImageManager.cargarImagenPreview(normalizarNombreImagen(iconPath), 16, 16);
+            icon.setIcon(imageIcon);
         } catch (Exception ignored) {
         }
         return icon;
+    }
+
+    private String normalizarNombreImagen(String iconPath) {
+        if (iconPath == null) {
+            return null;
+        }
+
+        int slash = iconPath.lastIndexOf('/');
+        return slash >= 0 ? iconPath.substring(slash + 1) : iconPath;
+    }
+
+    private void actualizarAvatar(String foto) {
+        if (lblAvatarIcon == null) {
+            return;
+        }
+
+        ImageIcon avatar = ImageManager.cargarImagenPreview(foto, 44, 44);
+        if (avatar == null) {
+            avatar = ImageManager.cargarImagenPreview("iconUserBig.png", 44, 44);
+        }
+
+        lblAvatarIcon.setIcon(avatar);
     }
     
     private JLabel createTitleLabel(String title, int x, int y) {
@@ -411,6 +424,7 @@ public class PnlResumenCliente extends JPanel {
         }
         
         this.clienteActual = cliente;
+        actualizarAvatar(cliente.getFoto());
         
         // Actualizar nombre completo
         if (lblNombre != null) {

@@ -1,9 +1,9 @@
 package frontend.src.view;
 
 import frontend.src.controller.Ventana;
+import frontend.src.service.ImageManager;
 
 import java.awt.*;
-import java.net.URL;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 
@@ -78,16 +78,9 @@ public class PnlTotalJuego extends JPanel {
 icon.setHorizontalAlignment(SwingConstants.CENTER);
 
 try {
-    URL url = getClass().getResource(path);
+    ImageIcon imageIcon = ImageManager.cargarImagenPreview(extraerNombreImagen(path), 30, 30);
 
-    if (url == null) {
-        System.out.println("No se encontró: " + path);
-    } else {
-        Image img = new ImageIcon(url).getImage()
-                .getScaledInstance(30, 30, Image.SCALE_SMOOTH);
-
-        icon.setIcon(new ImageIcon(img));
-    }
+    icon.setIcon(imageIcon);
 
 } catch (Exception e) {
     e.printStackTrace();
@@ -115,5 +108,11 @@ card.add(icon);
         card.add(num);
 
         return card;
+    }
+
+    private String extraerNombreImagen(String path) {
+        if (path == null) return null;
+        int slash = path.lastIndexOf('/');
+        return slash >= 0 ? path.substring(slash + 1) : path;
     }
 }

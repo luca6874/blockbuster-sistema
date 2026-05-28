@@ -2,6 +2,7 @@ package frontend.src.view;
 
 import frontend.src.controller.Ventana;
 import frontend.src.model.UsuarioInfo;
+import frontend.src.service.ImageManager;
 
 import java.awt.*;
 import javax.swing.*;
@@ -92,18 +93,9 @@ public class PnlInfoEmpleado extends JPanel {
 
     private void initLadoIdentidad(JPanel card) {
         try {
-            java.net.URL url = getClass().getResource("/frontend/src/images/iconUserBig.png");
-
-            if (url == null) {
-                System.out.println("No se encontro la imagen: /frontend/src/images/iconUserBig.png");
-            } else {
-                ImageIcon icon = new ImageIcon(url);
-                JLabel photo = new JLabel(new ImageIcon(
-                        icon.getImage().getScaledInstance(180, 180, Image.SCALE_SMOOTH)
-                ));
-                photo.setBounds(30, 40, 180, 180);
-                card.add(photo);
-            }
+            JLabel photo = new JLabel(ImageManager.cargarImagenPreview("iconUserBig.png", 180, 180));
+            photo.setBounds(30, 40, 180, 180);
+            card.add(photo);
         } catch (Exception e) {
             e.printStackTrace();
         }

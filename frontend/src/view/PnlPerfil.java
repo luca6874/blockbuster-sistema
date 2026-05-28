@@ -2,6 +2,7 @@ package frontend.src.view;
 
 import frontend.src.controller.Ventana;
 import frontend.src.model.UsuarioInfo;
+import frontend.src.service.ImageManager;
 
 import java.awt.*;
 import javax.swing.*;
@@ -27,8 +28,7 @@ public class PnlPerfil extends JPanel {
         this.add(topBar);
 
         try {
-            ImageIcon icon = new ImageIcon(getClass().getResource("/frontend/src/images/iconUserBig.png"));
-            JLabel userPhoto = new JLabel(new ImageIcon(icon.getImage().getScaledInstance(180, 180, Image.SCALE_SMOOTH)));
+            JLabel userPhoto = new JLabel(ImageManager.cargarImagenPreview("iconUserBig.png", 180, 180));
             userPhoto.setBounds(300, 80, 180, 180);
             this.add(userPhoto);
         } catch (Exception e) {}

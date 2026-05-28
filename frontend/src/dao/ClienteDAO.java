@@ -29,7 +29,7 @@ public class ClienteDAO {
             conn = ConexionBD.conectar();
 
             String sql = "SELECT id_cliente, nombre, primer_apellido, segundo_apellido, " +
-                         "correo_electronico, fecha_nacimiento, telefono, lvl_fidelidad, puntos " +
+                         "correo_electronico, fecha_nacimiento, telefono, lvl_fidelidad, puntos, foto " +
                          "FROM clientes " +
                          "ORDER BY nombre ASC";
 
@@ -64,7 +64,7 @@ public class ClienteDAO {
             int idNumerico = Integer.parseInt(id.replace("CLI-", ""));
 
             String sql = "SELECT id_cliente, nombre, primer_apellido, segundo_apellido, " +
-                         "correo_electronico, fecha_nacimiento, telefono, lvl_fidelidad, puntos " +
+                         "correo_electronico, fecha_nacimiento, telefono, lvl_fidelidad, puntos, foto " +
                          "FROM clientes " +
                          "WHERE id_cliente = ?";
 
@@ -99,8 +99,8 @@ public class ClienteDAO {
             int lvlFidelidad = NivelFidelidad.NIVEL_BRONCE;
 
             String sql = "INSERT INTO clientes (nombre, primer_apellido, segundo_apellido, " +
-                         "correo_electronico, fecha_nacimiento, telefono, lvl_fidelidad) " +
-                         "VALUES (?, ?, ?, ?, ?, ?, ?)";
+                         "correo_electronico, fecha_nacimiento, telefono, lvl_fidelidad, foto) " +
+                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, cliente.getNombres());
@@ -110,6 +110,7 @@ public class ClienteDAO {
             setFechaNacimiento(ps, 5, cliente.getFechaNacimiento());
             ps.setString(6, emptyToNull(cliente.getTelefono()));
             ps.setInt(7, lvlFidelidad);
+            ps.setString(8, emptyToNull(cliente.getFoto()));
 
             int filasAfectadas = ps.executeUpdate();
             ps.close();
@@ -132,13 +133,9 @@ public class ClienteDAO {
             conn = ConexionBD.conectar();
 
             int idNumerico = Integer.parseInt(cliente.getId().replace("CLI-", ""));
-            // Mantener el nivel actual del cliente - no cambiamos lvl_fidelidad en actualizaciones de perfil
-            // El nivel se calcula automáticamente solo cuando se agregan operaciones
-            int lvlFidelidad = cliente.getLvlFidelidad() > 0 ? cliente.getLvlFidelidad() : NivelFidelidad.NIVEL_BRONCE;
-
             String sql = "UPDATE clientes " +
                          "SET nombre = ?, primer_apellido = ?, segundo_apellido = ?, correo_electronico = ?, " +
-                         "    fecha_nacimiento = ?, telefono = ?, lvl_fidelidad = ? " +
+                         "    fecha_nacimiento = ?, telefono = ?, foto = ? " +
                          "WHERE id_cliente = ?";
 
             PreparedStatement ps = conn.prepareStatement(sql);
@@ -148,7 +145,7 @@ public class ClienteDAO {
             ps.setString(4, cliente.getEmail());
             setFechaNacimiento(ps, 5, cliente.getFechaNacimiento());
             ps.setString(6, emptyToNull(cliente.getTelefono()));
-            ps.setInt(7, lvlFidelidad);
+            ps.setString(7, emptyToNull(cliente.getFoto()));
             ps.setInt(8, idNumerico);
 
             int filasAfectadas = ps.executeUpdate();
@@ -210,6 +207,7 @@ public class ClienteDAO {
         
         cliente.setFrecuente(lvlFidelidad >= NivelFidelidad.NIVEL_BRONCE);
         cliente.setPuntos(rs.getInt("puntos"));
+        cliente.setFoto(rs.getString("foto"));
         cliente.setTelefono(rs.getString("telefono"));
 
         Date fechaNacimiento = rs.getDate("fecha_nacimiento");

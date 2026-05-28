@@ -1,6 +1,7 @@
 package frontend.src.view;
 
 import frontend.src.controller.Ventana;
+import frontend.src.service.ImageManager;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -191,9 +192,14 @@ public class ViewDashboard extends JPanel {
 
     private JLabel icon(String path, int w, int h) {
         try {
-            ImageIcon i = new ImageIcon(getClass().getResource(path));
-            return new JLabel(new ImageIcon(i.getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH)));
+            return new JLabel(ImageManager.cargarImagenPreview(extraerNombreImagen(path), w, h));
         } catch (Exception e) { return new JLabel(); }
+    }
+
+    private String extraerNombreImagen(String path) {
+        if (path == null) return null;
+        int slash = path.lastIndexOf('/');
+        return slash >= 0 ? path.substring(slash + 1) : path;
     }
 
     public Ventana getHost() { return host; }

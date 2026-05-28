@@ -11,7 +11,6 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
@@ -156,11 +155,6 @@ public class FichaTecnicaPDFGenerator {
 
         String nombre = nombreImagen.trim();
         try {
-            URL url = getClass().getResource("/frontend/src/images/" + nombre);
-            if (url != null) {
-                return ImageIO.read(url);
-            }
-
             File archivo = new File("frontend/src/images", nombre);
             if (archivo.exists()) {
                 return ImageIO.read(archivo);

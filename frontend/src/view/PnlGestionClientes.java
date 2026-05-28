@@ -4,6 +4,7 @@ import frontend.src.controller.Ventana;
 import frontend.src.controller.ClienteController;
 import frontend.src.controller.OperacionController;
 import frontend.src.model.ClienteInfo;
+import frontend.src.service.ImageManager;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -790,13 +791,10 @@ public class PnlGestionClientes extends JPanel {
         
         // Carátula del juego
         JLabel lblCaratula = new JLabel();
-        try {
-            ImageIcon icon = new ImageIcon(getClass().getResource("/images/" + imagen));
-            if (icon.getIconWidth() > 0) {
-                Image img = icon.getImage().getScaledInstance(50, 60, Image.SCALE_SMOOTH);
-                lblCaratula.setIcon(new ImageIcon(img));
-            }
-        } catch (Exception e) {
+        ImageIcon icon = ImageManager.cargarImagenPreview(imagen, 50, 60);
+        if (icon != null) {
+            lblCaratula.setIcon(icon);
+        } else {
             lblCaratula.setText("[Img]");
             lblCaratula.setHorizontalAlignment(SwingConstants.CENTER);
             lblCaratula.setBorder(new LineBorder(Color.GRAY, 1));

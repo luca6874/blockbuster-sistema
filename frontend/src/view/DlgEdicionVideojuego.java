@@ -3,8 +3,10 @@ package frontend.src.view;
 import frontend.src.controller.Ventana;
 import frontend.src.controller.VideojuegoController;
 import frontend.src.model.VideojuegoInfo;
+import frontend.src.service.ImageManager;
 
 import java.awt.*;
+import java.io.File;
 import java.net.URL;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -22,7 +24,7 @@ public class DlgEdicionVideojuego extends JDialog {
     private JTextField txtRenta;
     private JTextField txtVenta;
     private JTextField txtStock;
-    private JTextField txtImagen;
+    private String imagenActual;  // Almacena el nombre del archivo de imagen
 
     public DlgEdicionVideojuego(Ventana parent, VideojuegoInfo videojuego, Runnable onConfirm) {
         super(parent, "Edicion del videojuego", true);
@@ -81,7 +83,17 @@ public class DlgEdicionVideojuego extends JDialog {
         txtRenta = crearCampo(mainPanel, "Precio renta", colX, col3Y, 120);
         txtVenta = crearCampo(mainPanel, "Precio venta", colX + 140, col3Y, 120);
         txtStock = crearCampo(mainPanel, "Stock", colX + 280, col3Y, 90);
-        txtImagen = crearCampo(mainPanel, "Imagen/path", colX, col5Y, 300);
+
+        // Botón para seleccionar imagen
+        JButton btnSeleccionarImagen = new JButton("Seleccionar imagen");
+        btnSeleccionarImagen.setBounds(colX, col5Y, 140, 30);
+        btnSeleccionarImagen.setBackground(new Color(70, 130, 180));
+        btnSeleccionarImagen.setForeground(Color.WHITE);
+        btnSeleccionarImagen.setFont(new Font("Arial", Font.BOLD, 11));
+        btnSeleccionarImagen.setFocusPainted(false);
+        btnSeleccionarImagen.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnSeleccionarImagen.addActionListener(e -> seleccionarNuevaImagen());
+        mainPanel.add(btnSeleccionarImagen);
 
         cargarDatos(videojuego);
 
@@ -198,7 +210,7 @@ public class DlgEdicionVideojuego extends JDialog {
         txtRenta.setText(String.valueOf(videojuego.getPrecioRenta()));
         txtVenta.setText(String.valueOf(videojuego.getPrecioCompra()));
         txtStock.setText(String.valueOf(videojuego.getStock()));
-        txtImagen.setText(videojuego.getImagenUrl() != null ? videojuego.getImagenUrl() : "");
+        imagenActual = videojuego.getImagenUrl();
         cargarImagen(videojuego.getImagenUrl());
     }
 
@@ -240,7 +252,7 @@ public class DlgEdicionVideojuego extends JDialog {
                 renta,
                 venta,
                 stock,
-                txtImagen.getText().trim()
+                imagenActual
             );
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(this, "Stock, precios y anio deben tener formato numerico valido.", "Datos invalidos", JOptionPane.WARNING_MESSAGE);
@@ -272,19 +284,57 @@ public class DlgEdicionVideojuego extends JDialog {
             return;
         }
 
-        try {
-            URL url = getClass().getResource("/frontend/src/images/" + nombreImagen);
-            if (url != null) {
-                Image img = new ImageIcon(url).getImage().getScaledInstance(200, 260, Image.SCALE_SMOOTH);
-                lblImagen.setText("");
-                lblImagen.setIcon(new ImageIcon(img));
-            } else {
-                lblImagen.setIcon(null);
-                lblImagen.setText("Sin imagen");
-            }
-        } catch (Exception ex) {
+        ImageIcon icon = ImageManager.cargarImagenPreview(nombreImagen, 200, 260);
+        if (icon != null) {
+            lblImagen.setText("");
+            lblImagen.setIcon(icon);
+        } else {
             lblImagen.setIcon(null);
             lblImagen.setText("Sin imagen");
         }
     }
-}
+
+    /**
+     * Abre un diálogo para seleccionar una nueva imagen.
+     */
+    private void seleccionarNuevaImagen() {
+        File archivoSeleccionado = ImageManager.seleccionarImagen(this);
+        
+        if (archivoSeleccionado == null) {
+            return; // Usuario canceló
+        }
+
+        if (!ImageManager.validarImagen(archivoSeleccionado)) {
+            JOptionPane.showMessageDialog(
+                this,
+                "El archivo debe ser una imagen válida (PNG, JPG, JPEG) de máximo 5MB",
+                "Archivo inválido",
+                JOptionPane.WARNING_MESSAGE
+            );
+            return;
+        }
+
+        // Guardar la imagen en la carpeta del proyecto
+        String nombreGuardado = ImageManager.guardarImagen(archivoSeleccionado);
+        
+        if (nombreGuardado == null) {
+            JOptionPane.showMessageDialog(
+                this,
+                "Error al guardar la imagen. Verifica los permisos de la carpeta.",
+                "Error",
+                JOptionPane.ERROR_MESSAGE
+            );
+            return;
+        }
+
+        // Actualizar la variable y mostrar preview
+        imagenActual = nombreGuardado;
+        cargarImagen(nombreGuardado);
+        
+        JOptionPane.showMessageDialog(
+            this,
+            "Imagen seleccionada correctamente",
+            "Exito",
+            JOptionPane.INFORMATION_MESSAGE
+        );
+    }}

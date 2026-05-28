@@ -3,6 +3,7 @@ package frontend.src.view;
 import frontend.src.controller.Ventana;
 import frontend.src.controller.LoginController;
 import frontend.src.model.UsuarioInfo;
+import frontend.src.service.ImageManager;
 
 import java.awt.*;
 import javax.swing.*;
@@ -32,8 +33,7 @@ public class ViewLogin extends JPanel {
         JPanel rp = new JPanel(null); rp.setBackground(Ventana.MAROON_BG);
 
         try {
-            ImageIcon ex = new ImageIcon(getClass().getResource("/frontend/src/images/iconExit1.png"));
-            JLabel lEx = new JLabel(new ImageIcon(ex.getImage().getScaledInstance(22, 22, Image.SCALE_SMOOTH)));
+            JLabel lEx = new JLabel(ImageManager.cargarImagenPreview("iconExit1.png", 22, 22));
             lEx.setBounds(555, 525, 45, 45); lEx.setCursor(new Cursor(Cursor.HAND_CURSOR));
             lEx.addMouseListener(new java.awt.event.MouseAdapter() {
                 @Override public void mouseClicked(java.awt.event.MouseEvent e) { host.mostrarConfirmacionSalida(); }

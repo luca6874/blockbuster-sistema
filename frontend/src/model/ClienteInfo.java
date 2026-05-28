@@ -17,6 +17,7 @@ public class ClienteInfo {
     private String fechaNacimiento;
     private int puntos;
     private int lvlFidelidad;  // Nivel de fidelidad (1-4)
+    private String foto;  // Nombre del archivo de foto del perfil
 
     // Constructor vacío (para DAO)
     public ClienteInfo() {
@@ -163,5 +164,13 @@ public class ClienteInfo {
 
     public void setLvlFidelidad(int lvlFidelidad) {
         this.lvlFidelidad = lvlFidelidad;
+    }
+
+    public String getFoto() {
+        return foto;
+    }
+
+    public void setFoto(String foto) {
+        this.foto = foto;
     }
 }

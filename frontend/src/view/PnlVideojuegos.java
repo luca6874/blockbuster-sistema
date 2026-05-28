@@ -4,12 +4,12 @@ import frontend.src.controller.Ventana;
 import frontend.src.controller.VideojuegoController;
 import frontend.src.model.VideojuegoInfo;
 import frontend.src.service.FichaTecnicaPDFGenerator;
+import frontend.src.service.ImageManager;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
@@ -472,16 +472,10 @@ public class PnlVideojuegos extends JPanel {
             return;
         }
 
-        try {
-            URL url = getClass().getResource("/frontend/src/images/" + nombreImagen);
-            if (url != null) {
-                Image img = new ImageIcon(url).getImage().getScaledInstance(140, 180, Image.SCALE_SMOOTH);
-                lblDetalleImagen.setIcon(new ImageIcon(img));
-            } else {
-                lblDetalleImagen.setText("Sin imagen");
-                lblDetalleImagen.setHorizontalAlignment(SwingConstants.CENTER);
-            }
-        } catch (Exception ex) {
+        ImageIcon icon = ImageManager.cargarImagenPreview(nombreImagen, 140, 180);
+        if (icon != null) {
+            lblDetalleImagen.setIcon(icon);
+        } else {
             lblDetalleImagen.setText("Sin imagen");
             lblDetalleImagen.setHorizontalAlignment(SwingConstants.CENTER);
         }
@@ -679,15 +673,10 @@ public class PnlVideojuegos extends JPanel {
                 lblTitulo.setText(videojuego.getTitulo());
                 lblAnio.setText(videojuego.getAnioLanzamiento() > 0 ? "(" + videojuego.getAnioLanzamiento() + ")" : "");
 
-                try {
-                    String imagen = videojuego.getImagenUrl();
-                    URL url = imagen != null ? getClass().getResource("/frontend/src/images/" + imagen) : null;
-                    if (url != null) {
-                        Image img = new ImageIcon(url).getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
-                        lblImagen.setIcon(new ImageIcon(img));
-                    }
-                } catch (Exception ignored) {
-                    lblImagen.setIcon(null);
+                String imagen = videojuego.getImagenUrl();
+                ImageIcon icon = ImageManager.cargarImagenPreview(imagen, 40, 40);
+                if (icon != null) {
+                    lblImagen.setIcon(icon);
                 }
             }
 

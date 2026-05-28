@@ -3,6 +3,7 @@ package frontend.src.view;
 import frontend.src.controller.OperacionController;
 import frontend.src.controller.Ventana;
 import frontend.src.model.OperacionTicketInfo;
+import frontend.src.service.ImageManager;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -400,13 +401,16 @@ public class PnlRentasCompras extends JPanel {
     }
 
     private ImageIcon loadScaledIcon(String path, int width, int height) {
-        try {
-            ImageIcon original = new ImageIcon(getClass().getResource(path));
-            Image image = original.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
-            return new ImageIcon(image);
-        } catch (Exception e) {
+        return ImageManager.cargarImagenPreview(extraerNombreImagen(path), width, height);
+    }
+
+    private String extraerNombreImagen(String path) {
+        if (path == null) {
             return null;
         }
+
+        int slash = path.lastIndexOf('/');
+        return slash >= 0 ? path.substring(slash + 1) : path;
     }
 
     private void initTablaOperaciones() {
