@@ -88,7 +88,7 @@ public class DlgEdicionCliente extends JDialog {
         lblFoto.setText("U");
         content.add(lblFoto);
 
-        JButton btnCambiar = new JButton("Cambiar");
+        JButton btnCambiar = new JButton("Cambiar foto");
         btnCambiar.setBounds(40, 190, 120, 30);
         btnCambiar.setBackground(Ventana.ACCENT_RED);
         btnCambiar.setForeground(Color.WHITE);
@@ -96,6 +96,16 @@ public class DlgEdicionCliente extends JDialog {
         btnCambiar.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnCambiar.addActionListener(e -> seleccionarFotoPerfil());
         content.add(btnCambiar);
+
+        JButton btnQuitar = new JButton("Quitar foto");
+        btnQuitar.setBounds(40, 225, 120, 30);
+        btnQuitar.setContentAreaFilled(false);
+        btnQuitar.setBorder(new LineBorder(Ventana.ACCENT_RED));
+        btnQuitar.setForeground(Ventana.ACCENT_RED);
+        btnQuitar.setFont(new Font("Arial", Font.BOLD, 12));
+        btnQuitar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnQuitar.addActionListener(e -> quitarFotoPerfil());
+        content.add(btnQuitar);
 
         int xDerecha = 180;
         int yInicio = 60;
@@ -218,7 +228,17 @@ public class DlgEdicionCliente extends JDialog {
         lblFoto.setText("U");
     }
 
-    
+    private void quitarFotoPerfil() {
+        if (fotoActual == null || fotoActual.trim().isEmpty()) {
+            mostrarFoto(null);
+            return;
+        }
+
+        ImageManager.eliminarImagen(fotoActual);
+        fotoActual = null;
+        mostrarFoto(null);
+    }
+
 
 
     private void crearCampo(String label, int x, int y, int w, JPanel p, String valor, java.util.function.Consumer<JTextField> setter) {

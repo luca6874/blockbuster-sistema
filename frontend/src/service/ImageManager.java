@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.HashSet;
 import java.util.Set;
@@ -214,11 +215,18 @@ public class ImageManager {
         }
 
         try {
-            File archivo = new File(IMG_DIRECTORY, nombreImagen);
-            if (archivo.exists()) {
-                return archivo.delete();
+            Path directorioImagenes = new File(IMG_DIRECTORY).toPath().toAbsolutePath().normalize();
+            Path archivo = directorioImagenes.resolve(nombreImagen).normalize();
+
+            if (!archivo.startsWith(directorioImagenes)) {
+                return false;
             }
-            return false;
+
+            boolean eliminado = Files.deleteIfExists(archivo);
+            if (eliminado) {
+                usedFilenames.remove(nombreImagen);
+            }
+            return eliminado;
         } catch (Exception e) {
             System.err.println("Error al eliminar imagen: " + e.getMessage());
             return false;
