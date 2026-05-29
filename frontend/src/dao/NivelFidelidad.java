@@ -107,4 +107,35 @@ public class NivelFidelidad {
                 return new int[]{205, 127, 50};    // Default: Bronce
         }
     }
+
+    /**
+     * Obtiene el porcentaje de descuento según el nivel.
+     * 
+     * @param nivel nivel de fidelidad
+     * @return descuento en porcentaje
+     */
+    public static int obtenerDescuentoNivel(int nivel) {
+
+        switch (nivel) {
+
+            case NIVEL_PLATA:
+                return 5;
+
+            case NIVEL_ORO:
+                return 10;
+
+            case NIVEL_DIAMANTE:
+                return 15;
+
+            case NIVEL_BRONCE:
+            default:
+                return 0;
+        }
+}
+
+
+
+
+
+
 }

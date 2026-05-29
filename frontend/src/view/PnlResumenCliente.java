@@ -3,11 +3,17 @@ package frontend.src.view;
 import frontend.src.controller.Ventana;
 import frontend.src.controller.ClienteController;
 import frontend.src.dao.OperacionDAO;
+import frontend.src.service.ClienteInfoPDFGenerator;
 import frontend.src.service.ImageManager;
+import java.io.File;
+import javax.swing.JFileChooser;
+import frontend.src.dao.OperacionDAO;
+import frontend.src.service.ClienteInfoPDFGenerator;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
+import java.io.File;
 
 /**
  * Panel de Resumen del Cliente.
@@ -264,6 +270,70 @@ public class PnlResumenCliente extends JPanel {
     private void addAcciones() {
         JButton btnDescargar = createActionButton("Descargar info", new Color(110, 60, 70));
         btnDescargar.setBounds(15, 205, 110, 26);
+
+        btnDescargar.addActionListener(e ->{
+            if(clienteActual == null) {
+                JOptionPane.showMessageDialog(
+                    this,
+                    "No hay cliente seleccionado",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+
+            try {
+                String idTexto = clienteActual.getId();
+                int idNumerico = Integer.parseInt(idTexto.replace("CLI-", ""));
+
+                int totalCompras = OperacionDAO.contarJuegosComprados(idNumerico);
+                int totalRentas = OperacionDAO.contarJuegosRentados(idNumerico);
+                int totalOperaciones = totalCompras + totalRentas;
+
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setDialogTitle("Guardar resumen del cliente");
+                fileChooser.setSelectedFile(
+                    new File("cliente_" + idTexto + ".pdf")
+                );
+
+
+                int resultado = fileChooser.showSaveDialog(this);
+
+                if (resultado != JFileChooser.APPROVE_OPTION) {
+                    return;
+                }
+
+                File archivo = fileChooser.getSelectedFile();
+
+                ClienteInfoPDFGenerator generator = new ClienteInfoPDFGenerator();
+
+                 generator.generar(
+                    clienteActual,
+                    totalCompras,
+                    totalRentas,
+                    totalOperaciones,
+                    archivo
+                );
+
+                  JOptionPane.showMessageDialog(
+                        this,
+                        "PDF generado exitosamente",
+                        "Éxito",
+                        JOptionPane.INFORMATION_MESSAGE
+                    );
+            }catch (Exception ex) {
+
+                ex.printStackTrace();
+
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Error al generar el PDF:\n" + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+                );
+            }
+        });
+
         this.add(btnDescargar);
 
         JButton btnTarjeta = createActionButton("Generar tarjeta", new Color(152, 33, 54));
