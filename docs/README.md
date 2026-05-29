@@ -21,11 +21,12 @@ El sistema sigue una arquitectura MVC (Model - View - Controller) separada en:
 
 
 ## Estructura del proyecto
-- /backend
 - /frontend
 - /database 
 - /docs
 - /files
+- /frontend/src/images → imágenes de perfil de clientes
+- /frontend/src/service → generación de PDF y utilidades
 
 ## Integrantes
 - Leonardo Mata Romero
@@ -44,6 +45,11 @@ El sistema sigue una arquitectura MVC (Model - View - Controller) separada en:
 - Perfil editable de usuario
 - Validaciones y manejo de errores
 - Navegación funcional entre ventanas
+- Exportación de información de clientes en PDF
+- Generación de credenciales de cliente con fotografía
+- Sistema de imágenes de perfil para clientes
+      Las imágenes de perfil se almacenan localmente en: frontend/src/images
+- Sistema de fidelidad y acumulación de puntos
 
 ## Requisitos para usar el proyecto
 - Tener instalado Java JDK 17 o superior. En el equipo original se probó con Java 24.
@@ -84,5 +90,6 @@ Si el proyecto no reconoce MySQL:
 3. Agregar:
 
 files/mysql-connector-j-9.3.0.jar
-  
+
+NOTA: En caso de haber importado una base de datos antigua, realizar nuevamente la importación.  
 
