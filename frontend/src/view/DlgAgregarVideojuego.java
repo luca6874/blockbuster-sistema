@@ -3,8 +3,11 @@ package frontend.src.view;
 import frontend.src.controller.Ventana;
 import frontend.src.controller.VideojuegoController;
 import frontend.src.model.VideojuegoInfo;
+import frontend.src.service.ImageManager;
 
 import java.awt.*;
+import java.io.File;
+
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 
@@ -19,7 +22,8 @@ public class DlgAgregarVideojuego extends JDialog {
     private JTextField txtRenta;
     private JTextField txtVenta;
     private JTextField txtStock;
-    private JTextField txtImagen;
+    private String imagenActual;
+    private JLabel lblImagen;
 
     public DlgAgregarVideojuego(Ventana parent, Runnable onConfirm) {
         super(parent, "Agregar titulo", true);
@@ -48,12 +52,25 @@ public class DlgAgregarVideojuego extends JDialog {
         banner.add(separator);
         mainPanel.add(banner);
 
-        JLabel lblImagen = new JLabel("Imagen como path");
+        lblImagen = new JLabel("Sin imagen");
         lblImagen.setBounds(20, 80, 200, 260);
         lblImagen.setBorder(new LineBorder(new Color(220, 220, 220), 1));
         lblImagen.setHorizontalAlignment(SwingConstants.CENTER);
+        lblImagen.setVerticalAlignment(SwingConstants.CENTER);
         mainPanel.add(lblImagen);
 
+        JButton btnImagen = new JButton("Seleccionar imagen");
+        btnImagen.setBounds(40, 360, 160, 35);
+        btnImagen.setBackground(new Color(110, 75, 80));
+        btnImagen.setForeground(Color.WHITE);
+        btnImagen.setFocusPainted(false);
+        btnImagen.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        btnImagen.addActionListener(e -> seleccionarNuevaImagen());
+
+        mainPanel.add(btnImagen);
+
+                
         int colX = 240;
         int col1Y = 80;
         int col2Y = 140;
@@ -78,7 +95,6 @@ public class DlgAgregarVideojuego extends JDialog {
         txtRenta = crearCampo(mainPanel, "Precio renta", colX, col3Y, 120);
         txtVenta = crearCampo(mainPanel, "Precio venta", colX + 140, col3Y, 120);
         txtStock = crearCampo(mainPanel, "Stock", colX + 280, col3Y, 90);
-        txtImagen = crearCampo(mainPanel, "Imagen/path", colX, col5Y, 300);
 
         JButton btnConfirmar = new JButton("Confirmar");
         btnConfirmar.setBounds(260, 455, 110, 35);
@@ -173,10 +189,70 @@ public class DlgAgregarVideojuego extends JDialog {
             parent.setOscurecer(false);
             this.dispose();
             if (onConfirm != null) {
+                System.out.println("REFRESCANDO TABLA...");
                 onConfirm.run();
             }
         } else {
             JOptionPane.showMessageDialog(this, "Error al agregar el videojuego. Revisa los datos.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+        private void seleccionarNuevaImagen() {
+
+        File archivoSeleccionado = ImageManager.seleccionarImagen(this);
+
+        if (archivoSeleccionado == null) {
+            return;
+        }
+
+        if (!ImageManager.validarImagen(archivoSeleccionado)) {
+
+            JOptionPane.showMessageDialog(
+                this,
+                "El archivo debe ser una imagen válida",
+                "Archivo inválido",
+                JOptionPane.WARNING_MESSAGE
+            );
+
+            return;
+        }
+
+        String nombreGuardado = ImageManager.guardarImagen(archivoSeleccionado);
+
+        if (nombreGuardado == null) {
+
+            JOptionPane.showMessageDialog(
+                this,
+                "Error al guardar la imagen",
+                "Error",
+                JOptionPane.ERROR_MESSAGE
+            );
+
+            return;
+        }
+
+        imagenActual = nombreGuardado;
+
+        cargarImagen(nombreGuardado);
+    }
+
+    private void cargarImagen(String nombreImagen) {
+
+        ImageIcon icono = ImageManager.cargarImagenPreview(
+            nombreImagen,
+            200,
+            260
+        );
+
+        if (icono != null) {
+
+            lblImagen.setText("");
+            lblImagen.setIcon(icono);
+
+        } else {
+
+            lblImagen.setText("Sin imagen");
+            lblImagen.setIcon(null);
         }
     }
 
@@ -199,7 +275,7 @@ public class DlgAgregarVideojuego extends JDialog {
                 renta,
                 venta,
                 stock,
-                txtImagen.getText().trim()
+                imagenActual
             );
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(this, "Stock, precios y anio deben tener formato numerico valido.", "Datos invalidos", JOptionPane.WARNING_MESSAGE);
