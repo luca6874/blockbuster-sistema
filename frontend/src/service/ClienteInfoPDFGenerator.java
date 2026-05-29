@@ -230,4 +230,6 @@ public class ClienteInfoPDFGenerator {
         }
         return salida.toByteArray();
     }
+
+    
 }

@@ -3,10 +3,11 @@ package frontend.src.view;
 import frontend.src.controller.Ventana;
 import frontend.src.controller.ClienteController;
 import frontend.src.dao.OperacionDAO;
+import frontend.src.service.ClienteCredentialPDFGenerator;
 import frontend.src.service.ClienteInfoPDFGenerator;
 import frontend.src.service.ImageManager;
 import java.io.File;
-import javax.swing.JFileChooser;
+
 import frontend.src.dao.OperacionDAO;
 import frontend.src.service.ClienteInfoPDFGenerator;
 
@@ -338,6 +339,55 @@ public class PnlResumenCliente extends JPanel {
 
         JButton btnTarjeta = createActionButton("Generar tarjeta", new Color(152, 33, 54));
         btnTarjeta.setBounds(130, 205, 110, 26);
+        btnTarjeta.addActionListener(e -> {
+            try {
+                if (clienteActual == null) {
+                    JOptionPane.showMessageDialog(
+                        this,
+                        "No hay cliente seleccionado",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                    return;
+                }
+
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setDialogTitle("Guardar tarjeta de cliente");
+                fileChooser.setSelectedFile(
+                    new File("tarjeta_" + clienteActual.getId() + ".pdf")
+                );
+
+                int opcion = fileChooser.showSaveDialog(this);
+
+                if (opcion != JFileChooser.APPROVE_OPTION) {
+                    return;
+                }
+
+                ClienteCredentialPDFGenerator generator =
+                    new ClienteCredentialPDFGenerator();
+
+                generator.generar(clienteActual, fileChooser.getSelectedFile());
+
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Tarjeta generada exitosamente",
+                    "Éxito",
+                    JOptionPane.INFORMATION_MESSAGE
+                );
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Error al generar la tarjeta",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+                );
+            }
+        });
+
+
         this.add(btnTarjeta);
 
         JButton btnEditar = createActionButton("Editar cliente", new Color(46, 204, 113));
