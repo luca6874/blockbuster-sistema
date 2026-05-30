@@ -1,6 +1,5 @@
 package frontend.src.view;
 
-import frontend.src.controller.Ventana;
 import frontend.src.controller.ClienteController;
 import frontend.src.dao.OperacionDAO;
 import frontend.src.service.ClienteCredentialPDFGenerator;
@@ -8,13 +7,9 @@ import frontend.src.service.ClienteInfoPDFGenerator;
 import frontend.src.service.ImageManager;
 import java.io.File;
 
-import frontend.src.dao.OperacionDAO;
-import frontend.src.service.ClienteInfoPDFGenerator;
-
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
-import java.io.File;
 
 /**
  * Panel de Resumen del Cliente.
@@ -95,13 +90,13 @@ public class PnlResumenCliente extends JPanel {
         avatarCont.add(lblAvatarIcon);
         this.add(avatarCont);
 
-        lblNombre = new JLabel("Luis Spinetta");
+        lblNombre = new JLabel();
         lblNombre.setFont(new Font("Arial", Font.BOLD, 13));
         lblNombre.setForeground(Color.BLACK);
         lblNombre.setBounds(80, 30, 150, 18);
         this.add(lblNombre);
 
-        lblEmail = new JLabel("pescado@rabioso.com");
+        lblEmail = new JLabel();
         lblEmail.setFont(new Font("Arial", Font.PLAIN, 10));
         lblEmail.setForeground(new Color(120, 120, 120));
         lblEmail.setBounds(80, 50, 150, 16);
@@ -507,18 +502,6 @@ public class PnlResumenCliente extends JPanel {
         return clienteActual != null ? clienteActual.getNombres() : "Sin datos";
     }
 
-    private String obtenerApellidos() {
-        if (clienteActual == null) return "Sin datos";
-        StringBuilder apellidos = new StringBuilder();
-        if (clienteActual.getPrimerApellido() != null && !clienteActual.getPrimerApellido().isEmpty()) {
-            apellidos.append(clienteActual.getPrimerApellido());
-        }
-        if (clienteActual.getSegundoApellido() != null && !clienteActual.getSegundoApellido().isEmpty()) {
-            if (apellidos.length() > 0) apellidos.append(" ");
-            apellidos.append(clienteActual.getSegundoApellido());
-        }
-        return apellidos.length() > 0 ? apellidos.toString() : "Sin datos";
-    }
 
     private String obtenerEmail() {
         return clienteActual != null ? clienteActual.getEmail() : "N/A";

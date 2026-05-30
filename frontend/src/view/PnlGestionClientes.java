@@ -65,7 +65,6 @@ public class PnlGestionClientes extends JPanel {
     private JButton btnCrearCliente;
     private JLabel lblTotalClientes;
     private JLabel lblTituloEstadisticas;
-    private JLabel lblJuegosPendientes;
     private PnlTotalJuego pnlTotalJuego;
     private PnlResumenCliente pnlResumenCliente;
     private List<ClienteInfo> clientesActuales;  // Almacena clientes para filtrado

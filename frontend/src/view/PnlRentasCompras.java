@@ -497,7 +497,6 @@ public class PnlRentasCompras extends JPanel {
         filaSeleccionada = fila;
         String[] datos = datosOperacionesFiltradas.get(fila);
         String cliente = datos[IDX_CLIENTE];
-        String videojuego = datos[IDX_VIDEOJUEGO];
         String[] juegoInfo = resolverFichaJuego(datos);
         String descuento = datos[IDX_DESCUENTO];
         double montoBase = parseCurrency(datos[IDX_MONTO]);
@@ -782,16 +781,6 @@ public class PnlRentasCompras extends JPanel {
         return datos[indice].trim();
     }
 
-    private void eliminarOperacionSeleccionada() {
-        if (filaSeleccionada < 0 || filaSeleccionada >= datosOperacionesFiltradas.size()) {
-            return;
-        }
-
-        String idOperacion = valorIndice(datosOperacionesFiltradas.get(filaSeleccionada), IDX_ID);
-        datosOperaciones.removeIf(datos -> valorIndice(datos, IDX_ID).equals(idOperacion));
-        filtrarOperaciones();
-
-    }
 
     private void descargarTicketPDF() {
         int fila = tablaOperaciones != null ? tablaOperaciones.getSelectedRow() : filaSeleccionada;

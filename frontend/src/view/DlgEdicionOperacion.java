@@ -58,7 +58,6 @@ public class DlgEdicionOperacion extends JDialog {
         int col3Y = 170;
         int col4Y = 230;
         int col5Y = 290;
-        int col6Y = 350;
 
         JLabel lblCliente = new JLabel("Cliente");
         lblCliente.setBounds(colX, col1Y, 100, 20);

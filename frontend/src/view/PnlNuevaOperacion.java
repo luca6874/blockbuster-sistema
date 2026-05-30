@@ -434,7 +434,6 @@ public class PnlNuevaOperacion extends JPanel {
             ticketText.append("Carrito vacio\n");
         } else {
             // Obtener el cliente del primer item (todos comparten cliente)
-            OperacionInfo primerItem = carrito.get(0);
             ticketText.append("Cliente: ").append(clienteSeleccionado != null ? clienteSeleccionado.getNombre() : "Sin cliente").append("\n\n");
 
             // Mostrar cada item en el carrito

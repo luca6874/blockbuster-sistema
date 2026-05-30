@@ -1,6 +1,5 @@
 package frontend.src.view;
 
-import frontend.src.controller.Ventana;
 import frontend.src.service.ImageManager;
 
 import java.awt.*;
