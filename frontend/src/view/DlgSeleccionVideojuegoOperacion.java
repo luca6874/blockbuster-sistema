@@ -56,7 +56,7 @@ public class DlgSeleccionVideojuegoOperacion extends JDialog {
         txtBuscar.setBounds(20, 14, 350, 30);
         txtBuscar.setBorder(new LineBorder(BORDER, 1, true));
         txtBuscar.setFont(new Font("Arial", Font.PLAIN, 11));
-        txtBuscar.setText("Buscar por título, género, anio...");
+        txtBuscar.setText("Buscar por título, género, año...");
         txtBuscar.setForeground(new Color(150, 150, 150));
         txtBuscar.addFocusListener(new java.awt.event.FocusAdapter() {
             @Override
