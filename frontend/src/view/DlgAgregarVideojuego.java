@@ -75,8 +75,7 @@ public class DlgAgregarVideojuego extends JDialog {
         int col1Y = 80;
         int col2Y = 140;
         int col3Y = 200;
-        int col4Y = 260;
-        int col5Y = 320;
+       
 
         txtTitulo = crearCampo(mainPanel, "Titulo", colX, col1Y, 200);
         txtAnio = crearCampo(mainPanel, "Anio", colX + 220, col1Y, 80);

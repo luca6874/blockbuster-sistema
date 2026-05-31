@@ -7,7 +7,6 @@ import frontend.src.service.ImageManager;
 
 import java.awt.*;
 import java.io.File;
-import java.net.URL;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 
@@ -63,7 +62,6 @@ public class DlgEdicionVideojuego extends JDialog {
         int col1Y = 90;
         int col2Y = 150;
         int col3Y = 210;
-        int col4Y = 270;
         int col5Y = 330;
 
         txtTitulo = crearCampo(mainPanel, "Titulo", colX, col1Y, 200);

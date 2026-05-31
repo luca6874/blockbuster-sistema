@@ -397,26 +397,6 @@ public class DlgEdicionCliente extends JDialog {
         return texto.matches("^[a-zA-ZáéíóúñüÁÉÍÓÚÑÜàèìòùÀÈÌÒÙäëïöÄËÏÖ ]+$");
     }
 
-    /**
-     * Valida que una fecha tenga formato válido (AAAA-MM-DD o dd-mm-yyyy).
-     * 
-     * @param fechaString la fecha a validar
-     * @return true si es válida, false si no
-     */
-    private boolean fechaValida(String fechaString) {
-        return parseFechaNacimiento(fechaString) != null;
-    }
-
-    /**
-     * Verifica si una fecha es futura comparándola con la fecha actual.
-     * 
-     * @param fechaString la fecha en formato AAAA-MM-DD o dd-mm-yyyy
-     * @return true si la fecha es futura, false si es pasada o actual
-     */
-    private boolean fechaEsFutura(String fechaString) {
-        LocalDate fecha = parseFechaNacimiento(fechaString);
-        return fecha != null && fecha.isAfter(LocalDate.now());
-    }
 
     private LocalDate parseFechaNacimiento(String fechaString) {
         try {

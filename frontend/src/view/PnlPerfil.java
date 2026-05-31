@@ -11,10 +11,8 @@ import javax.swing.*;
  * Vista resumida del administrador dentro del Dashboard.
  */
 public class PnlPerfil extends JPanel {
-    private final ViewDashboard parent;
 
     public PnlPerfil(ViewDashboard parent) {
-        this.parent = parent;
         this.setLayout(null);
         this.setBackground(Ventana.CARD_WHITE);
 
