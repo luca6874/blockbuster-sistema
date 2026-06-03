@@ -31,7 +31,7 @@ public class DlgEdicionOperacion extends JDialog {
     private final String[] datosOperacion;
 
     public DlgEdicionOperacion(Ventana parent, String[] datosOperacion) {
-        super(parent, "Edicion de Operacion", true);
+        super(parent, "Edición de Operación", true);
         this.datosOperacion = datosOperacion;
         this.setUndecorated(true);
         this.setSize(600, 550);
@@ -46,7 +46,7 @@ public class DlgEdicionOperacion extends JDialog {
         header.setBounds(0, 0, 600, 40);
         mainPanel.add(header);
 
-        JLabel lblTitulo = new JLabel("Editar Operacion - ID: " + datosOperacion[IDX_ID]);
+        JLabel lblTitulo = new JLabel("Editar Operación - ID: " + datosOperacion[IDX_ID]);
         lblTitulo.setForeground(Color.WHITE);
         lblTitulo.setFont(new Font("Arial", Font.BOLD, 14));
         lblTitulo.setBounds(15, 10, 500, 20);
@@ -83,7 +83,7 @@ public class DlgEdicionOperacion extends JDialog {
         comboVideojuego.setSelectedItem(datosOperacion[IDX_VIDEOJUEGO]);
         mainPanel.add(comboVideojuego);
 
-        JLabel lblTipo = new JLabel("Tipo de Operacion");
+        JLabel lblTipo = new JLabel("Tipo de Operación");
         lblTipo.setBounds(colX, col3Y, 120, 20);
         lblTipo.setFont(new Font("Arial", Font.BOLD, 11));
         mainPanel.add(lblTipo);

@@ -50,7 +50,7 @@ public class PnlPerfil extends JPanel {
         lblID.setBounds(290, 320, 200, 25);
         this.add(lblID);
 
-        JButton btnInfo = new JButton("Ver informacion");
+        JButton btnInfo = new JButton("Ver información");
         btnInfo.setBounds(290, 360, 200, 30);
         btnInfo.setBackground(Ventana.ACCENT_RED);
         btnInfo.setForeground(Color.WHITE);
@@ -58,7 +58,7 @@ public class PnlPerfil extends JPanel {
         btnInfo.addActionListener(e -> parent.setContenido(new PnlInfoEmpleado(parent)));
         this.add(btnInfo);
 
-        JButton btnCerrar = new JButton("Cerrar sesion");
+        JButton btnCerrar = new JButton("Cerrar sesión");
         btnCerrar.setBounds(290, 400, 200, 30);
         btnCerrar.setContentAreaFilled(false);
         btnCerrar.setBorder(BorderFactory.createLineBorder(Ventana.ACCENT_RED));

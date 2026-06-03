@@ -49,7 +49,7 @@ public class DlgFormCliente extends JDialog {
         txtPrimerApellido = crearCampo("Primer apellido", 250, y, 180, content);
         txtSegundoApellido = crearCampo("Segundo apellido", 450, y, 190, content);
         txtEmail = crearCampo("Correo Electronico", 40, y + 70, 620, content);
-        txtTelefono = crearCampo("Telefono de Contacto", 40, y + 140, 280, content);
+        txtTelefono = crearCampo("Teléfono de Contacto", 40, y + 140, 280, content);
         txtFechaNacimiento = crearCampo("Fecha de nacimiento (yyyy-mm-dd)", 360, y + 140, 280, content);
 
         JButton btnCan = new JButton("Cancelar");
@@ -106,8 +106,8 @@ public class DlgFormCliente extends JDialog {
         if (!telefono.isEmpty() && !telefono.matches("\\d{10}")) {
             JOptionPane.showMessageDialog(
                 this,
-                "El telefono debe tener 10 digitos",
-                "Telefono invalido",
+                "El teléfono debe tener 10 dígitos",
+                "Teléfono inválido",
                 JOptionPane.WARNING_MESSAGE
             );
             return;

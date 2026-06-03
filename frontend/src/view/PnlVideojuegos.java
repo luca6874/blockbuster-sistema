@@ -84,7 +84,7 @@ public class PnlVideojuegos extends JPanel {
         panel.setBackground(Ventana.CARD_WHITE);
         panel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
 
-        txtBuscar = new JTextField("Buscar por nombre, genero, año...");
+        txtBuscar = new JTextField("Buscar por nombre, género, año...");
         txtBuscar.setBounds(10, 10, 350, 30);
         txtBuscar.setBorder(new LineBorder(new Color(200, 200, 200), 1, true));
         txtBuscar.setBackground(Color.WHITE);
@@ -95,7 +95,7 @@ public class PnlVideojuegos extends JPanel {
         txtBuscar.addFocusListener(new java.awt.event.FocusAdapter() {
             @Override
             public void focusGained(java.awt.event.FocusEvent e) {
-                if (txtBuscar.getText().equals("Buscar por nombre, genero, año...")) {
+                if (txtBuscar.getText().equals("Buscar por nombre, género, año...")) {
                     txtBuscar.setText("");
                     txtBuscar.setForeground(Color.BLACK);
                 }
@@ -104,7 +104,7 @@ public class PnlVideojuegos extends JPanel {
             @Override
             public void focusLost(java.awt.event.FocusEvent e) {
                 if (txtBuscar.getText().isEmpty()) {
-                    txtBuscar.setText("Buscar por nombre, genero, año...");
+                    txtBuscar.setText("Buscar por nombre, género, año...");
                     txtBuscar.setForeground(new Color(150, 150, 150));
                 }
             }
@@ -288,7 +288,7 @@ public class PnlVideojuegos extends JPanel {
     }
 
     private void initTablaVideojuegos() {
-        String[] columnas = {"Titulo", "Genero", "Clasificacion", "Renta", "Compra"};
+        String[] columnas = {"Titulo", "Género", "Clasificacion", "Renta", "Compra"};
 
         datosVideojuegos = VideojuegoController.traerVideojuegosDeBD();
         // Inicializar lista filtrada con todos los datos al inicio
@@ -374,7 +374,7 @@ public class PnlVideojuegos extends JPanel {
 
         lblDetalleTitulo.setText("<html><b>" + videojuego.getTitulo() + "</b></html>");
         lblDetallePlataforma.setText("<html>" + valor(videojuego.getPlataforma()) + "</html>");
-        lblDetalleGenero.setText("<html>Genero: " + valor(videojuego.getGenero()) + "</html>");
+        lblDetalleGenero.setText("<html>Género: " + valor(videojuego.getGenero()) + "</html>");
         lblDetalleClasificacion.setText("<html>Clasificacion: " + valor(videojuego.getClasificacion()) + "</html>");
         lblDetalleAnno.setText("<html>Año: " + (videojuego.getAnioLanzamiento() > 0 ? videojuego.getAnioLanzamiento() : "-") + "</html>");
         lblDetalleModo.setText("<html>Modo: " + obtenerModo(videojuego) + "</html>");
@@ -564,7 +564,7 @@ public class PnlVideojuegos extends JPanel {
         
         // Actualizar tabla con datos filtrados
         DefaultTableModel modelo = (DefaultTableModel) tablaVideojuegos.getModel();
-        modelo.setDataVector(convertirVideojuegosAArray(), new String[]{"Titulo", "Genero", "Clasificacion", "Renta", "Compra"});
+        modelo.setDataVector(convertirVideojuegosAArray(), new String[]{"Titulo", "Género", "Clasificacion", "Renta", "Compra"});
         
         // Restaurar renderizadores y anchos de columna
         tablaVideojuegos.getColumnModel().getColumn(0).setPreferredWidth(180);
@@ -595,7 +595,7 @@ public class PnlVideojuegos extends JPanel {
 
     private String obtenerTextoBusqueda() {
         String texto = txtBuscar.getText();
-        if (texto == null || "Buscar por nombre, genero, año...".equals(texto)) {
+        if (texto == null || "Buscar por nombre, género, año...".equals(texto)) {
             return "";
         }
         return texto.trim().toLowerCase();

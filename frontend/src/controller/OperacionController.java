@@ -156,9 +156,9 @@ public class OperacionController {
 
         if (resultado) {
             int puntosGanados = calcularPuntosGanados(monto - descuento);
-            return "Exito: Operacion registrada correctamente. Stock actualizado. Puntos ganados: " + puntosGanados + ".";
+            return "Exito: Operación registrada correctamente. Stock actualizado. Puntos ganados: " + puntosGanados + ".";
         } else {
-            return "Error: No se pudo registrar la operacion.";
+            return "Error: No se pudo registrar la operación.";
         }
     }
 

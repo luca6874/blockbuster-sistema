@@ -84,7 +84,7 @@ public class ViewDashboard extends JPanel {
         });
         sidebar.add(pRentasCompras);
 
-        pNuevaOperacion = crearItemSidebar("Nueva operacion", null, 285);
+        pNuevaOperacion = crearItemSidebar("Nueva operación", null, 285);
         pNuevaOperacion.addMouseListener(new MouseAdapter() {
             @Override public void mouseClicked(MouseEvent e) {
                 mostrarNuevaOperacion();

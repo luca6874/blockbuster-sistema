@@ -318,7 +318,7 @@ public class PnlGestionClientes extends JPanel {
     private void abrirEditarCliente(String clienteId) {
         ClienteInfo cliente = ClienteController.obtenerClientePorId(clienteId);
         if (cliente == null) {
-            JOptionPane.showMessageDialog(this, "No se pudo cargar la informacion del cliente.", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "No se pudo cargar la información del cliente.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -1280,7 +1280,7 @@ public class PnlGestionClientes extends JPanel {
         int opcion = JOptionPane.showConfirmDialog(
                 this,
                 "Marcar esta renta como devuelta y aumentar el stock del videojuego?",
-                "Confirmar devolucion",
+                "Confirmar devolución",
                 JOptionPane.YES_NO_OPTION
         );
         if (opcion != JOptionPane.YES_OPTION) {

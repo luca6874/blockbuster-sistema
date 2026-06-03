@@ -27,7 +27,7 @@ public class PnlInfoEmpleado extends JPanel {
         JPanel topBar = new JPanel(new BorderLayout());
         topBar.setBackground(new Color(110, 60, 70));
         topBar.setBounds(0, 0, 2000, 40);
-        JLabel tB = new JLabel("  Perfil de Administrador - Informacion de Empleado", SwingConstants.LEFT);
+        JLabel tB = new JLabel("  Perfil de Administrador - Información de Empleado", SwingConstants.LEFT);
         tB.setForeground(Color.WHITE);
         tB.setFont(new Font("Arial", Font.BOLD, 14));
         topBar.add(tB);
@@ -61,7 +61,7 @@ public class PnlInfoEmpleado extends JPanel {
 
         llenarCamposConDatosUsuario();
 
-        JButton btnCambiar = new JButton("cambiar informacion");
+        JButton btnCambiar = new JButton("cambiar información");
         btnCambiar.setBounds(400, 400, 160, 35);
         btnCambiar.setContentAreaFilled(false);
         btnCambiar.setBorder(new LineBorder(Ventana.ACCENT_RED, 1, true));
@@ -123,7 +123,7 @@ public class PnlInfoEmpleado extends JPanel {
         btnRegresar.addActionListener(e -> parent.setContenido(new PnlPerfil(parent)));
         card.add(btnRegresar);
 
-        JButton btnCerrar = new JButton("Cerrar sesion");
+        JButton btnCerrar = new JButton("Cerrar sesión");
         btnCerrar.setBounds(50, 350, 140, 30);
         btnCerrar.setContentAreaFilled(false);
         btnCerrar.setBorder(new LineBorder(Ventana.ACCENT_RED, 1, true));

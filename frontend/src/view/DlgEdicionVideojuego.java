@@ -26,7 +26,7 @@ public class DlgEdicionVideojuego extends JDialog {
     private String imagenActual;  // Almacena el nombre del archivo de imagen
 
     public DlgEdicionVideojuego(Ventana parent, VideojuegoInfo videojuego, Runnable onConfirm) {
-        super(parent, "Edicion del videojuego", true);
+        super(parent, "Edición del videojuego", true);
         this.parent = parent;
         this.videojuegoOriginal = videojuego;
         this.onConfirm = onConfirm;
@@ -42,7 +42,7 @@ public class DlgEdicionVideojuego extends JDialog {
         banner.setBounds(0, 0, 650, 60);
         banner.setBackground(new Color(250, 250, 250));
 
-        JLabel lblHeader = new JLabel("Edicion del videojuego");
+        JLabel lblHeader = new JLabel("Edición del videojuego");
         lblHeader.setBounds(25, 10, 400, 40);
         lblHeader.setFont(new Font("Arial", Font.BOLD, 26));
         lblHeader.setForeground(new Color(50, 50, 50));
@@ -77,7 +77,7 @@ public class DlgEdicionVideojuego extends JDialog {
         mainPanel.add(comboClasificacion);
 
         comboPlataforma = crearComboPlataforma(mainPanel, "Plataforma", colX, col2Y, 180);
-        comboGenero = crearComboGenero(mainPanel, "Genero", colX + 200, col2Y, 240);
+        comboGenero = crearComboGenero(mainPanel, "Género", colX + 200, col2Y, 240);
         txtRenta = crearCampo(mainPanel, "Precio renta", colX, col3Y, 120);
         txtVenta = crearCampo(mainPanel, "Precio venta", colX + 140, col3Y, 120);
         txtStock = crearCampo(mainPanel, "Stock", colX + 280, col3Y, 90);

@@ -249,7 +249,7 @@ public class ClienteController {
 
         if (cliente.getTelefono() != null && !cliente.getTelefono().trim().isEmpty()
                 && !cliente.getTelefono().matches("\\d{10}")) {
-            System.err.println("Error: Telefono debe tener 10 digitos");
+            System.err.println("Error: Teléfono debe tener 10 dígitos");
             return false;
         }
 

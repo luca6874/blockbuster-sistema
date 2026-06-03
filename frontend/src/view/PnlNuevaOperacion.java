@@ -88,7 +88,7 @@ public class PnlNuevaOperacion extends JPanel {
         header.setBounds(0, 0, 528, 28);
         panel.add(header);
 
-        JLabel lblHeader = new JLabel("Nueva operacion");
+        JLabel lblHeader = new JLabel("Nueva operación");
         lblHeader.setForeground(Color.WHITE);
         lblHeader.setFont(new Font("Arial", Font.PLAIN, 12));
         lblHeader.setBounds(10, 5, 150, 18);
@@ -120,7 +120,7 @@ public class PnlNuevaOperacion extends JPanel {
         sepDos.setForeground(BORDER);
         panel.add(sepDos);
 
-        JLabel lblTipo = createSectionLabel("Tipo de operacion", 16, 198, 140);
+        JLabel lblTipo = createSectionLabel("Tipo de operación", 16, 198, 140);
         panel.add(lblTipo);
 
         JComboBox<String> comboTipo = createComboBox(new String[]{
@@ -141,7 +141,7 @@ public class PnlNuevaOperacion extends JPanel {
         this.comboDescuento.setToolTipText("Selecciona un cliente para cargar descuentos disponibles.");
         panel.add(this.comboDescuento);
 
-        JLabel lblFecha = createSectionLabel("Fecha de devolucion", 16, 266, 160);
+        JLabel lblFecha = createSectionLabel("Fecha de devolución", 16, 266, 160);
         panel.add(lblFecha);
 
         this.txtFecha = createTextField();
@@ -177,7 +177,7 @@ public class PnlNuevaOperacion extends JPanel {
 
         actualizarTicket();
 
-        btnConfirmar = createActionButton("Confirmar operacion", GREEN_BTN, new Color(57, 127, 58));
+        btnConfirmar = createActionButton("Confirmar operación", GREEN_BTN, new Color(57, 127, 58));
         btnConfirmar.setBounds(10, 290, 120, 28);
         btnConfirmar.setEnabled(false);
         btnConfirmar.addActionListener(e -> confirmarOperaciones());
@@ -344,7 +344,7 @@ public class PnlNuevaOperacion extends JPanel {
         int idUsuario = usuarioActual != null ? usuarioActual.getIdUsuario() : 0;
 
         if (idCliente <= 0 || idVideojuego <= 0 || idUsuario <= 0) {
-            JOptionPane.showMessageDialog(this, "No se pudo obtener el cliente, videojuego o usuario de la operacion.", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "No se pudo obtener el cliente, videojuego o usuario de la operación.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
         LocalDate fechaOperacion = LocalDate.now();
@@ -524,7 +524,7 @@ public class PnlNuevaOperacion extends JPanel {
         }
 
         // Mostrar resultado
-        String mensaje = "Operacion completada:\n" +
+        String mensaje = "Operación completada:\n" +
                          "Exitosas: " + exitosas + "\n" +
                          "Fallidas: " + fallidas + "\n" +
                          "Puntos ganados: " + puntosGanados;

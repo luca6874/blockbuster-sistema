@@ -14,7 +14,7 @@ public class TicketPDFGenerator {
 
     public void generar(OperacionTicketInfo ticket, File destino) throws Exception {
         if (ticket == null) {
-            throw new IllegalArgumentException("No hay datos de operacion para generar el ticket.");
+            throw new IllegalArgumentException("No hay datos de operación para generar el ticket.");
         }
         if (destino == null) {
             throw new IllegalArgumentException("No se selecciono una ruta de destino.");
@@ -71,20 +71,20 @@ public class TicketPDFGenerator {
         contenido.append("Q\n");
 
         texto(contenido, "F2", 18, 36, 606, "BRIARBUSTER");
-        texto(contenido, "F1", 10, 36, 592, "Ticket / comprobante de operacion");
+        texto(contenido, "F1", 10, 36, 592, "Ticket / comprobante de operación");
         texto(contenido, "F1", 9, 282, 606, "Generado: " + LocalDateTime.now().format(FECHA_GENERACION));
 
         linea(contenido, 36, 558, 348);
-        texto(contenido, "F2", 13, 36, 536, "Operacion " + ticket.getIdOperacion());
+        texto(contenido, "F2", 13, 36, 536, "Operación " + ticket.getIdOperacion());
 
         int y = 506;
         y = fila(contenido, y, "Tipo", ticket.getTipo());
         y = fila(contenido, y, "Cliente", ticket.getCliente());
         y = fila(contenido, y, "Videojuego", ticket.getVideojuego());
         y = fila(contenido, y, "Plataforma", ticket.getPlataforma());
-        y = fila(contenido, y, "Fecha de operacion", ticket.getFechaOperacion());
+        y = fila(contenido, y, "Fecha de operación", ticket.getFechaOperacion());
         if (ticket.esRenta()) {
-            y = fila(contenido, y, "Fecha de devolucion", ticket.getFechaDevolucion());
+            y = fila(contenido, y, "Fecha de devolución", ticket.getFechaDevolucion());
         }
         y = fila(contenido, y, "Monto", ticket.getMonto());
         y = fila(contenido, y, "Descuento", ticket.getDescuento());

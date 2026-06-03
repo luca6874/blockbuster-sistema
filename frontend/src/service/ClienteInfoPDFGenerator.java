@@ -73,7 +73,7 @@ public class ClienteInfoPDFGenerator {
         y = dibujarFila(g, y, "Nombre completo", cliente.getNombre());
         y = dibujarFila(g, y, "ID cliente", cliente.getId());
         y = dibujarFila(g, y, "Correo electronico", cliente.getEmail());
-        y = dibujarFila(g, y, "Telefono", cliente.getTelefono());
+        y = dibujarFila(g, y, "Teléfono", cliente.getTelefono());
 
         y += 18;
         y = dibujarSeccion(g, y, "Fidelidad");

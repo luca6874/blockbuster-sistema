@@ -153,7 +153,7 @@ public class PnlRentasCompras extends JPanel {
         comboTipo.setFont(new Font("Arial", Font.PLAIN, 12));
         panel.add(comboTipo);
 
-        JButton btnNuevaOperacion = new JButton("+ Nueva operacion");
+        JButton btnNuevaOperacion = new JButton("+ Nueva operación");
         btnNuevaOperacion.setBounds(790, 10, 140, 30);
         btnNuevaOperacion.setBackground(Ventana.ACCENT_RED);
         btnNuevaOperacion.setForeground(Color.WHITE);
@@ -211,7 +211,7 @@ public class PnlRentasCompras extends JPanel {
     private JPanel createPanelDetalle() {
         JPanel panel = createRoundedPanel(Ventana.CARD_WHITE, DETAIL_BORDER, 26);
 
-        JLabel lblTitulo = new JLabel("Detalle de Operacion");
+        JLabel lblTitulo = new JLabel("Detalle de Operación");
         lblTitulo.setBounds(16, 12, 180, 22);
         lblTitulo.setFont(new Font("Arial", Font.BOLD, 14));
         lblTitulo.setForeground(Color.BLACK);
@@ -516,7 +516,7 @@ public class PnlRentasCompras extends JPanel {
         lblDetalleTipo.setText(datos[IDX_TIPO]);
         configurarBadgeTipo(datos[IDX_TIPO]);
 
-        lblDetalleFechaRenta.setText("Fecha de operacion: " + datos[IDX_FECHA_OPERACION]);
+        lblDetalleFechaRenta.setText("Fecha de operación: " + datos[IDX_FECHA_OPERACION]);
         if ("N/A".equalsIgnoreCase(datos[IDX_FECHA_VENCIMIENTO])) {
             lblDetalleFechaVencimiento.setText("Entrega: inmediata");
         } else {
@@ -555,14 +555,14 @@ public class PnlRentasCompras extends JPanel {
         }
 
         lblDetalleID.setText("ID: ----");
-        lblDetalleCliente.setText("Selecciona una operacion");
+        lblDetalleCliente.setText("Selecciona una operación");
         lblDetalleCorreo.setText("El detalle aparecera aqui.");
         lblDetalleAvatar.setText("--");
         lblDetalleVideojuego.setText("Sin videojuego");
-        lblDetalleSubtitulo.setText("Selecciona una fila para ver mas informacion.");
+        lblDetalleSubtitulo.setText("Selecciona una fila para ver más información.");
         lblDetallePlataforma.setText("Plataforma: --");
         lblDetalleTipo.setText("Tipo");
-        lblDetalleFechaRenta.setText("Fecha de operacion: --");
+        lblDetalleFechaRenta.setText("Fecha de operación: --");
         lblDetalleFechaVencimiento.setText("Fecha limite: --");
         lblDetalleEstado.setText("Sin estado");
         lblDetalleMonto.setText("$0.00");
@@ -789,7 +789,7 @@ public class PnlRentasCompras extends JPanel {
         }
 
         if (filaSeleccionada < 0 || filaSeleccionada >= datosOperacionesFiltradas.size()) {
-            JOptionPane.showMessageDialog(this, "Selecciona una operacion para generar el PDF.", "Sin operacion seleccionada", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Selecciona una operación para generar el PDF.", "Sin operación seleccionada", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
@@ -891,7 +891,7 @@ public class PnlRentasCompras extends JPanel {
     private String[] resolverFichaJuego(String[] datos) {
         return new String[]{
             datos[IDX_VIDEOJUEGO],
-            "Operacion " + datos[IDX_TIPO].toLowerCase(Locale.ROOT),
+            "Operación " + datos[IDX_TIPO].toLowerCase(Locale.ROOT),
             datos[IDX_PLATAFORMA],
             datos[IDX_IMAGEN]
         };

@@ -90,7 +90,7 @@ public class DlgAgregarVideojuego extends JDialog {
         mainPanel.add(comboClasificacion);
 
         comboPlataforma = crearComboPlataforma(mainPanel, "Plataforma", colX, col2Y, 180);
-        comboGenero = crearComboGenero(mainPanel, "Genero", colX + 200, col2Y, 240);
+        comboGenero = crearComboGenero(mainPanel, "Género", colX + 200, col2Y, 240);
         txtRenta = crearCampo(mainPanel, "Precio renta", colX, col3Y, 120);
         txtVenta = crearCampo(mainPanel, "Precio venta", colX + 140, col3Y, 120);
         txtStock = crearCampo(mainPanel, "Stock", colX + 280, col3Y, 90);

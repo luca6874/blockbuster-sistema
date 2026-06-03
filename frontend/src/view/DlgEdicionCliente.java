@@ -58,7 +58,7 @@ public class DlgEdicionCliente extends JDialog {
         };
         content.setOpaque(false);
 
-        JLabel lblTit = new JLabel("Editar informacion del cliente");
+        JLabel lblTit = new JLabel("Editar información del cliente");
         lblTit.setBounds(40, 20, 400, 25);
         lblTit.setFont(new Font("Arial", Font.BOLD, 18));
         lblTit.setForeground(Ventana.MAROON_BG);
@@ -115,7 +115,7 @@ public class DlgEdicionCliente extends JDialog {
         crearCampo("Primer apellido", xDerecha + 180, yInicio, 150, content, primerApellido, result -> txtPrimerApellido = result);
         crearCampo("Segundo apellido", xDerecha + 350, yInicio, 150, content, segundoApellido, result -> txtSegundoApellido = result);
         crearCampo("E-mail", xDerecha, yInicio + espaciado, 520, content, email, result -> txtEmail = result);
-        crearCampo("Telefono", xDerecha, yInicio + espaciado * 2, 280, content, telefono, result -> txtTelefono = result);
+        crearCampo("Teléfono", xDerecha, yInicio + espaciado * 2, 280, content, telefono, result -> txtTelefono = result);
         crearCampo("Fecha nacimiento (dd-mm-yyyy)", xDerecha + 320, yInicio + espaciado * 2, 180, content, fechaNacimiento, result -> txtFechaNacimiento = result);
 
         JLabel lblIdLabel = new JLabel("ID:");
@@ -299,8 +299,8 @@ public class DlgEdicionCliente extends JDialog {
         if (!telefono.isEmpty() && !telefono.matches("\\d{10}")) {
             JOptionPane.showMessageDialog(
                 this,
-                "El telefono debe tener 10 digitos",
-                "Telefono invalido",
+                "El teléfono debe tener 10 dígitos",
+                "Teléfono inválido",
                 JOptionPane.WARNING_MESSAGE
             );
             return;
