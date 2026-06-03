@@ -144,7 +144,7 @@ public class VideojuegoController {
         int anio = videojuego.getAnioLanzamiento();
         int anioMaximo = Year.now().getValue() + 1;
         if (anio != 0 && (anio < 1970 || anio > anioMaximo)) {
-            System.err.println("Error: Anio de lanzamiento invalido");
+            System.err.println("Error: Año de lanzamiento inválido");
             return false;
         }
 

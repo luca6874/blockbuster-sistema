@@ -77,7 +77,7 @@ public class FichaTecnicaPDFGenerator {
         y = dibujarFila(g, y, "Plataforma", valor(videojuego.getPlataforma()));
         y = dibujarFila(g, y, "Genero", valor(videojuego.getGenero()));
         y = dibujarFila(g, y, "Clasificacion", valor(videojuego.getClasificacion()));
-        y = dibujarFila(g, y, "Anio de lanzamiento", videojuego.getAnioLanzamiento() > 0 ? String.valueOf(videojuego.getAnioLanzamiento()) : "-");
+        y = dibujarFila(g, y, "Año de lanzamiento", videojuego.getAnioLanzamiento() > 0 ? String.valueOf(videojuego.getAnioLanzamiento()) : "-");
         y = dibujarFila(g, y, "Precio renta", formatoMoneda(videojuego.getPrecioRenta()));
         y = dibujarFila(g, y, "Precio compra", formatoMoneda(videojuego.getPrecioCompra()));
         y = dibujarFila(g, y, "Stock actual", String.valueOf(videojuego.getStock()));

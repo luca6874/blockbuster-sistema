@@ -65,7 +65,7 @@ public class DlgEdicionVideojuego extends JDialog {
         int col5Y = 330;
 
         txtTitulo = crearCampo(mainPanel, "Titulo", colX, col1Y, 200);
-        txtAnio = crearCampo(mainPanel, "Anio", colX + 220, col1Y, 80);
+        txtAnio = crearCampo(mainPanel, "Año", colX + 220, col1Y, 80);
 
         JLabel lblClasif = new JLabel("Clasificacion");
         lblClasif.setBounds(colX + 320, col1Y, 90, 20);
@@ -253,7 +253,7 @@ public class DlgEdicionVideojuego extends JDialog {
                 imagenActual
             );
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Stock, precios y anio deben tener formato numerico valido.", "Datos invalidos", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Stock, precios y año deben tener formato numerico valido.", "Datos invalidos", JOptionPane.WARNING_MESSAGE);
             return null;
         }
     }

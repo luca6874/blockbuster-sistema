@@ -84,7 +84,7 @@ public class PnlVideojuegos extends JPanel {
         panel.setBackground(Ventana.CARD_WHITE);
         panel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
 
-        txtBuscar = new JTextField("Buscar por nombre, genero, anio...");
+        txtBuscar = new JTextField("Buscar por nombre, genero, año...");
         txtBuscar.setBounds(10, 10, 350, 30);
         txtBuscar.setBorder(new LineBorder(new Color(200, 200, 200), 1, true));
         txtBuscar.setBackground(Color.WHITE);
@@ -95,7 +95,7 @@ public class PnlVideojuegos extends JPanel {
         txtBuscar.addFocusListener(new java.awt.event.FocusAdapter() {
             @Override
             public void focusGained(java.awt.event.FocusEvent e) {
-                if (txtBuscar.getText().equals("Buscar por nombre, genero, anio...")) {
+                if (txtBuscar.getText().equals("Buscar por nombre, genero, año...")) {
                     txtBuscar.setText("");
                     txtBuscar.setForeground(Color.BLACK);
                 }
@@ -104,7 +104,7 @@ public class PnlVideojuegos extends JPanel {
             @Override
             public void focusLost(java.awt.event.FocusEvent e) {
                 if (txtBuscar.getText().isEmpty()) {
-                    txtBuscar.setText("Buscar por nombre, genero, anio...");
+                    txtBuscar.setText("Buscar por nombre, genero, año...");
                     txtBuscar.setForeground(new Color(150, 150, 150));
                 }
             }
@@ -376,7 +376,7 @@ public class PnlVideojuegos extends JPanel {
         lblDetallePlataforma.setText("<html>" + valor(videojuego.getPlataforma()) + "</html>");
         lblDetalleGenero.setText("<html>Genero: " + valor(videojuego.getGenero()) + "</html>");
         lblDetalleClasificacion.setText("<html>Clasificacion: " + valor(videojuego.getClasificacion()) + "</html>");
-        lblDetalleAnno.setText("<html>Anio: " + (videojuego.getAnioLanzamiento() > 0 ? videojuego.getAnioLanzamiento() : "-") + "</html>");
+        lblDetalleAnno.setText("<html>Año: " + (videojuego.getAnioLanzamiento() > 0 ? videojuego.getAnioLanzamiento() : "-") + "</html>");
         lblDetalleModo.setText("<html>Modo: " + obtenerModo(videojuego) + "</html>");
         lblDetalleRenta.setText("Renta: " + formatoMoneda(videojuego.getPrecioRenta()));
         lblDetalleCompra.setText("Venta: " + formatoMoneda(videojuego.getPrecioCompra()));
@@ -595,7 +595,7 @@ public class PnlVideojuegos extends JPanel {
 
     private String obtenerTextoBusqueda() {
         String texto = txtBuscar.getText();
-        if (texto == null || "Buscar por nombre, genero, anio...".equals(texto)) {
+        if (texto == null || "Buscar por nombre, genero, año...".equals(texto)) {
             return "";
         }
         return texto.trim().toLowerCase();
