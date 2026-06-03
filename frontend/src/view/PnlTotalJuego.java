@@ -1,15 +1,24 @@
 package frontend.src.view;
 
 import frontend.src.service.ImageManager;
+import frontend.src.dao.OperacionDAO;
 
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 
 /**
- * Panel de Total Juegos - Versión Corregida con Tamaño Ajustado.
+ * Panel de Total Juegos - Conectado a base de datos en tiempo real.
+ * Muestra:
+ * - Total de videojuegos rentados
+ * - Total de videojuegos vendidos
+ * - Total de videojuegos pendientes de devolución
  */
 public class PnlTotalJuego extends JPanel {
+
+    private JLabel lblRentados;
+    private JLabel lblVendidos;
+    private JLabel lblPendientes;
 
     public PnlTotalJuego() {
         this.setLayout(null);
@@ -23,36 +32,60 @@ public class PnlTotalJuego extends JPanel {
         ));
 
         initComponentes();
+        cargarDatos();
     }
 
     private void initComponentes() {
 
-        // Tarjeta izquierda
+        // Tarjeta izquierda - Juegos Rentados
         JPanel cardRentados = createCardVertical(
-                "Juegos", "rentados", "20",
+                "Juegos", "rentados", "",
                 "/frontend/src/images/iconVideoGame1.png",
                 20, 20
         );
+        lblRentados = (JLabel) cardRentados.getComponent(3); // El número es el 4º componente
         this.add(cardRentados);
 
-        // Tarjeta derecha
+        // Tarjeta derecha - Juegos Vendidos
         JPanel cardVendidos = createCardVertical(
-                "Juegos", "vendidos", "18",
+                "Juegos", "vendidos", "",
                 "/frontend/src/images/money.png",
                 125, 20
         );
+        lblVendidos = (JLabel) cardVendidos.getComponent(3); // El número es el 4º componente
         this.add(cardVendidos);
 
-        // Texto inferior
-        JLabel lblPendientes = new JLabel("Total juegos pendientes :");
-        lblPendientes.setFont(new Font("Arial", Font.PLAIN, 12));
-        lblPendientes.setBounds(20, 150, 170, 20);
-        this.add(lblPendientes);
+        // Texto inferior - Juegos Pendientes
+        JLabel lblTexto = new JLabel("Total juegos pendientes :");
+        lblTexto.setFont(new Font("Arial", Font.PLAIN, 12));
+        lblTexto.setBounds(20, 150, 170, 20);
+        this.add(lblTexto);
 
-        JLabel lblNum = new JLabel("18");
-        lblNum.setFont(new Font("Arial", Font.BOLD, 16));
-        lblNum.setBounds(190, 150, 40, 20);
-        this.add(lblNum);
+        lblPendientes = new JLabel("0");
+        lblPendientes.setFont(new Font("Arial", Font.BOLD, 16));
+        lblPendientes.setBounds(190, 150, 40, 20);
+        this.add(lblPendientes);
+    }
+
+    private void cargarDatos() {
+        try {
+            // Obtener datos de la BD
+            int juegosRentados = OperacionDAO.contarTotalJuegosRentados();
+            int juegosVendidos = OperacionDAO.contarTotalJuegosVendidos();
+            int juegosPendientes = OperacionDAO.contarTotalJuegosPendientes();
+
+            // Actualizar labels
+            lblRentados.setText(String.valueOf(juegosRentados));
+            lblVendidos.setText(String.valueOf(juegosVendidos));
+            lblPendientes.setText(String.valueOf(juegosPendientes));
+        } catch (Exception e) {
+            System.err.println("Error al cargar datos de operaciones: " + e.getMessage());
+            e.printStackTrace();
+            // Valores por defecto en caso de error
+            lblRentados.setText("0");
+            lblVendidos.setText("0");
+            lblPendientes.setText("0");
+        }
     }
 
     private JPanel createCardVertical(String l1, String l2, String cantidad, String path, int x, int y) {
@@ -74,33 +107,31 @@ public class PnlTotalJuego extends JPanel {
 
         // Icono
         JLabel icon = new JLabel();
-icon.setHorizontalAlignment(SwingConstants.CENTER);
+        icon.setHorizontalAlignment(SwingConstants.CENTER);
 
-try {
-    ImageIcon imageIcon = ImageManager.cargarImagenPreview(extraerNombreImagen(path), 30, 30);
+        try {
+            ImageIcon imageIcon = ImageManager.cargarImagenPreview(extraerNombreImagen(path), 30, 30);
+            icon.setIcon(imageIcon);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-    icon.setIcon(imageIcon);
+        icon.setBounds(0, 8, 100, 30);
+        card.add(icon);
 
-} catch (Exception e) {
-    e.printStackTrace();
-}
-
-
-icon.setBounds(0, 8, 100, 30);
-card.add(icon);
-
-        // Texto
+        // Texto línea 1
         JLabel t1 = new JLabel(l1, SwingConstants.CENTER);
         t1.setFont(new Font("Arial", Font.PLAIN, 11));
         t1.setBounds(0, 35, 100, 15);
         card.add(t1);
 
+        // Texto línea 2
         JLabel t2 = new JLabel(l2, SwingConstants.CENTER);
         t2.setFont(new Font("Arial", Font.PLAIN, 11));
         t2.setBounds(0, 50, 100, 15);
         card.add(t2);
 
-        // Número
+        // Número (inicialmente vacío, se llenará dinámicamente)
         JLabel num = new JLabel(cantidad, SwingConstants.CENTER);
         num.setFont(new Font("Arial", Font.BOLD, 20));
         num.setBounds(0, 70, 100, 30);

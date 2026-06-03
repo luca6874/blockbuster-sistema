@@ -30,7 +30,7 @@ public class OperacionDAO {
             conn = ConexionBD.conectar();
 
             String sql = "SELECT id_operacion, id_cliente, id_videojuego, id_usuario, tipo, " +
-                         "monto, descuento, fecha_operacion, fecha_devolucion " +
+                         "monto, descuento, fecha_operacion, fecha_devolucion, devuelto " +
                          "FROM operaciones " +
                          "ORDER BY fecha_operacion DESC";
 
@@ -274,7 +274,7 @@ public class OperacionDAO {
             conn = ConexionBD.conectar();
 
             String sql = "SELECT id_operacion, id_cliente, id_videojuego, id_usuario, tipo, " +
-                         "monto, descuento, fecha_operacion, fecha_devolucion " +
+                         "monto, descuento, fecha_operacion, fecha_devolucion, devuelto " +
                          "FROM operaciones " +
                          "WHERE id_operacion = ?";
 
@@ -307,7 +307,7 @@ public class OperacionDAO {
             conn = ConexionBD.conectar();
 
             String sql = "SELECT id_operacion, id_cliente, id_videojuego, id_usuario, tipo, " +
-                         "monto, descuento, fecha_operacion, fecha_devolucion " +
+                         "monto, descuento, fecha_operacion, fecha_devolucion, devuelto " +
                          "FROM operaciones " +
                          "WHERE id_cliente = ? " +
                          "ORDER BY fecha_operacion DESC";
@@ -692,6 +692,115 @@ public class OperacionDAO {
         }
     }
 
+    /**
+     * Cuenta el total de videojuegos rentados en todo el sistema.
+     * 
+     * @return Cantidad total de juegos rentados
+     */
+    public static int contarTotalJuegosRentados() {
+        Connection conn = null;
+
+        try {
+            conn = ConexionBD.conectar();
+
+            String sql = "SELECT COUNT(*) as total FROM operaciones " +
+                         "WHERE UPPER(tipo) = 'RENTA'";
+
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+
+            int total = 0;
+            if (rs.next()) {
+                total = rs.getInt("total");
+            }
+
+            rs.close();
+            ps.close();
+
+            return total;
+
+        } catch (Exception e) {
+            System.err.println("Error en contarTotalJuegosRentados: " + e.getMessage());
+            e.printStackTrace();
+            return 0;
+        } finally {
+            ConexionBD.cerrar(conn);
+        }
+    }
+
+    /**
+     * Cuenta el total de videojuegos vendidos/comprados en todo el sistema.
+     * 
+     * @return Cantidad total de juegos vendidos
+     */
+    public static int contarTotalJuegosVendidos() {
+        Connection conn = null;
+
+        try {
+            conn = ConexionBD.conectar();
+
+            String sql = "SELECT COUNT(*) as total FROM operaciones " +
+                         "WHERE UPPER(tipo) = 'COMPRA'";
+
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+
+            int total = 0;
+            if (rs.next()) {
+                total = rs.getInt("total");
+            }
+
+            rs.close();
+            ps.close();
+
+            return total;
+
+        } catch (Exception e) {
+            System.err.println("Error en contarTotalJuegosVendidos: " + e.getMessage());
+            e.printStackTrace();
+            return 0;
+        } finally {
+            ConexionBD.cerrar(conn);
+        }
+    }
+
+    /**
+     * Cuenta el total de videojuegos rentados que aún no han sido devueltos.
+     * Solo cuenta rentas con devuelto = false (rentas activas/pendientes).
+     * 
+     * @return Cantidad de juegos pendientes de devolución
+     */
+    public static int contarTotalJuegosPendientes() {
+        Connection conn = null;
+
+        try {
+            conn = ConexionBD.conectar();
+
+            String sql = "SELECT COUNT(*) as total FROM operaciones " +
+                         "WHERE UPPER(tipo) = 'RENTA' AND devuelto = FALSE";
+
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+
+            int total = 0;
+            if (rs.next()) {
+                total = rs.getInt("total");
+            }
+
+            rs.close();
+            ps.close();
+
+            return total;
+
+        } catch (Exception e) {
+            System.err.println("Error en contarTotalJuegosPendientes: " + e.getMessage());
+            e.printStackTrace();
+            return 0;
+        } finally {
+            ConexionBD.cerrar(conn);
+        }
+    }
+
     private static OperacionInfo mapearOperacion(ResultSet rs) throws Exception {
         OperacionInfo operacion = new OperacionInfo();
         operacion.setIdOperacion(rs.getInt("id_operacion"));
@@ -707,6 +816,8 @@ public class OperacionDAO {
 
         Date fechaDevolucion = rs.getDate("fecha_devolucion");
         operacion.setFechaDevolucion(fechaDevolucion != null ? fechaDevolucion.toLocalDate() : null);
+
+        operacion.setDevuelto(rs.getBoolean("devuelto"));
 
         return operacion;
     }

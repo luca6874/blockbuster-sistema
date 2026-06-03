@@ -16,6 +16,7 @@ public class OperacionInfo {
     private double descuento;
     private LocalDate fechaOperacion;
     private LocalDate fechaDevolucion;
+    private boolean devuelto; // true si la renta fue devuelta
 
     // Constructor vacío (para DAO)
     public OperacionInfo() {
@@ -102,6 +103,10 @@ public class OperacionInfo {
         return fechaDevolucion;
     }
 
+    public boolean isDevuelto() {
+        return devuelto;
+    }
+
     // SETTERS
     public void setIdOperacion(int idOperacion) {
         this.idOperacion = idOperacion;
@@ -137,5 +142,9 @@ public class OperacionInfo {
 
     public void setFechaDevolucion(LocalDate fechaDevolucion) {
         this.fechaDevolucion = fechaDevolucion;
+    }
+
+    public void setDevuelto(boolean devuelto) {
+        this.devuelto = devuelto;
     }
 }
