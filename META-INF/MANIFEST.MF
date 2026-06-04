@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Main-Class: frontend.src.controller.Main
+Created-By: 21.0.9 (JetBrains s.r.o.)
+

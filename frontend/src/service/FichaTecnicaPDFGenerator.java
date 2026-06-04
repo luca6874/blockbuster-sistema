@@ -11,6 +11,7 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
@@ -154,6 +155,23 @@ public class FichaTecnicaPDFGenerator {
         }
 
         String nombre = nombreImagen.trim();
+        
+        // Intentar cargar desde classpath (recursos del JAR)
+        try {
+            String rutaRecurso = "/frontend/src/images/" + nombre;
+            InputStream is = FichaTecnicaPDFGenerator.class.getResourceAsStream(rutaRecurso);
+            if (is != null) {
+                BufferedImage img = ImageIO.read(is);
+                is.close();
+                if (img != null) {
+                    return img;
+                }
+            }
+        } catch (Exception ignored) {
+            // Silenciosamente fallar e intentar desde filesystem
+        }
+        
+        // Fallback: intentar cargar desde filesystem (para desarrollo)
         try {
             File archivo = new File("frontend/src/images", nombre);
             if (archivo.exists()) {

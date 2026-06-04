@@ -6,6 +6,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -162,6 +163,45 @@ public class ImageManager {
     }
 
     /**
+     * Carga una imagen desde el classpath (recursos del JAR) o desde filesystem como fallback.
+     * Intenta primero desde recursos (para ejecución en JAR), luego desde archivo (para desarrollo).
+     * @param nombreImagen nombre del archivo de imagen
+     * @return BufferedImage cargada, o null si no se encuentra
+     */
+    private static BufferedImage cargarImagenDesdeRecurso(String nombreImagen) {
+        if (nombreImagen == null || nombreImagen.trim().isEmpty()) {
+            return null;
+        }
+
+        // Intentar cargar desde classpath (recursos del JAR)
+        try {
+            String rutaRecurso = "/frontend/src/images/" + nombreImagen;
+            InputStream is = ImageManager.class.getResourceAsStream(rutaRecurso);
+            if (is != null) {
+                BufferedImage img = ImageIO.read(is);
+                is.close();
+                if (img != null) {
+                    return img;
+                }
+            }
+        } catch (IOException e) {
+            // Silenciosamente fallar e intentar desde filesystem
+        }
+
+        // Fallback: intentar cargar desde filesystem (para desarrollo)
+        try {
+            File archivo = new File(IMG_DIRECTORY, nombreImagen);
+            if (archivo.exists()) {
+                return ImageIO.read(archivo);
+            }
+        } catch (IOException e) {
+            // Silenciosamente fallar
+        }
+
+        return null;
+    }
+
+    /**
      * Carga una imagen para mostrar preview.
      * @param nombreImagen nombre del archivo de imagen
      * @param anchoMax ancho máximo para escalar
@@ -173,35 +213,25 @@ public class ImageManager {
             return null;
         }
 
-        try {
-            File archivo = new File(IMG_DIRECTORY, nombreImagen);
-            if (!archivo.exists()) {
-                return null;
-            }
-
-            BufferedImage img = ImageIO.read(archivo);
-            if (img == null) {
-                return null;
-            }
-
-            // Escalar manteniendo proporción
-            int ancho = img.getWidth();
-            int alto = img.getHeight();
-            
-            double escalaAncho = (double) anchoMax / ancho;
-            double escalaAlto = (double) altoMax / alto;
-            double escala = Math.min(escalaAncho, escalaAlto);
-            
-            int nuevoAncho = (int) (ancho * escala);
-            int nuevoAlto = (int) (alto * escala);
-            
-            Image imgEscalada = img.getScaledInstance(nuevoAncho, nuevoAlto, Image.SCALE_SMOOTH);
-            return new ImageIcon(imgEscalada);
-
-        } catch (IOException e) {
-            System.err.println("Error al cargar imagen: " + e.getMessage());
+        // Cargar desde recursos (JAR o filesystem)
+        BufferedImage img = cargarImagenDesdeRecurso(nombreImagen);
+        if (img == null) {
             return null;
         }
+
+        // Escalar manteniendo proporción
+        int ancho = img.getWidth();
+        int alto = img.getHeight();
+        
+        double escalaAncho = (double) anchoMax / ancho;
+        double escalaAlto = (double) altoMax / alto;
+        double escala = Math.min(escalaAncho, escalaAlto);
+        
+        int nuevoAncho = (int) (ancho * escala);
+        int nuevoAlto = (int) (alto * escala);
+        
+        Image imgEscalada = img.getScaledInstance(nuevoAncho, nuevoAlto, Image.SCALE_SMOOTH);
+        return new ImageIcon(imgEscalada);
     }
 
     /**
