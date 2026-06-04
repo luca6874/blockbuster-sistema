@@ -52,11 +52,10 @@ El sistema sigue una arquitectura MVC (Model - View - Controller) separada en:
 - Sistema de fidelidad y acumulación de puntos
 
 ## Requisitos para usar el proyecto
-- Tener instalado Java JDK 17 o superior. En el equipo original se probó con Java 24.
-- Tener instalado Visual Studio Code o Eclipse IDE for Java Developers.
-- En caso de usar VS Code, instalar la extensión:
-    Extension Pack for Java de Microsoft.
-- MySQL Server
+
+- Java JDK 24 o superior.
+- MySQL Server 8.0 o superior.
+- (Opcional) Visual Studio Code o Eclipse para ejecutar desde código fuente.
 
 ## Instrucciones de ejecucion
 - Descargar o clonar el proyecto.
@@ -91,5 +90,19 @@ Si el proyecto no reconoce MySQL:
 
 files/mysql-connector-j-9.3.0.jar
 
-NOTA: En caso de haber importado una base de datos antigua, realizar nuevamente la importación.  
+NOTA: En caso de haber importado una base de datos antigua, realizar nuevamente la importación. 
+
+## Ejecución mediante archivo .jar
+
+1. Tener instalado Java 24 o superior.
+2. Abrir una terminal en la carpeta donde se encuentra:
+
+blockbuster-sistema.jar
+
+3. Ejecutar:
+
+java -jar blockbuster-sistema.jar
+
+Nota:
+El archivo .jar ya incluye las librerías necesarias para MySQL Connector/J.
 
