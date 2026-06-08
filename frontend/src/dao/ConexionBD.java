@@ -16,9 +16,9 @@ import java.sql.DriverManager;
  */
 public class ConexionBD {
     
-    private static final String URL = "jdbc:mysql://localhost:3306/blockbuster"; 
-    private static final String USUARIO = "root"; // modificar aqui el usuario si no es root
-    private static final String PASSWORD = "Kenseigod_7"; //modificar aqui la contraseña
+    private static final String URL = "jdbc:mysql://sql.freedb.tech:3306/freedb_rgWhpCAU"; 
+    private static final String USUARIO = "u_MaNFrd"; // modificar aqui el usuario si no es root
+    private static final String PASSWORD = "JoiMn585ysCT"; //modificar aqui la contraseña
     private static final String DRIVER = "com.mysql.cj.jdbc.Driver";
 
     /**

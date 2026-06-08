@@ -3,7 +3,7 @@ param(
     [switch]$OnlyPackage
 )
 
-$projectRoot = "."
+$projectRoot = (Get-Location).Path
 $srcDir = "frontend\src"
 $buildDir = "build"
 $classesDir = "$buildDir\classes"
@@ -138,13 +138,25 @@ $manifestContent = "Manifest-Version: 1.0`nMain-Class: frontend.src.controller.M
 $manifestFile = "$manifestDir\MANIFEST.MF"
 [System.IO.File]::WriteAllText($manifestFile, $manifestContent, [System.Text.Encoding]::ASCII)
 
-$jarPath = "$buildDir\$jarName"
-Push-Location -Path $classesDir
-& $jarExe -cfm "$jarPath" "..\..\$manifestFile" .
+# Obtener ruta absoluta del proyecto
+$projectAbsPath = (Get-Location).Path
+$jarAbsPath = Join-Path -Path (Join-Path -Path $projectAbsPath -ChildPath "build") -ChildPath "blockbuster-sistema.jar"
+$classesAbsPath = Join-Path -Path (Join-Path -Path $projectAbsPath -ChildPath "build") -ChildPath "classes"
+$manifestAbsPath = Join-Path -Path (Join-Path -Path (Join-Path -Path $projectAbsPath -ChildPath "build") -ChildPath "manifest") -ChildPath "MANIFEST.MF"
+
+Write-Host "DEBUG: Rutas absolutas:"
+Write-Host "  JAR: $jarAbsPath"
+Write-Host "  Classes: $classesAbsPath"
+Write-Host "  Manifest: $manifestAbsPath"
+
+Push-Location -Path $classesAbsPath
+Write-Host "DEBUG: Ubicacion actual: $(Get-Location)"
+& $jarExe -cfm $jarAbsPath $manifestAbsPath .
+$jarCreateResult = $LASTEXITCODE
 Pop-Location
 
-if ($LASTEXITCODE -ne 0) {
-    Write-Host "ERROR - No se pudo crear el JAR" -ForegroundColor Red
+if ($jarCreateResult -ne 0) {
+    Write-Host "ERROR - No se pudo crear el JAR (código: $jarCreateResult)" -ForegroundColor Red
     exit 1
 }
 
@@ -152,7 +164,7 @@ Write-Host "OK - JAR generado" -ForegroundColor Green
 
 Write-Host ""
 Write-Host "[5/5] Verificando contenido del JAR..." -ForegroundColor Cyan
-$jarContents = & $jarExe -tf $jarPath 2>&1
+$jarContents = & $jarExe -tf $jarAbsPath 2>&1
 
 $hasImages = $jarContents | Select-String -Pattern "images/.*\.(png|jpg|jpeg)" | Measure-Object | Select-Object -ExpandProperty Count
 $hasClasses = $jarContents | Select-String -Pattern "Main\.class" | Measure-Object | Select-Object -ExpandProperty Count
@@ -178,12 +190,12 @@ if ($hasMysql -gt 0) {
     Write-Host "  [ERROR] MySQL Connector NO encontrado en el JAR" -ForegroundColor Red
 }
 
-$jarSize = (Get-Item $jarPath).Length / 1MB
+$jarSize = (Get-Item $jarAbsPath).Length / 1MB
 Write-Host ""
 Write-Host "=== Compilacion completada ===" -ForegroundColor Cyan
-Write-Host "Archivo JAR: $jarPath" -ForegroundColor Cyan
+Write-Host "Archivo JAR: $jarAbsPath" -ForegroundColor Cyan
 Write-Host "Tamaño: $([math]::Round($jarSize, 2)) MB" -ForegroundColor Cyan
-Write-Host "Comando: java -jar $jarPath" -ForegroundColor Cyan
+Write-Host "Comando: java -jar $jarAbsPath" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "NOTA: Este JAR es completamente portable." -ForegroundColor Green
 Write-Host "      No requiere dependencias externas." -ForegroundColor Green
